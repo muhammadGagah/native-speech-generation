@@ -32,18 +32,11 @@ Key Features:
 
 To get started, obtain a Gemini API key from Google AI Studio and enter it in the add-on's settings panel, found under NVDA's Tools menu."""),
 	# version
-	addon_version="1.5.1",
+	addon_version="1.5.2",
 	# Brief changelog for this version
 	# Translators: what's new content for the add-on version to be shown in the add-on store
-	addon_changelog=_("""-Fix issue with SSL.
-- Fixing libraries that conflict with other add-ons.
-- Refactor codebase and fix dependency issues
-- Add "Reinstall Libraries" feature to replace google-genai on errors
-- New Feature: "Talk With AI" (Gemini Live)
-- New Feature: Added "Grounding with Google Search" in Talk With AI.
-- Update compatibility: require minimum NVDA 2024.1
-- Add Russian translation
-- Fix README file issues."""),
+	addon_changelog=_("""- Reverting the lib updator code due to SSL issues
+- Now talkWithAI has a feature to change the input and output used."""),
 	# Author(s)
 	addon_author="Muhammad <muha.aku@gmail.com>",
 	# URL for the add-on documentation support

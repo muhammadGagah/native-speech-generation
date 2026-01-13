@@ -11,7 +11,6 @@ import shutil
 import glob
 from logHandler import log
 from collections.abc import Callable
-import ssl
 
 addonHandler.initTranslation()
 
@@ -20,41 +19,6 @@ LIB_URL = "https://github.com/MuhammadGagah/python-library-add-on-Native-Speech-
 # Centralized Path Definitions
 ADDON_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LIB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib")
-
-
-def create_windows_ssl_context() -> ssl.SSLContext:
-    """
-    Creates an SSL Context that trusts the Windows Certificate Store.
-    This resolves SslCertVerifyError in environments with Antivirus/Proxy inspection.
-    """
-    try:
-        ctx = ssl.create_default_context()
-        count = 0 
-        
-        # Load ROOT certificates
-        try:
-            for cert in ssl.enum_certificates("ROOT"):
-                ctx.load_verify_locations(cadata=cert)
-                count += 1
-        except Exception as e:
-            log.warning(f"lib_updater: Failed to load ROOT certs: {e}")
-
-        # Load CA certificates
-        try:
-            for cert in ssl.enum_certificates("CA"):
-                ctx.load_verify_locations(cadata=cert)
-                count += 1
-        except Exception as e:
-            log.warning(f"lib_updater: Failed to load CA certs: {e}")
-
-        log.info(f"lib_updater: Windows SSL Context Initialized. Loaded {count} system certificates.")
-        return ctx
-
-    except Exception as e:
-        log.error(f"lib_updater: Fallback - Failed to create Windows SSL context: {e}", exc_info=True)
-        # Fallback to default if everything fails, though this is unlikely
-        return ssl.create_default_context()
-
 
 
 def cleanup_trash() -> None:
@@ -91,12 +55,8 @@ def download_and_extract(addon_dir: str, progress_callback: Callable[[int, str],
 
     try:
         wx.CallAfter(progress_callback, 10, _("Downloading libraries..."))
-        
-        # Use our custom Windows-trusted SSL context
-        ssl_ctx = create_windows_ssl_context()
-        
         # Download the file
-        with urllib.request.urlopen(LIB_URL, context=ssl_ctx, timeout=30) as response, open(zip_path, "wb") as out_file:
+        with urllib.request.urlopen(LIB_URL) as response, open(zip_path, "wb") as out_file:
             total_length = response.length
             if total_length:
                 dl = 0

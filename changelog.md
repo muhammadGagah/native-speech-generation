@@ -1,3 +1,7 @@
+**changelog v1.5.2**
+- Reverting the lib updator code due to SSL issues
+- Now talkWithAI has a feature to change the input and output used.
+
 **changelog v1.5.1**
 
 - Fix issue with SSL.
