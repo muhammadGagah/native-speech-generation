@@ -14,7 +14,7 @@ from collections.abc import Callable
 
 addonHandler.initTranslation()
 
-LIB_URL = "https://github.com/MuhammadGagah/python-library-add-on-Native-Speech-Generation/releases/latest/download/lib.zip"
+LIB_URL = "https://github.com/muhammadGagah/python-library-add-on-Native-Speech-Generation/releases/latest/download/lib.zip"
 
 # Centralized Path Definitions
 ADDON_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
