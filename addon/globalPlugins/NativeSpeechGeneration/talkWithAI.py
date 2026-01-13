@@ -71,6 +71,12 @@ class TalkWithAIDialog(wx.Dialog):
         self.play_thread = None
         self.volume = 80 # Default volume percentage
         
+        # Audio Device Selection
+        self.input_devices = self._get_device_list(input=True)
+        self.output_devices = self._get_device_list(input=False)
+        self.selected_input_idx = None
+        self.selected_output_idx = None
+
         self._build_ui()
         
         if not pyaudio:
@@ -82,6 +88,30 @@ class TalkWithAIDialog(wx.Dialog):
 
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char_hook)
+
+    def _get_device_list(self, input=True):
+        """Returns a list of dicts: {'index': int, 'name': str}"""
+        devices = []
+        if not pyaudio:
+             return devices
+        p = pyaudio.PyAudio()
+        try:
+            info = p.get_host_api_info_by_index(0)
+            num_devices = info.get('deviceCount')
+            for i in range(num_devices):
+                dev = p.get_device_info_by_host_api_device_index(0, i)
+                if input:
+                    if dev.get('maxInputChannels') > 0:
+                         devices.append({'index': i, 'name': dev.get('name')})
+                else:
+                    if dev.get('maxOutputChannels') > 0:
+                         devices.append({'index': i, 'name': dev.get('name')})
+        except Exception as e:
+            log.error(f"Error listing devices: {e}")
+        finally:
+            p.terminate()
+        return devices
+
 
     def _build_ui(self):
         # Main Sizer
@@ -112,11 +142,37 @@ class TalkWithAIDialog(wx.Dialog):
         btn_sizer.Add(self.disconnect_btn, 1, wx.LEFT, 5)
         controls_sizer.Add(btn_sizer, 0, wx.EXPAND | wx.ALL, 5)
         
-        # Mic Toggle
         self.mic_btn = wx.ToggleButton(panel, label=_("Microphone: ON"))
         self.mic_btn.SetValue(True)
         self.mic_btn.Bind(wx.EVT_TOGGLEBUTTON, self.on_mic_toggle)
         controls_sizer.Add(self.mic_btn, 0, wx.ALL | wx.EXPAND, 5)
+
+        # Device Selection Sizer
+        self.device_sizer = wx.BoxSizer(wx.VERTICAL)
+        
+        # Input Device
+        input_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        input_label = wx.StaticText(panel, label=_("Microphone:"))
+        input_choices = [d['name'] for d in self.input_devices]
+        self.input_choice = wx.Choice(panel, choices=input_choices)
+        if input_choices:
+             self.input_choice.SetSelection(0)
+        input_sizer.Add(input_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        input_sizer.Add(self.input_choice, 1, wx.EXPAND)
+        self.device_sizer.Add(input_sizer, 0, wx.ALL | wx.EXPAND, 5)
+
+        # Output Device
+        output_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        output_label = wx.StaticText(panel, label=_("Speaker:"))
+        output_choices = [d['name'] for d in self.output_devices]
+        self.output_choice = wx.Choice(panel, choices=output_choices)
+        if output_choices:
+             self.output_choice.SetSelection(0)
+        output_sizer.Add(output_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+        output_sizer.Add(self.output_choice, 1, wx.EXPAND)
+        self.device_sizer.Add(output_sizer, 0, wx.ALL | wx.EXPAND, 5)
+        
+        controls_sizer.Add(self.device_sizer, 0, wx.EXPAND)
 
         # Google Search Checkbox
         self.google_search_cb = wx.CheckBox(panel, label=_("Grounding with Google Search"))
@@ -166,9 +222,40 @@ class TalkWithAIDialog(wx.Dialog):
         self.connect_btn.Disable()
         self.disconnect_btn.Enable()
         
-        # Store state and hide checkbox
+        # Store state and hide checkbox & device selection
         self.use_google_search = self.google_search_cb.GetValue()
         self.google_search_cb.Hide()
+        
+        # Get selected devices
+        in_sel = self.input_choice.GetSelection()
+        if in_sel != wx.NOT_FOUND and self.input_devices:
+             self.selected_input_idx = self.input_devices[in_sel]['index']
+        
+        out_sel = self.output_choice.GetSelection()
+        if out_sel != wx.NOT_FOUND and self.output_devices:
+             self.selected_output_idx = self.output_devices[out_sel]['index']
+
+        # Hide device selection by hiding their sizer items provided the sizer exists
+        # Actually easier to hide the controls
+        self.input_choice.Hide()
+        self.output_choice.Hide()
+        # To truly hide the space, we might need to detach or hide via sizer but simple Hide() usually works well enough in wx
+        # A cleaner way is to Hide the sizer or panel area
+        # Let's verify if hiding controls collapses layout
+        # We can recursively hide the static texts too if we want, but let's keep it simple first. 
+        # Better: Hide list controls, maybe the labels too.
+        # Let's hide the whole device_sizer content manually or if we put it in a panel.
+        # For now, just hiding choices is requested, but labels should probably go too.
+        # Let's use ShowItems on sizer if possible or just loop
+        for child in self.device_sizer.GetChildren():
+            w = child.GetWindow()
+            if w: w.Hide()
+            s = child.GetSizer()
+            if s: 
+                for c in s.GetChildren():
+                     w2 = c.GetWindow()
+                     if w2: w2.Hide()
+
         self.Layout()
         
         self.update_status(_("Connecting..."))
@@ -414,7 +501,8 @@ class TalkWithAIDialog(wx.Dialog):
                 channels=CHANNELS,
                 rate=OUTPUT_RATE,
                 output=True,
-                frames_per_buffer=CHUNK
+                frames_per_buffer=CHUNK,
+                output_device_index=self.selected_output_idx
             )
             
             # Input Stream (Mic)
@@ -423,7 +511,8 @@ class TalkWithAIDialog(wx.Dialog):
                 channels=CHANNELS,
                 rate=INPUT_RATE,
                 input=True,
-                frames_per_buffer=CHUNK
+                frames_per_buffer=CHUNK,
+                input_device_index=self.selected_input_idx
             )
             
             # Initialize Client
@@ -531,6 +620,17 @@ class TalkWithAIDialog(wx.Dialog):
                 self.connect_btn.Enable()
                 self.disconnect_btn.Disable()
                 self.google_search_cb.Show()
+                
+                # Show device selection again
+                for child in self.device_sizer.GetChildren():
+                    w = child.GetWindow()
+                    if w: w.Show()
+                    s = child.GetSizer()
+                    if s: 
+                        for c in s.GetChildren():
+                             w2 = c.GetWindow()
+                             if w2: w2.Show()
+
                 self.Layout()
                 self.update_status(_("Ready"))
             except RuntimeError:
