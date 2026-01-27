@@ -1,4 +1,3 @@
-import codecs
 import gettext
 from functools import partial
 
@@ -14,7 +13,7 @@ def generateManifest(
 	symbolDictionaries: SymbolDictionaries,
 ):
 	# Prepare the root manifest section
-	with codecs.open(source, "r", "utf-8") as f:
+	with open(source, "r", encoding="utf-8") as f:
 		manifest_template = f.read()
 	manifest = manifest_template.format(**addon_info)
 	# Add additional manifest sections such as custom braile tables
@@ -26,7 +25,7 @@ def generateManifest(
 	if symbolDictionaries:
 		manifest += format_nested_section("symbolDictionaries", symbolDictionaries)
 
-	with codecs.open(dest, "w", "utf-8") as f:
+	with open(dest, "w", encoding="utf-8") as f:
 		f.write(manifest)
 
 
@@ -44,7 +43,7 @@ def generateTranslatedManifest(
 	vars: dict[str, str] = {}
 	for var in ("addon_summary", "addon_description", "addon_changelog"):
 		vars[var] = _(addon_info[var])
-	with codecs.open(source, "r", "utf-8") as f:
+	with open(source, "r", encoding="utf-8") as f:
 		manifest_template = f.read()
 	manifest = manifest_template.format(**vars)
 
@@ -63,5 +62,5 @@ def generateTranslatedManifest(
 	if symbolDictionaries:
 		manifest += _format_section_only_with_displayName("symbolDictionaries", symbolDictionaries)
 
-	with codecs.open(dest, "w", "utf-8") as f:
+	with open(dest, "w", encoding="utf-8") as f:
 		f.write(manifest)
