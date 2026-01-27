@@ -39,20 +39,20 @@ def onInstall() -> None:
 		# Check if we are updating (old lib exists) and new lib is missing (fresh install/update pkg)
 		if os.path.exists(existingLib) and not os.path.exists(newLib):
 			log.info(
-				"NativeSpeechGeneration installTasks: Found existing libraries from previous version. Copying to new installation..."
+				"NativeSpeechGeneration installTasks: Found existing libraries from previous version. Copying to new installation...",
 			)
 			shutil.copytree(existingLib, newLib)
 			log.info(
-				"NativeSpeechGeneration installTasks: Libraries copied successfully. No re-download needed."
+				"NativeSpeechGeneration installTasks: Libraries copied successfully. No re-download needed.",
 			)
 		else:
 			log.info(
-				"NativeSpeechGeneration installTasks: No existing libraries found or new lib already present. Skipping copy."
+				"NativeSpeechGeneration installTasks: No existing libraries found or new lib already present. Skipping copy.",
 			)
 
 	except Exception as e:
 		log.warning(
-			f"NativeSpeechGeneration installTasks: Failed to copy existing libraries during update: {e}"
+			f"NativeSpeechGeneration installTasks: Failed to copy existing libraries during update: {e}",
 		)
 
 	log.info("NativeSpeechGeneration add-on onInstall phase completed.")

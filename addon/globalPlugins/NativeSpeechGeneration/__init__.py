@@ -74,7 +74,7 @@ if not LIBS_AVAILABLE:
 			wx.CallAfter(
 				wx.MessageBox,
 				_(
-					"Native Speech Generation is installing dependencies. Please restart NVDA for the changes to take effect."
+					"Native Speech Generation is installing dependencies. Please restart NVDA for the changes to take effect.",
 				),
 				_("Restart Required"),
 				wx.OK | wx.ICON_INFORMATION,
@@ -109,7 +109,9 @@ else:
 
 			toolsMenu = gui.mainFrame.sysTrayIcon.toolsMenu
 			self.menuItem = toolsMenu.Append(
-				wx.ID_ANY, _("&Native Speech Generation"), _("Generate speech using Gemini TTS")
+				wx.ID_ANY,
+				_("&Native Speech Generation"),
+				_("Generate speech using Gemini TTS"),
 			)
 			gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, self.onShowDialog, self.menuItem)
 
@@ -129,7 +131,7 @@ else:
 				wx.CallAfter(
 					wx.MessageBox,
 					_(
-						"The Native Speech Generation add-on is already open. Please close the dialog before opening it again."
+						"The Native Speech Generation add-on is already open. Please close the dialog before opening it again.",
 					),
 					_("Add-on Already Running"),
 					wx.OK | wx.ICON_WARNING,

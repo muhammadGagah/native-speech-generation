@@ -47,8 +47,6 @@ CHUNK = 1024
 BUFFER_THRESHOLD = 5
 
 
-
-
 class TalkWithAIDialog(wx.Dialog):
 	def __init__(self, parent, apiKey, voiceName, systemInstruction):
 		super().__init__(parent, title=_("Talk With AI"), size=(400, 300))
@@ -80,7 +78,8 @@ class TalkWithAIDialog(wx.Dialog):
 
 		if not pyaudio:
 			wx.CallAfter(
-				self.reportError, _("PyAudio library is not installed. This feature requires PyAudio.")
+				self.reportError,
+				_("PyAudio library is not installed. This feature requires PyAudio."),
 			)
 			self.connectBtn.Disable()
 		if not genai:
@@ -434,10 +433,12 @@ class TalkWithAIDialog(wx.Dialog):
 			if self.micOn and self.inputStream and self.inputStream.is_active():
 				try:
 					data = await self.loop.run_in_executor(
-						None, lambda: self.inputStream.read(CHUNK, exception_on_overflow=False)
+						None,
+						lambda: self.inputStream.read(CHUNK, exception_on_overflow=False),
 					)
 					await session.send(
-						input={"data": data, "mime_type": f"audio/pcm;rate={INPUT_RATE}"}, end_of_turn=False
+						input={"data": data, "mime_type": f"audio/pcm;rate={INPUT_RATE}"},
+						end_of_turn=False,
 					)
 				except Exception as e:
 					log.error(f"Mic/Send Error: {e}")
@@ -523,8 +524,8 @@ class TalkWithAIDialog(wx.Dialog):
 				"tools": toolsConfig,
 				"generation_config": {
 					"speech_config": {
-						"voice_config": {"prebuilt_voice_config": {"voice_name": self.voiceName}}
-					}
+						"voice_config": {"prebuilt_voice_config": {"voice_name": self.voiceName}},
+					},
 				},
 				"system_instruction": {"parts": [{"text": self.systemInstruction}]}
 				if self.systemInstruction
@@ -561,7 +562,8 @@ class TalkWithAIDialog(wx.Dialog):
 						# If connection drops, receiveLoop finishes.
 						# We then cancel sendTask and reconnect.
 						_done, pending = await asyncio.wait(
-							[sendTask, receiveTask], return_when=asyncio.FIRST_COMPLETED
+							[sendTask, receiveTask],
+							return_when=asyncio.FIRST_COMPLETED,
 						)
 
 						# Cancel pending tasks (e.g. send loop if receive died)

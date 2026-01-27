@@ -106,7 +106,11 @@ class NativeSpeechDialog(wx.Dialog):
 		tempSizer = wx.BoxSizer(wx.HORIZONTAL)
 		tempLabel = wx.StaticText(self.settingsPanel, label=_("Temperature:"))
 		self.tempSlider = wx.Slider(
-			self.settingsPanel, value=10, minValue=0, maxValue=20, style=wx.SL_HORIZONTAL
+			self.settingsPanel,
+			value=10,
+			minValue=0,
+			maxValue=20,
+			style=wx.SL_HORIZONTAL,
 		)
 		self.tempValueLabel = wx.StaticText(self.settingsPanel, label=self._tempToLabel(10))
 		self.tempSlider.Bind(wx.EVT_SLIDER, self.onTempChange)
@@ -317,7 +321,10 @@ class NativeSpeechDialog(wx.Dialog):
 	def onTalkWithAi(self, evt: wx.Event) -> None:
 		if not talkWithAI:
 			wx.CallAfter(
-				wx.MessageBox, _("Talk With AI module is missing."), _("Error"), wx.OK | wx.ICON_ERROR
+				wx.MessageBox,
+				_("Talk With AI module is missing."),
+				_("Error"),
+				wx.OK | wx.ICON_ERROR,
 			)
 			return
 
@@ -325,7 +332,7 @@ class NativeSpeechDialog(wx.Dialog):
 			wx.CallAfter(
 				wx.MessageBox,
 				_(
-					"Talk With AI currently does not support multi-speaker mode. Please select Single-speaker."
+					"Talk With AI currently does not support multi-speaker mode. Please select Single-speaker.",
 				),
 				_("Feature Limitation"),
 				wx.OK | wx.ICON_WARNING,
@@ -379,7 +386,10 @@ class NativeSpeechDialog(wx.Dialog):
 		text = self.textCtrl.GetValue().strip()
 		if not text:
 			wx.CallAfter(
-				wx.MessageBox, _("Please enter text to generate."), _("Error"), wx.OK | wx.ICON_ERROR
+				wx.MessageBox,
+				_("Please enter text to generate."),
+				_("Error"),
+				wx.OK | wx.ICON_ERROR,
 			)
 			return
 
@@ -429,8 +439,8 @@ class NativeSpeechDialog(wx.Dialog):
 				voiceName = self._getSelectedVoiceName(self.voiceChoiceSingle, self.selectedVoiceIdx)
 				speechConfig = types.SpeechConfig(
 					voice_config=types.VoiceConfig(
-						prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voiceName)
-					)
+						prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voiceName),
+					),
 				)
 			else:
 				speaker1Name = self.spk1NameCtrl.GetValue().strip() or "Speaker1"
@@ -443,21 +453,23 @@ class NativeSpeechDialog(wx.Dialog):
 							types.SpeakerVoiceConfig(
 								speaker=speaker1Name,
 								voice_config=types.VoiceConfig(
-									prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice1)
+									prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice1),
 								),
 							),
 							types.SpeakerVoiceConfig(
 								speaker=speaker2Name,
 								voice_config=types.VoiceConfig(
-									prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice2)
+									prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice2),
 								),
 							),
-						]
-					)
+						],
+					),
 				)
 
 			generateConfig = types.GenerateContentConfig(
-				temperature=temp, response_modalities=["audio"], speech_config=speechConfig
+				temperature=temp,
+				response_modalities=["audio"],
+				speech_config=speechConfig,
 			)
 			outPathBase = os.path.join(ADDON_DIR_VAL, "last_audio_generated")
 
@@ -465,7 +477,11 @@ class NativeSpeechDialog(wx.Dialog):
 				return
 
 			savedPath = self._streamAndSaveAudio(
-				self.client, self.model, contents, generateConfig, outPathBase
+				self.client,
+				self.model,
+				contents,
+				generateConfig,
+				outPathBase,
 			)
 
 			if self.isClosed:
@@ -494,7 +510,12 @@ class NativeSpeechDialog(wx.Dialog):
 		self.isGenerating = False
 
 	def _streamAndSaveAudio(
-		self, client: Any, model: str, contents: list[Any], configObj: Any, outPathBase: str
+		self,
+		client: Any,
+		model: str,
+		contents: list[Any],
+		configObj: Any,
+		outPathBase: str,
 	) -> str | None:
 		fileIndex = 0
 		savedPaths = []
@@ -505,7 +526,9 @@ class NativeSpeechDialog(wx.Dialog):
 				return None
 			# Store the stream object
 			self.currentStream = client.models.generate_content_stream(
-				model=model, contents=contents, config=configObj
+				model=model,
+				contents=contents,
+				config=configObj,
 			)
 
 			for chunk in self.currentStream:
