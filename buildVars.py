@@ -14,11 +14,10 @@ Key Features:
 - Seamless Workflow: The add-on provides instant audio playback upon generation and allows you to save the resulting .wav file for later use.
 
 To get started, obtain a Gemini API key from Google AI Studio and enter it in the add-on's settings panel, found under NVDA's Tools menu."""),
-	addon_version="1.5.3",
-	addon_changelog=_("""- Code Refactoring: Complies with NVDA coding standards (Tabs, CamelCase).
-- Optimized Update: Preserves library files to avoid redownloading data.
-- Improved UX: Restored device selection in "Talk With AI", better button states, and fixed dialog closing behavior.
-- Fix: Resolved namespace conflicts and ensured proper stream cancellation.
+	addon_version="1.5.4",
+	addon_changelog=_("""- Stability: Restored previous dependency handling to resolve crashes (pyo3 panic).
+- Localization: Fixed translation issues for Interface and Settings dialogs.
+- Fix: Resolved SSL Certificate path error.
 """),
 	addon_author="Muhammad <muha.aku@gmail.com>",
 	addon_url="https://github.com/muhammadGagah/native-speech-generation/",
@@ -31,7 +30,13 @@ To get started, obtain a Gemini API key from Google AI Studio and enter it in th
 	addon_licenseURL="https://www.gnu.org/licenses/gpl-2.0.html",
 )
 
-pythonSources: list[str] = ["addon/globalPlugins/NativeSpeechGeneration/*.py", "addon/installTasks.py"]
+pythonSources: list[str] = [
+	"addon/globalPlugins/NativeSpeechGeneration/*.py",
+	"addon/globalPlugins/NativeSpeechGeneration/core/*.py",
+	"addon/globalPlugins/NativeSpeechGeneration/interface/*.py",
+	"addon/globalPlugins/NativeSpeechGeneration/lib/*.py",
+	"addon/installTasks.py",
+]
 
 i18nSources: list[str] = pythonSources + ["buildVars.py"]
 

@@ -76,6 +76,7 @@ if not LIBS_AVAILABLE:
 				_(
 					"Native Speech Generation is installing dependencies. Please restart NVDA for the changes to take effect.",
 				),
+				# Translators: Title of the information dialog recommending a restart.
 				_("Restart Required"),
 				wx.OK | wx.ICON_INFORMATION,
 			)
@@ -110,7 +111,9 @@ else:
 			toolsMenu = gui.mainFrame.sysTrayIcon.toolsMenu
 			self.menuItem = toolsMenu.Append(
 				wx.ID_ANY,
+				# Translators: Name of the add-on in the NVDA Tools menu.
 				_("&Native Speech Generation"),
+				# Translators: Tooltip or description for the menu item.
 				_("Generate speech using Gemini TTS"),
 			)
 			gui.mainFrame.sysTrayIcon.Bind(wx.EVT_MENU, self.onShowDialog, self.menuItem)
@@ -133,6 +136,7 @@ else:
 					_(
 						"The Native Speech Generation add-on is already open. Please close the dialog before opening it again.",
 					),
+					# Translators: Title of warning dialog when user tries to open the add-on twice.
 					_("Add-on Already Running"),
 					wx.OK | wx.ICON_WARNING,
 				)

@@ -10,6 +10,7 @@ import winsound
 import gui
 import ui
 import config
+import addonHandler
 from logHandler import log
 from typing import Any, TYPE_CHECKING
 
@@ -31,6 +32,9 @@ if TYPE_CHECKING:
 		return msg
 
 
+# Initialize translation
+addonHandler.initTranslation()
+
 # Need to know addon_dir for saving "last_audio_generated"
 _guiDir = os.path.dirname(os.path.abspath(__file__))
 _pkgDir = os.path.dirname(_guiDir)
@@ -40,6 +44,7 @@ ADDON_DIR_VAL = os.path.dirname(_globalPluginsDir)
 
 class NativeSpeechDialog(wx.Dialog):
 	def __init__(self, parent: wx.Window) -> None:
+		# Translators: The title of the main dialog window for generating speech.
 		super().__init__(parent, title=_("Native Speech Generation (Gemini TTS)"))
 		try:
 			self.apiKey = config.conf[CONFIG_DOMAIN]["apiKey"]
@@ -64,12 +69,14 @@ class NativeSpeechDialog(wx.Dialog):
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		# Text Input
+		# Translators: Label for the text area where user inputs text to be converted to speech.
 		textLabel = wx.StaticText(self, label=_("&Type text to convert here:"))
 		self.textCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(520, 160))
 		mainSizer.Add(textLabel, flag=wx.ALL, border=6)
 		mainSizer.Add(self.textCtrl, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=6)
 
 		# Style Input
+		# Translators: Label for optional instructions on how the speech should be spoken (e.g. "Happy", "Sad").
 		styleLabel = wx.StaticText(self, label=_("&Style instructions (optional):"))
 		self.styleCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(520, 60))
 		mainSizer.Add(styleLabel, flag=wx.ALL, border=6)
@@ -77,6 +84,7 @@ class NativeSpeechDialog(wx.Dialog):
 
 		# Model & Mode Selection
 		modelSizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Label for selecting the AI model to use for generation.
 		modelLabel = wx.StaticText(self, label=_("Select &Model:"))
 		self.modelChoice = wx.Choice(self, choices=[_("Flash (Standard Quality)"), _("Pro (High Quality)")])
 		self.modelChoice.SetSelection(0)
@@ -84,7 +92,9 @@ class NativeSpeechDialog(wx.Dialog):
 		modelSizer.Add(modelLabel, flag=wx.ALIGN_CENTER_VERTICAL | wx.ALL, border=6)
 		modelSizer.Add(self.modelChoice, flag=wx.ALL, border=6)
 
+		# Translators: Radio button to select single speaker mode.
 		self.modeSingleRb = wx.RadioButton(self, label=_("Single-speaker"), style=wx.RB_GROUP)
+		# Translators: Radio button to select multi-speaker mode.
 		self.modeMultiRb = wx.RadioButton(self, label=_("Multi-speaker (2)"))
 		self.modeSingleRb.SetValue(True)
 		self.modeSingleRb.Bind(wx.EVT_RADIOBUTTON, self.onModeChange)
@@ -94,6 +104,7 @@ class NativeSpeechDialog(wx.Dialog):
 		mainSizer.Add(modelSizer, flag=wx.EXPAND)
 
 		# Settings Toggle
+		# Translators: Checkbox to show advanced settings like Temperature.
 		self.settingsCheckbox = wx.CheckBox(self, label=_("Advanced Settings (&Temperature)"))
 		self.settingsCheckbox.SetValue(False)
 		mainSizer.Add(self.settingsCheckbox, flag=wx.LEFT | wx.RIGHT | wx.TOP, border=6)
@@ -104,6 +115,7 @@ class NativeSpeechDialog(wx.Dialog):
 
 		paneSizer = wx.BoxSizer(wx.VERTICAL)
 		tempSizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Label for the temperature slider which controls creativity of the AI.
 		tempLabel = wx.StaticText(self.settingsPanel, label=_("Temperature:"))
 		self.tempSlider = wx.Slider(
 			self.settingsPanel,
@@ -131,15 +143,18 @@ class NativeSpeechDialog(wx.Dialog):
 
 		# Action Buttons
 		btnSizer = wx.StdDialogButtonSizer()
+		# Translators: Button to start generating the speech audio.
 		self.generateBtn = wx.Button(self, label=_("&Generate Speech"))
 		self.generateBtn.Bind(wx.EVT_BUTTON, self.onGenerate)
 		btnSizer.AddButton(self.generateBtn)
 
+		# Translators: Button to play the generated audio.
 		self.playBtn = wx.Button(self, label=_("&Play"))
 		self.playBtn.Bind(wx.EVT_BUTTON, self.onPlay)
 		self.playBtn.Enable(False)
 		btnSizer.AddButton(self.playBtn)
 
+		# Translators: Button to save the generated audio to a file.
 		self.saveBtn = wx.Button(self, label=_("Save &Audio"))
 		self.saveBtn.Bind(wx.EVT_BUTTON, self.onSave)
 		self.saveBtn.Enable(False)
@@ -148,14 +163,17 @@ class NativeSpeechDialog(wx.Dialog):
 		mainSizer.Add(btnSizer, flag=wx.EXPAND | wx.ALL, border=10)
 
 		# Talk With AI Button
+		# Translators: Button to open the real-time conversation dialog.
 		self.talkBtn = wx.Button(self, label=_("Talk With &AI"))
 		self.talkBtn.Bind(wx.EVT_BUTTON, self.onTalkWithAi)
 		mainSizer.Add(self.talkBtn, flag=wx.ALIGN_CENTER | wx.ALL, border=5)
 
 		# Footer
 		footerSizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Button to open settings specifically for configuring the API key.
 		self.getKeyBtn = wx.Button(self, label=_("API Key Settings"))
 		self.getKeyBtn.Bind(wx.EVT_BUTTON, self.onSettings)
+		# Translators: Button that opens a web browser to view available voices in Google AI Studio.
 		self.viewVoicesBtn = wx.Button(self, label=_("View voices in AI Studio"))
 		self.viewVoicesBtn.Bind(wx.EVT_BUTTON, self.onOpenAiStudio)
 		footerSizer.Add(self.getKeyBtn, flag=wx.ALL, border=6)
@@ -179,6 +197,7 @@ class NativeSpeechDialog(wx.Dialog):
 	def _buildVoicePanelSingle(self) -> wx.Panel:
 		panel = wx.Panel(self)
 		sizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Label for selecting a voice in single speaker mode.
 		label = wx.StaticText(panel, label=_("Select &Voice:"))
 		self.voiceChoiceSingle = wx.Choice(panel, choices=[_("Loading voices...")])
 		self.voiceChoiceSingle.SetSelection(0)
@@ -197,7 +216,7 @@ class NativeSpeechDialog(wx.Dialog):
 		# Speaker 1
 		spk1Sizer = wx.BoxSizer(wx.HORIZONTAL)
 		spk1Label = wx.StaticText(panel, label=_("Speaker 1 Name:"))
-		self.spk1NameCtrl = wx.TextCtrl(panel, value="Speaker1", size=(100, -1))
+		self.spk1NameCtrl = wx.TextCtrl(panel, value=_("Speaker1"), size=(100, -1))
 		voice1Label = wx.StaticText(panel, label=_("Voice:"))
 		self.voiceChoiceMulti1 = wx.Choice(panel, choices=[_("Loading voices...")])
 		self.voiceChoiceMulti1.SetSelection(0)
@@ -213,7 +232,7 @@ class NativeSpeechDialog(wx.Dialog):
 		# Speaker 2
 		spk2Sizer = wx.BoxSizer(wx.HORIZONTAL)
 		spk2Label = wx.StaticText(panel, label=_("Speaker 2 Name:"))
-		self.spk2NameCtrl = wx.TextCtrl(panel, value="Speaker2", size=(100, -1))
+		self.spk2NameCtrl = wx.TextCtrl(panel, value=_("Speaker2"), size=(100, -1))
 		voice2Label = wx.StaticText(panel, label=_("Voice:"))
 		self.voiceChoiceMulti2 = wx.Choice(panel, choices=[_("Loading voices...")])
 		self.voiceChoiceMulti2.SetSelection(0)
@@ -279,7 +298,6 @@ class NativeSpeechDialog(wx.Dialog):
 
 	def onVoiceKeypressGeneric(self, evt: wx.Event) -> None:
 		key = evt.GetKeyCode()
-		# Usage of match statement (Python 3.10+)
 		match key:
 			case wx.WXK_SPACE:
 				ctrl = evt.GetEventObject()
@@ -443,8 +461,8 @@ class NativeSpeechDialog(wx.Dialog):
 					),
 				)
 			else:
-				speaker1Name = self.spk1NameCtrl.GetValue().strip() or "Speaker1"
-				speaker2Name = self.spk2NameCtrl.GetValue().strip() or "Speaker2"
+				speaker1Name = self.spk1NameCtrl.GetValue().strip() or _("Speaker1")
+				speaker2Name = self.spk2NameCtrl.GetValue().strip() or _("Speaker2")
 				voice1 = self._getSelectedVoiceName(self.voiceChoiceMulti1, self.selectedVoiceIdx)
 				voice2 = self._getSelectedVoiceName(self.voiceChoiceMulti2, self.selectedVoiceIdx2)
 				speechConfig = types.SpeechConfig(
@@ -608,7 +626,7 @@ class NativeSpeechDialog(wx.Dialog):
 		with wx.FileDialog(
 			self,
 			_("Save Audio File"),
-			wildcard="WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3",
+			wildcard=_("WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3"),
 			style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
 		) as dlg:
 			if dlg.ShowModal() == wx.ID_CANCEL:

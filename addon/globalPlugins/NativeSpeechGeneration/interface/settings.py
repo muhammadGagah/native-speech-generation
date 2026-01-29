@@ -6,6 +6,7 @@ import shutil
 import time
 from typing import TYPE_CHECKING
 import gui
+import addonHandler
 import config
 from logHandler import log
 
@@ -19,7 +20,12 @@ if TYPE_CHECKING:
 		return msg
 
 
+# Initialize translation
+addonHandler.initTranslation()
+
+
 class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
+	# Translators: Title of the settings panel in NVDA preferences.
 	title = _("Native Speech Generation")
 
 	def makeSettings(self, settingsSizer: wx.Sizer) -> None:
@@ -28,6 +34,7 @@ class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 		# API Key Configuration Group
 		apiSizer = wx.BoxSizer(wx.HORIZONTAL)
 
+		# Translators: Label for the input field where user enters their Gemini API Key.
 		apiLabel = wx.StaticText(self, label=_("&Gemini API Key:"))
 		apiSizer.Add(apiLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
 
@@ -41,18 +48,21 @@ class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 		apiSizer.Add(self.apiKeyCtrlHidden, 1, wx.EXPAND | wx.RIGHT, 5)
 		apiSizer.Add(self.apiKeyCtrlVisible, 1, wx.EXPAND | wx.RIGHT, 5)
 
+		# Translators: Checkbox to toggle visibility of the API key (show/hide characters).
 		self.showApiCheck = wx.CheckBox(self, label=_("Show API Key"))
 		self.showApiCheck.Bind(wx.EVT_CHECKBOX, self.onToggleApiVisibility)
 		apiSizer.Add(self.showApiCheck, 0, wx.ALIGN_CENTER_VERTICAL)
 
 		# Add the row to the main settings sizer
-		sHelper.addItem(apiSizer)
+		self.onToggleApiVisibility(None)  # Set initial state
 
+		# Translators: Button starting a process to help user get an API key (opens a website).
 		self.getKeyBtn = wx.Button(self, label=_("&How to get API Key..."))
 		sHelper.addItem(self.getKeyBtn)
 		self.getKeyBtn.Bind(wx.EVT_BUTTON, self.onGetKey)
 
 		# Reinstall libraries button
+		# Translators: Button to force a reinstallation of external dependencies (Python libraries).
 		self.reinstallBtn = wx.Button(self, label=_("&Reinstall Libraries"))
 		sHelper.addItem(self.reinstallBtn)
 		self.reinstallBtn.Bind(wx.EVT_BUTTON, self.onReinstall)
