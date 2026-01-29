@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 	def _(msg: str) -> str:
 		return msg
 
+
 # Initialize translation
 addonHandler.initTranslation()
 

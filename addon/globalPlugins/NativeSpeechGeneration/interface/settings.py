@@ -19,8 +19,10 @@ if TYPE_CHECKING:
 	def _(msg: str) -> str:
 		return msg
 
+
 # Initialize translation
 addonHandler.initTranslation()
+
 
 class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 	# Translators: Title of the settings panel in NVDA preferences.
