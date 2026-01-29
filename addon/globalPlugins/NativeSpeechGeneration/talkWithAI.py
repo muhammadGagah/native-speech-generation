@@ -49,6 +49,7 @@ BUFFER_THRESHOLD = 5
 
 class TalkWithAIDialog(wx.Dialog):
 	def __init__(self, parent, apiKey, voiceName, systemInstruction):
+		# Translators: Title of the dialog for the "Talk With AI" feature (REAL-TIME conversation).
 		super().__init__(parent, title=_("Talk With AI"), size=(400, 300))
 		self.apiKey = apiKey
 		self.voiceName = voiceName
@@ -119,8 +120,10 @@ class TalkWithAIDialog(wx.Dialog):
 		panelSizer = wx.BoxSizer(wx.VERTICAL)
 
 		# 1. Status Area
+		# Translators: Label for the status area showing connection state.
 		statusBox = wx.StaticBox(panel, label=_("Status"))
 		statusSizer = wx.StaticBoxSizer(statusBox, wx.VERTICAL)
+		# Translators: Initial status message when the dialog opens.
 		self.statusLabel = wx.StaticText(panel, label=_("Ready to Connect"))
 		statusSizer.Add(self.statusLabel, 0, wx.ALL | wx.EXPAND, 5)
 		panelSizer.Add(statusSizer, 0, wx.ALL | wx.EXPAND, 5)
@@ -131,8 +134,10 @@ class TalkWithAIDialog(wx.Dialog):
 
 		# Connect/Disconnect Buttons
 		btnSizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Button to start the voice conversation.
 		self.connectBtn = wx.Button(panel, label=_("Start Conversation"))
 		self.connectBtn.Bind(wx.EVT_BUTTON, self.onConnect)
+		# Translators: Button to stop the voice conversation.
 		self.disconnectBtn = wx.Button(panel, label=_("Stop Conversation"))
 		self.disconnectBtn.Bind(wx.EVT_BUTTON, self.onDisconnect)
 		self.disconnectBtn.Disable()
@@ -142,6 +147,7 @@ class TalkWithAIDialog(wx.Dialog):
 		controlsSizer.Add(btnSizer, 0, wx.EXPAND | wx.ALL, 5)
 
 		# Mic Toggle
+		# Translators: Toggle button label indicating microphone is ON.
 		self.micBtn = wx.ToggleButton(panel, label=_("Microphone: ON"))
 		self.micBtn.SetValue(True)
 		self.micBtn.Bind(wx.EVT_TOGGLEBUTTON, self.onMicToggle)
@@ -175,6 +181,7 @@ class TalkWithAIDialog(wx.Dialog):
 		controlsSizer.Add(self.deviceSizer, 0, wx.EXPAND)
 
 		# Google Search Checkbox
+		# Translators: Checkbox to enable "Grounding", allowing the AI to search Google for answers.
 		self.googleSearchCb = wx.CheckBox(panel, label=_("Grounding with Google Search"))
 		self.googleSearchCb.SetValue(False)
 		controlsSizer.Add(self.googleSearchCb, 0, wx.ALL | wx.EXPAND, 5)
