@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 import os
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import addonHandler
 import globalPluginHandler

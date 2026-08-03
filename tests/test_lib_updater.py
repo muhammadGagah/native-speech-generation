@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import importlib.util
 import builtins
+import importlib.util
 import sys
 import tempfile
 import types
@@ -10,7 +10,6 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LIB_UPDATER_PATH = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "lib_updater.py"
@@ -33,7 +32,6 @@ class _Log:
 class _ProgressDialog:
 	def __init__(self, *_args: object, **_kwargs: object) -> None:
 		super().__init__()
-		pass
 
 	def Destroy(self) -> None:
 		pass
@@ -59,40 +57,40 @@ def _messageBox(*_args: object, **_kwargs: object) -> int:
 
 
 def _installNvdaStubs() -> None:
-	setattr(builtins, "_", _translate)
+	builtins._ = _translate
 
 	addonHandler = types.ModuleType("addonHandler")
-	setattr(addonHandler, "initTranslation", lambda: None)
+	addonHandler.initTranslation = lambda: None
 	sys.modules["addonHandler"] = addonHandler
 
 	core = types.ModuleType("core")
-	setattr(core, "restart", lambda: None)
+	core.restart = lambda: None
 	sys.modules["core"] = core
 
 	gui = types.ModuleType("gui")
-	setattr(gui, "mainFrame", object())
-	setattr(gui, "messageBox", _messageBox)
+	gui.mainFrame = object()
+	gui.messageBox = _messageBox
 	sys.modules["gui"] = gui
 
 	logHandler = types.ModuleType("logHandler")
-	setattr(logHandler, "log", _Log())
+	logHandler.log = _Log()
 	sys.modules["logHandler"] = logHandler
 
 	wx = types.ModuleType("wx")
-	setattr(wx, "CallAfter", _callAfter)
-	setattr(wx, "CallLater", _callLater)
-	setattr(wx, "MessageBox", _messageBox)
-	setattr(wx, "ProgressDialog", _ProgressDialog)
-	setattr(wx, "OK", 1)
-	setattr(wx, "CANCEL", 2)
-	setattr(wx, "ICON_ERROR", 4)
-	setattr(wx, "ICON_INFORMATION", 8)
-	setattr(wx, "PD_APP_MODAL", 16)
-	setattr(wx, "PD_AUTO_HIDE", 32)
+	wx.CallAfter = _callAfter
+	wx.CallLater = _callLater
+	wx.MessageBox = _messageBox
+	wx.ProgressDialog = _ProgressDialog
+	wx.OK = 1
+	wx.CANCEL = 2
+	wx.ICON_ERROR = 4
+	wx.ICON_INFORMATION = 8
+	wx.PD_APP_MODAL = 16
+	wx.PD_AUTO_HIDE = 32
 	sys.modules["wx"] = wx
 
 	buildVersion = types.ModuleType("buildVersion")
-	setattr(buildVersion, "version", "2026.1")
+	buildVersion.version = "2026.1"
 	sys.modules["buildVersion"] = buildVersion
 
 

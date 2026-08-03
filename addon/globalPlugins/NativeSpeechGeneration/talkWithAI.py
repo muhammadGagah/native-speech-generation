@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import asyncio
 import os
 import queue
@@ -8,12 +7,12 @@ import threading
 import time
 import traceback
 import winsound
+from typing import Any
 
 import addonHandler
-import wx
 import ui
+import wx
 from logHandler import log
-from typing import Any
 
 from .core.gemini_imports import (
 	GENAI_AVAILABLE,
@@ -52,8 +51,6 @@ HISTORY_MAX_CHARS = 1800
 
 class TalkWithAIRuntimeError(RuntimeError):
 	"""Raised when the Live API runtime does not support the required feature set."""
-
-	pass
 
 
 class TalkWithAIDialog(wx.Dialog):
@@ -580,10 +577,8 @@ class TalkWithAIDialog(wx.Dialog):
 					scaledShorts = []
 					for sample in shorts:
 						value = int(sample * factor)
-						if value > 32767:
-							value = 32767
-						if value < -32768:
-							value = -32768
+						value = min(value, 32767)
+						value = max(value, -32768)
 						scaledShorts.append(value)
 					data = struct.pack(f"{count}h", *scaledShorts)
 

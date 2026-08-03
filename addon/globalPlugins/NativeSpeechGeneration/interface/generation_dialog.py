@@ -1,32 +1,31 @@
-# -*- coding: utf-8 -*-
-import wx
-import threading
-import os
 import mimetypes
-import urllib.request
-import webbrowser
+import os
 import tempfile
+import threading
+import urllib.request
 import uuid
+import webbrowser
 import winsound
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
+
+import addonHandler
 import gui
 import ui
-import addonHandler
+import wx
 from logHandler import log
-from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
 
+from .. import talkWithAI
+from ..core import config_store
+from ..core.audio_utils import convertToWav, mergeWavFiles, safeStartFile, saveBinaryFile
 from ..core.constants import (
 	DEFAULT_MODEL,
+	FALLBACK_VOICES,
 	FLASH_25_MODEL,
 	PRO_25_MODEL,
 	VOICE_SAMPLE_BASE,
-	FALLBACK_VOICES,
 )
-from ..core import config_store
-from ..core.audio_utils import convertToWav, mergeWavFiles, saveBinaryFile, safeStartFile
 from ..core.gemini_imports import GENAI_AVAILABLE, GENAI_IMPORT_ERROR, genai, getRuntimeScope, types
-
-from .. import talkWithAI
 
 if TYPE_CHECKING:
 

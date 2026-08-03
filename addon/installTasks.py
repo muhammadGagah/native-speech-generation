@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Tasks to perform during installation of the Native Speech Generation NVDA add-on
 # Copyright (C) 2026 Muhammad.
 # This add-on is free software, licensed under the terms of the GNU General Public License (version 2).
@@ -6,6 +5,7 @@
 
 import os
 import shutil
+
 import addonHandler
 from logHandler import log
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 
 from logHandler import log
@@ -21,15 +20,15 @@ GENAI_AVAILABLE = _RUNTIME.genaiAvailable
 PYAUDIO_AVAILABLE = _RUNTIME.pyaudioAvailable
 
 __all__ = [
-	"genai",
-	"types",
-	"pyaudio",
-	"VENDOR_VERSIONS",
-	"GENAI_IMPORT_ERROR",
-	"PYAUDIO_IMPORT_ERROR",
 	"GENAI_AVAILABLE",
+	"GENAI_IMPORT_ERROR",
 	"PYAUDIO_AVAILABLE",
+	"PYAUDIO_IMPORT_ERROR",
+	"VENDOR_VERSIONS",
+	"genai",
 	"getRuntimeScope",
+	"pyaudio",
+	"types",
 ]
 
 if not GENAI_AVAILABLE:
