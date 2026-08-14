@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
+import contextlib
+import os
 import struct
 import wave
-import os
-import contextlib
-from logHandler import log
-import wx
+from typing import TYPE_CHECKING, Any
+
 import addonHandler
-from typing import Any, TYPE_CHECKING
+import wx
+from logHandler import log
 
 if TYPE_CHECKING:
 

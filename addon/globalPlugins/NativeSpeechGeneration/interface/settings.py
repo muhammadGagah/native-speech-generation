@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-import wx
 import webbrowser
 from typing import TYPE_CHECKING
-import gui
+
 import addonHandler
+import gui
+import wx
 from logHandler import log
 
 from .. import lib_updater
