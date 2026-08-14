@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 'NativeSpeechGeneration' '1.7.0'\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2026-04-04 16:18+0800\n"
-"PO-Revision-Date: 2026-04-06 09:21+0300\n"
+"POT-Creation-Date: 2026-06-04 15:07+0300\n"
+"PO-Revision-Date: 2026-06-04 15:20+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
@@ -13,68 +13,70 @@ msgstr ""
 "X-Generator: Poedit 3.9\n"
 "X-Poedit-Basepath: .\n"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:57
-msgid "Downloading libraries..."
-msgstr "Завантаження бібліотек..."
+#. Translators: Error shown when this add-on has no trusted checksum for a dependency archive.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:117
+#, python-brace-format
+msgid "No approved checksum is bundled for {assetName}."
+msgstr "Для {assetName} немає затвердженої контрольної суми."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:71
-msgid "Downloading..."
-msgstr "Завантаження..."
+#. Translators: Error shown when the GitHub release metadata cannot identify the release version.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:137
+msgid "The latest library release does not include a version tag."
+msgstr "Останній випуск бібліотеки не містить тегу версії."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:76
-msgid "Extracting libraries..."
-msgstr "Видобування бібліотек..."
-
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:84
-msgid "Extraction complete."
-msgstr "Видобування завершено."
-
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:95
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:172
 #, python-brace-format
 msgid ""
-"Failed to download or extract required libraries. The add-on might not work "
+"Failed to download or install required libraries. The add-on might not work "
 "correctly.\n"
 "\n"
 "Error: {error}"
 msgstr ""
-"Не вдалося завантажити або видобути необхідні бібліотеки. Додаток може "
-"працювати некоректно.\n"
+"Не вдалося завантажити або встановити необхідні бібліотеки. Додаток може не "
+"працювати належним чином.\n"
 "\n"
 "Помилка: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:97
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:153
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:277
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:278
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:131
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:336
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:355
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:388
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:405
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:417
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:440
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:531
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:599
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:621
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:659
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:139
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:191
+#. Translators: Title of a dependency installation error dialog.
+#. Translators: Title of an error dialog in Talk With AI.
+#. Translators: Status shown when Talk With AI enters an error state.
+#. Translators: Title of an API key configuration error dialog.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:174
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:223
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:292
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:294
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:134
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:438
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:458
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:492
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:532
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:545
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:571
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:664
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:751
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:775
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:821
+#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:140
 msgid "Error"
 msgstr "Помилка"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:117
+#. Translators: Title of a progress dialog shown while installing add-on dependencies.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:189
 msgid "Installing Dependencies"
 msgstr "Встановлення залежностей"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:118
+#. Translators: Initial progress message while dependency installation is being prepared.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:191
 msgid "Checking for required libraries..."
 msgstr "Перевірка необхідних бібліотек..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:127
+#. Translators: Progress message shown when dependency installation has completed.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:200
 msgid "Installation complete!"
 msgstr "Встановлення завершено!"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:145
+#. Translators: Message shown after dependencies are installed and NVDA must restart.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:212
 msgid ""
 "The Native Speech Generation libraries have been successfully installed/"
 "updated.\n"
@@ -85,65 +87,134 @@ msgstr ""
 "\n"
 "Будь ласка, перезапустіть NVDA, щоб зміни набули чинності."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:147
+#. Translators: Title of the dialog shown after dependency installation completes.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:215
 msgid "Installation Complete"
 msgstr "Встановлення завершено"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:152
+#. Translators: Error shown when dependency installation fails.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:221
 msgid "Library installation failed. Please check the log."
 msgstr "Помилка встановлення бібліотеки. Будь ласка, перевірте журнал."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:164
+#. Translators: Confirmation before reinstalling or updating external Python dependencies from GitHub.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:234
 msgid ""
-"Are you sure you want to reinstall the libraries? This will redownload the "
-"dependencies and require an NVDA restart."
+"This will download the latest verified libraries for your NVDA version and "
+"require an NVDA restart. Continue?"
 msgstr ""
-"Ви впевнені, що бажаєте перевстановити бібліотеки? Це призведе до повторного "
-"завантаження залежностей і потребує перезапуску NVDA."
+"Це призведе до завантаження найновіших перевірених бібліотек для вашої "
+"версії NVDA та потребуватиме перезапуску NVDA. Продовжити?"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:166
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:159
-msgid "Confirm Reinstall"
-msgstr "Підтвердити перевстановлення"
+#. Translators: Title of the dialog confirming a dependency library reinstall.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:237
+msgid "Confirm Library Update"
+msgstr "Підтвердити оновлення бібліотеки"
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:168
+#. Translators: Confirmation shown when required libraries are missing.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:241
 msgid ""
 "Required libraries for Native Speech Generation are missing. Click OK to "
-"download them."
+"download the latest verified package for your NVDA version."
 msgstr ""
 "Відсутні необхідні бібліотеки для генерації природного мовлення. Натисніть "
-"OK, щоб завантажити їх."
+"OK, щоб завантажити останній перевірений пакет для вашої версії NVDA."
 
-#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:169
+#. Translators: Title of the dialog shown when dependency libraries are missing.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:244
 msgid "Missing Dependencies"
 msgstr "Відсутні залежності"
 
+#. Translators: Progress message shown while verified libraries are being extracted.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:289
+msgid "Extracting libraries..."
+msgstr "Видобування бібліотек..."
+
+#. Translators: Progress message shown while replacing the dependency library folder.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:296
+msgid "Installing libraries..."
+msgstr "Встановлення бібліотек..."
+
+#. Translators: Progress message shown after library extraction and installation.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:304
+msgid "Library installation complete."
+msgstr "Встановлення бібліотеки завершено."
+
+#. Translators: Progress message shown before dependency download begins.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:325
+msgid "Downloading libraries..."
+msgstr "Завантаження бібліотек..."
+
+#. Translators: Progress message shown while dependency download is in progress.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:342
+msgid "Downloading..."
+msgstr "Завантаження..."
+
+#. Translators: Progress message shown while checking the downloaded dependency package.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:348
+msgid "Verifying libraries..."
+msgstr "Перевірка бібліотек..."
+
+#. Translators: Error shown when a downloaded dependency archive contains an unsafe path.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:400
+#, python-brace-format
+msgid "The library archive contains an unsafe path: {path}"
+msgstr "Архів бібліотеки містить небезпечний шлях: {path}"
+
+#. Translators: Error shown when a downloaded dependency archive would extract outside the target folder.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:406
+#, python-brace-format
+msgid ""
+"The library archive contains a path outside the installation directory: "
+"{path}"
+msgstr "Архів бібліотеки містить шлях поза каталогом встановлення: {path}"
+
+#. Translators: Error shown when a downloaded dependency package fails checksum verification.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:424
+#, python-brace-format
+msgid "Library checksum mismatch. Expected {expected}, got {actual}."
+msgstr ""
+"Невідповідність контрольної суми бібліотеки. Очікуване значення {expected}, "
+"отримано {actual}."
+
+#. Translators: Error shown when a GitHub release lacks the dependency asset needed for this NVDA version.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:468
+#, python-brace-format
+msgid "The latest library release does not contain {assetName}."
+msgstr "Останній випуск бібліотеки не містить {assetName}."
+
+#. Translators: Error shown when a dependency release lacks checksum metadata.
+#: addon\globalPlugins\NativeSpeechGeneration\lib_updater.py:491
+#, python-brace-format
+msgid "The latest library release does not include a checksum for {assetName}."
+msgstr "В останній версії бібліотеки відсутня контрольна сума для {assetName}."
+
 #. Translators: Title of the dialog for the "Talk With AI" feature (REAL-TIME conversation).
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:59
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:64
 msgid "Talk With AI"
 msgstr "Розмова з ШІ"
 
 #. Translators: Choice label for the lowest reasoning setting in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:94
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:99
 msgid "No Thinking"
 msgstr "Без роздумів"
 
 #. Translators: Choice label for low reasoning depth in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:96
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:101
 msgid "Low"
 msgstr "Низький"
 
 #. Translators: Choice label for medium reasoning depth in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:98
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:103
 msgid "Medium"
 msgstr "Середній"
 
 #. Translators: Choice label for high reasoning depth in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:100
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:105
 msgid "High"
 msgstr "Високий"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:110
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:115
 msgid ""
 "PyAudio is not available. This feature requires a working PyAudio "
 "installation."
@@ -151,77 +222,87 @@ msgstr ""
 "PyAudio недоступний. Для цієї функції потрібна працездатна інсталяція "
 "PyAudio."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:119
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:124
 msgid "Google GenAI is not available."
 msgstr "Google GenAI недоступний."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:163
+#. Translators: Group label for connection status in the Talk With AI dialog.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:170
 msgid "Status"
 msgstr "Статус"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:167
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:268
+#. Translators: Status label. {status} is replaced with the current Talk With AI status.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:175
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:282
 #, python-brace-format
 msgid "Status: {status}"
 msgstr "Статус: {status}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:167
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:175
 msgid "Ready to Connect"
 msgstr "Готовий до підключення"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:172
+#. Translators: Group label for Talk With AI controls.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:181
 msgid "Controls"
 msgstr "Керування"
 
 #. Translators: Button to start the voice conversation.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:177
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:186
 msgid "Start Conversation"
 msgstr "Розпочати розмову"
 
 #. Translators: Button to stop the voice conversation.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:180
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:189
 msgid "Stop Conversation"
 msgstr "Зупинити розмову"
 
 #. Translators: Toggle button label indicating microphone is ON.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:189
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:284
+#. Translators: Toggle button label indicating microphone state.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:198
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:301
 msgid "Microphone: ON"
 msgstr "Мікрофон: УВІМК"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:197
+#. Translators: Label for selecting the microphone input device.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:207
 msgid "Microphone:"
 msgstr "Мікрофон:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:207
+#. Translators: Label for selecting the speaker output device.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:218
 msgid "Speaker:"
 msgstr "Голос:"
 
 #. Translators: Checkbox to enable grounding with Google Search in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:219
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:230
 msgid "Grounding with Google Search"
 msgstr "Перевірка за допомогою пошуку Google"
 
 #. Translators: Label for choosing the reasoning depth in Talk With AI.
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:225
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:236
 msgid "Thinking level:"
 msgstr "Рівень міркування:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:233
+#. Translators: Label for the Talk With AI playback volume slider.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:245
 msgid "Volume:"
 msgstr "Гучність:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:244
+#. Translators: Informational label. {voiceName} is replaced with the selected Gemini voice.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:257
 #, python-brace-format
 msgid "Voice: {voiceName}"
 msgstr "Голос: {voiceName}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:284
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:301
 msgid "Microphone: OFF"
 msgstr "Мікрофон: ВИМК"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:303
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:398
+#. Translators: Dependency error detail. {baseMessage} is the main error and {errorDetail} is the import exception.
+#. Translators: Error details appended to a dependency import failure.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:321
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:525
 #, python-brace-format
 msgid ""
 "{baseMessage}\n"
@@ -232,7 +313,8 @@ msgstr ""
 "\n"
 "Подробиці імпорту: {errorDetail}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:387
+#. Translators: Dependency compatibility error for Talk With AI.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:409
 #, python-brace-format
 msgid ""
 "Installed google-genai library ({version}) does not support the Gemini 3.1 "
@@ -243,7 +325,8 @@ msgstr ""
 "Gemini 3.1 Live API, потрібні для функції «Розмова з ШІ». Відсутні: "
 "{missing}. Будь ласка, оновіть бібліотеки додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:393
+#. Translators: Dependency compatibility error for Talk With AI when no library version is known.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:416
 #, python-brace-format
 msgid ""
 "Installed google-genai library does not support the Gemini 3.1 Live API "
@@ -254,19 +337,23 @@ msgstr ""
 "API, потрібні для функції «Розмова з ШІ». Відсутні: {missing}. Будь ласка, "
 "оновіть бібліотеки додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:434
+#. Translators: Status shown while Talk With AI is connecting.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:458
 msgid "Connecting..."
 msgstr "Підключення..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:442
+#. Translators: Status shown while Talk With AI is disconnecting.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:467
 msgid "Disconnecting..."
 msgstr "Відключення..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:599
+#. Translators: Error shown when google-genai type helpers are missing.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:626
 msgid "Google GenAI types are not available."
 msgstr "Типи Google GenAI недоступні."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:622
+#. Translators: Error shown when Live API configuration cannot be built.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:650
 msgid ""
 "Failed to prepare the Gemini Live configuration. Please update the add-on "
 "libraries."
@@ -274,7 +361,8 @@ msgstr ""
 "Не вдалося підготувати конфігурацію Gemini Live. Будь ласка, оновіть "
 "бібліотеки додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:632
+#. Translators: Dependency compatibility error for Talk With AI.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:661
 #, python-brace-format
 msgid ""
 "The installed google-genai library ({version}) is too old for Gemini 3.1 "
@@ -285,7 +373,8 @@ msgstr ""
 "Gemini 3.1. Відсутній метод сеансу: {methodName}. Будь ласка, оновіть "
 "бібліотеки додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:640
+#. Translators: Dependency compatibility error for Talk With AI when no library version is known.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:670
 #, python-brace-format
 msgid ""
 "The installed google-genai library is too old for Gemini 3.1 Live sessions. "
@@ -294,56 +383,47 @@ msgstr ""
 "Установлена бібліотека google-genai застаріла для Live-сеансів Gemini 3.1. "
 "Відсутній метод сеансу: {methodName}. Будь ласка, оновіть бібліотеки додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:788
+#. Translators: Status shown when Talk With AI connects successfully.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:822
 msgid "Connected"
 msgstr "З'єднано"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:835
+#. Translators: Status shown while Talk With AI waits before reconnecting.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:870
 #, python-brace-format
 msgid "Connection lost. Retrying in {seconds:.1f}s"
 msgstr "З'єднання втрачено. Повторна спроба через {seconds:.1f}s"
 
-#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:888
+#. Translators: Status shown when Talk With AI is ready for a new session.
+#: addon\globalPlugins\NativeSpeechGeneration\talkWithAI.py:925
 msgid "Ready"
 msgstr "Готово"
 
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:56
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:100
-msgid "Open the Native Speech Generation dialog"
-msgstr "Відкриває діалог генерації природного мовлення"
-
-#. Translators: Title of the settings panel in NVDA preferences.
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:57
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:101
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:25
-#: buildVars.py:6
-msgid "Native Speech Generation"
-msgstr "Генерація природного мовлення"
-
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:64
-msgid ""
-"Native Speech Generation is installing dependencies. Please restart NVDA for "
-"the changes to take effect."
-msgstr ""
-"Генерація природного мовлення встановлює залежності. Перезапустіть NVDA, щоб "
-"зміни набули чинності."
-
-#. Translators: Title of the information dialog recommending a restart.
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:68
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:180
-msgid "Restart Required"
-msgstr "Потрібен перезапуск"
-
 #. Translators: Name of the add-on in the NVDA Tools menu.
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:93
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:87
 msgid "&Native Speech Generation"
 msgstr "&Генерація природного мовлення"
 
-#. Translators: Tooltip or description for the menu item.
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:95
+#. Translators: Tooltip or description for the Native Speech Generation Tools menu item.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:89
 msgid "Generate speech using Gemini TTS"
 msgstr "Генерувати мовлення за допомогою Gemini TTS"
 
+#. Translators: Input gesture description for opening the Native Speech Generation dialog.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:95
+msgid "Open the Native Speech Generation dialog"
+msgstr "Відкриває діалог генерації природного мовлення"
+
+#. Translators: Input gestures category name for Native Speech Generation.
+#. Translators: Title of the settings panel in NVDA preferences.
+#. Translators: Summary for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:97
+#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:25
+#: buildVars.py:12
+msgid "Native Speech Generation"
+msgstr "Генерація природного мовлення"
+
+#. Translators: Warning shown when the user tries to open the add-on dialog twice.
 #: addon\globalPlugins\NativeSpeechGeneration\__init__.py:115
 msgid ""
 "The Native Speech Generation add-on is already open. Please close the dialog "
@@ -352,134 +432,196 @@ msgstr ""
 "Додаток Генерація природного мовлення вже відкрито. Закрийте діалог додатка, "
 "перш ніж відкривати його знову."
 
-#. Translators: Title of warning dialog when user tries to open the add-on twice.
+#. Translators: Title of warning dialog when the user tries to open the add-on twice.
 #: addon\globalPlugins\NativeSpeechGeneration\__init__.py:118
 msgid "Add-on Already Running"
 msgstr "Додаток вже запущено"
 
-#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:130
+#. Translators: Error shown when the main add-on dialog cannot be opened.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:133
 #, python-brace-format
 msgid "Failed to open Native Speech Generation dialog: {error}"
 msgstr "Не вдалося відкрити діалог«Генерація природного мовлення»: {error}"
 
+#. Translators: Message shown when dependency installation is still pending.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:143
+msgid ""
+"Native Speech Generation is installing dependencies. Please restart NVDA for "
+"the changes to take effect."
+msgstr ""
+"Генерація природного мовлення встановлює залежності. Перезапустіть NVDA, щоб "
+"зміни набули чинності."
+
+#. Translators: Title of the information dialog recommending an NVDA restart.
+#: addon\globalPlugins\NativeSpeechGeneration\__init__.py:147
+msgid "Restart Required"
+msgstr "Потрібен перезапуск"
+
+#. Translators: Message shown when generated audio was saved but could not be opened automatically.
+#: addon\globalPlugins\NativeSpeechGeneration\core\audio_utils.py:117
+#, python-brace-format
+msgid "Audio generated, but failed to play automatically: {error}"
+msgstr ""
+"Аудіофайл створено, але не вдалося відтворити його автоматично: {error}"
+
+#. Translators: Title of an informational message dialog.
+#: addon\globalPlugins\NativeSpeechGeneration\core\audio_utils.py:119
+msgid "Info"
+msgstr "Інформація"
+
 #. Translators: The title of the main dialog window for generating speech.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:44
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:63
 msgid "Native Speech Generation (Gemini TTS)"
 msgstr "Генерація природного мовлення (Gemini TTS)"
 
+#. Translators: Model option for the newest Gemini Flash text-to-speech preview.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:87
+msgid "Flash 3.1 Preview"
+msgstr "Flash 3.1 Preview"
+
+#. Translators: Description for the Gemini Flash 3.1 Preview model.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:89
+msgid "Powerful, low-latency speech generation, very good for short audio."
+msgstr ""
+"Потужна генерація мовлення з низькою затримкою, дуже хороша для короткого "
+"аудіо."
+
+#. Translators: Model option for the older Gemini Flash text-to-speech preview.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:94
+msgid "Flash 2.5"
+msgstr "Flash 2.5"
+
+#. Translators: Description for the Gemini Flash 2.5 model.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:96
+msgid "Standard quality, responsive speech generation."
+msgstr "Стандартна якість, генерація адаптивного мовлення."
+
+#. Translators: Model option for the Gemini Pro text-to-speech preview.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:101
+msgid "Pro 2.5 (High Quality)"
+msgstr "Pro 2.5 (висока якість)"
+
+#. Translators: Description for the Gemini Pro 2.5 model.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:103
+msgid "Premium speech generation with more realistic voices."
+msgstr "Преміальна генерація мовлення з більш реалістичними голосами."
+
 #. Translators: Label for the text area where user inputs text to be converted to speech.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:65
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:111
 msgid "&Type text to convert here:"
 msgstr "&Введіть тут текст для перетворення:"
 
 #. Translators: Label for optional instructions on how the speech should be spoken (e.g. "Happy", "Sad").
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:71
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:117
 msgid "&Style instructions (optional):"
 msgstr "&Інструкції щодо стилю (за бажанням):"
 
 #. Translators: Label for selecting the AI model to use for generation.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:78
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:125
 msgid "Select &Model:"
 msgstr "Виберіть модель:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:79
-msgid "Flash (Standard Quality)"
-msgstr "Flash (стандартна якість)"
-
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:79
-msgid "Pro (High Quality)"
-msgstr "Pro (висока якість)"
-
 #. Translators: Radio button to select single speaker mode.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:86
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:137
 msgid "Single-speaker"
 msgstr "Одномовний"
 
 #. Translators: Radio button to select multi-speaker mode.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:88
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:139
 msgid "Multi-speaker (2)"
 msgstr "Багатомовний (2)"
 
 #. Translators: Checkbox to show advanced settings like Temperature.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:97
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:152
 msgid "Advanced Settings (&Temperature)"
 msgstr "Розширені налаштування (&тембр)"
 
 #. Translators: Label for the temperature slider which controls creativity of the AI.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:107
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:162
 msgid "Temperature:"
 msgstr "Тембр:"
 
 #. Translators: Button to start generating the speech audio.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:133
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:539
+#. Translators: Button label restored after speech generation finishes.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:188
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:673
 msgid "&Generate Speech"
 msgstr "&Генерувати мовлення"
 
 #. Translators: Button to play the generated audio.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:138
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:193
 msgid "&Play"
 msgstr "&Грати"
 
 #. Translators: Button to save the generated audio to a file.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:144
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:199
 msgid "Save &Audio"
 msgstr "Зберегти &аудіо"
 
 #. Translators: Button to open the real-time conversation dialog.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:152
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:207
 msgid "Talk With &AI"
 msgstr "Розмова з &ШІ"
 
 #. Translators: Button to open settings specifically for configuring the API key.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:158
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:213
 msgid "API Key Settings"
 msgstr "Налаштування ключа API"
 
 #. Translators: Button that opens a web browser to view available voices in Google AI Studio.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:161
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:216
 msgid "View voices in AI Studio"
 msgstr "Переглянути голоси в AI Studio"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:167
+#. Translators: Button to close the Native Speech Generation dialog.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:223
 msgid "&Close"
 msgstr "&Закрити"
 
 #. Translators: Label for selecting a voice in single speaker mode.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:185
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:241
 msgid "Select &Voice:"
 msgstr "Вибрати & Голос:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:186
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:204
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:219
+#. Translators: Temporary item shown while the add-on prepares the voice list.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:243
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:265
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:284
 msgid "Loading voices..."
 msgstr "Завантаження голосів ..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:201
+#. Translators: Label for entering the first speaker name in multi-speaker mode.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:259
 msgid "Speaker 1 Name:"
 msgstr "Голос 1 Ім'я:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:202
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:477
+#. Translators: Default name for the first speaker in multi-speaker mode.
+#. Translators: Fallback speaker name used when the first speaker field is blank.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:261
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:510
 msgid "Speaker1"
 msgstr "Голос 1"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:203
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:218
+#. Translators: Label for choosing the first speaker voice in multi-speaker mode.
+#. Translators: Label for choosing the second speaker voice in multi-speaker mode.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:263
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:282
 msgid "Voice:"
 msgstr "Голос:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:216
+#. Translators: Label for entering the second speaker name in multi-speaker mode.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:278
 msgid "Speaker 2 Name:"
 msgstr "Голос2 Ім'я:"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:217
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:478
+#. Translators: Default name for the second speaker in multi-speaker mode.
+#. Translators: Fallback speaker name used when the second speaker field is blank.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:280
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:512
 msgid "Speaker2"
 msgstr "Голос 2"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:327
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:428
 #, python-brace-format
 msgid ""
 "The stored Gemini API key could not be decrypted on this Windows user or "
@@ -490,7 +632,7 @@ msgstr ""
 "цього компютера Windows. Введіть його ще раз у налаштуваннях NVDA або "
 "задайте {envVarName} у змінних середовища."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:333
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:434
 #, python-brace-format
 msgid ""
 "No Gemini API key is configured. Set it in NVDA settings, or define "
@@ -499,11 +641,13 @@ msgstr ""
 "API-ключ Gemini не налаштовано. Укажіть його в налаштуваннях NVDA або "
 "задайте {envVarName} у змінних середовища."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:354
+#. Translators: Error shown if the optional Talk With AI dialog module cannot be loaded.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:457
 msgid "Talk With AI module is missing."
 msgstr "Модуль «Розмова з ШІ» відсутній."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:364
+#. Translators: Warning shown when Talk With AI is opened while multi-speaker mode is selected.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:468
 msgid ""
 "Talk With AI currently does not support multi-speaker mode. Please select "
 "Single-speaker."
@@ -511,16 +655,17 @@ msgstr ""
 "Зараз Розмова з ШІ не підтримує режим декількох співрозмовників. Будь ласка, "
 "оберіть режим одного співрозмовника."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:366
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:470
 msgid "Feature Limitation"
 msgstr "Обмеження функцій"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:387
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:491
 #, python-brace-format
 msgid "Failed to open Talk With AI: {error}"
 msgstr "Не вдалося відкрити Розмову з ШІ: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:396
+#. Translators: Error shown when the bundled google-genai dependency cannot be imported.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:521
 msgid ""
 "google-genai is not available. Please restart NVDA after updating the add-on "
 "libraries."
@@ -528,80 +673,86 @@ msgstr ""
 "google-genai недоступний. Перезапустіть NVDA після оновлення бібліотек "
 "додатка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:416
+#. Translators: Error shown when the user tries to generate speech without entering text.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:544
 msgid "Please enter text to generate."
 msgstr "Будь ласка, введіть текст для генерації."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:423
+#. Translators: Temporary Generate button label while speech generation is running.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:553
 msgid "Generating..."
 msgstr "Генерувати..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:430
+#. Translators: Status announcement made when speech generation starts.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:561
 msgid "Generating speech, please wait..."
 msgstr "Генерація мовлення, будь ласка, зачекайте..."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:439
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:570
 #, python-brace-format
 msgid "Failed to initialize Google GenAI client: {error}"
 msgstr "Не вдалося ініціалізувати клієнт Google GenAI: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:450
+#. Translators: Status announcement made when speech generation fails.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:582
 msgid "Failed to generate audio."
 msgstr "Не вдалося створити аудіо."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:452
+#. Translators: Status announcement made when speech generation succeeds.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:585
 msgid "Generation complete."
 msgstr "Генерація завершена."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:526
+#. Translators: Status announcement made when speech generation raises an unexpected error.
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:659
 msgid "An error occurred during generation."
 msgstr "Під час генерації сталася помилка."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:530
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:663
 #, python-brace-format
 msgid "An unexpected error occurred: {error}"
 msgstr "Сталася несподівана помилка: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:598
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:750
 msgid "No inline audio data returned by model."
 msgstr "Модель не повертає вбудованих аудіоданих."
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:620
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:774
 #, python-brace-format
 msgid "Failed to generate speech: {error}"
 msgstr "Не вдалося згенерувати мовлення: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:638
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:800
 msgid "Save Audio File"
 msgstr "Зберегти аудіофайл"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:639
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:801
 msgid "WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3"
 msgstr "Файли WAV (*.wav)|*.wav|Файли MP3 (*.mp3)|*.mp3"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:651
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:813
 #, python-brace-format
 msgid "Audio saved to {path}"
 msgstr "Аудіо збережено в {path}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:652
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:814
 msgid "Success"
 msgstr "Успіх"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:658
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:820
 #, python-brace-format
 msgid "Failed to save audio: {error}"
 msgstr "Не вдалося зберегти аудіо: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:673
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:838
 msgid "Sample not available"
 msgstr "Зразок недоступний"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:678
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:843
 msgid "Playing voice sample"
 msgstr "Відтворення зразка голосу"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:683
+#: addon\globalPlugins\NativeSpeechGeneration\interface\generation_dialog.py:848
 msgid "Failed to play sample"
 msgstr "Не вдалося відтворити зразок"
 
@@ -655,46 +806,22 @@ msgstr ""
 "перевизначить його."
 
 #. Translators: Error shown if Windows DPAPI storage fails while saving the API key.
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:138
+#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:139
 #, python-brace-format
 msgid "Failed to save the Gemini API key securely: {error}"
 msgstr "Не вдалося безпечно зберегти API-ключ Gemini: {error}"
 
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:158
-msgid ""
-"This will delete the existing library and restart NVDA to redownload it.\n"
-"Are you sure?"
-msgstr ""
-"Це призведе до видалення існуючої бібліотеки та перезапуску NVDA для її "
-"повторного завантаження.\n"
-"Ви впевнені?"
-
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:179
-msgid ""
-"Library removed successfully. NVDA will now restart to download the latest "
-"version."
-msgstr ""
-"Бібліотеку успішно видалено. Тепер NVDA перезапуститься, щоб завантажити "
-"останню версію."
-
-#: addon\globalPlugins\NativeSpeechGeneration\interface\settings.py:190
-#, python-brace-format
-msgid ""
-"Failed to remove library: {error}\n"
-"Please check log."
-msgstr ""
-"Не вдалося видалити бібліотеку: {error}\n"
-"Будь ласка, перевірте журнал."
-
-#: buildVars.py:7
+#. Translators: Long description for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
+#: buildVars.py:14
 msgid ""
 "Harness the power of Google's state-of-the-art Gemini AI for high-quality "
 "speech generation directly within NVDA. This add-on provides a user-friendly "
 "dialog to convert text into natural-sounding audio.\n"
 "\n"
 "Key Features:\n"
-"- High-Quality Voices: Choose between Gemini Pro for premium, life-like "
-"speech and Gemini Flash for standard quality, responsive generation.\n"
+"- High-Quality Voices: Choose between Gemini Flash 3.1 Preview for powerful, "
+"low-latency short audio, Gemini Flash 2.5 for standard responsive "
+"generation, and Gemini Pro 2.5 for premium, life-like speech.\n"
 "- Single and Multi-Speaker Modes: Easily generate audio for a single speaker "
 "or create dynamic dialogues with two distinct speakers. Simply format your "
 "text with \"SpeakerName:\" to assign voices.\n"
@@ -714,9 +841,10 @@ msgstr ""
 "діалог для перетворення тексту в природне мовлення.\n"
 "\n"
 "Ключові особливості:\n"
-"- Високоякісні голоси: вибирайте між Gemini Pro для преміум-якості, "
-"реалістичної мови та Gemini Flash для стандартної якості, чутливої "
-"генерації.\n"
+"- Високоякісні голоси: обирайте між Gemini Flash 3.1 Preview для потужного "
+"короткого аудіо з низькою затримкою, Gemini Flash 2.5 для стандартного "
+"швидкого відтворення та Gemini Pro 2.5 для преміум-якості, реалістичної "
+"мови.\n"
 "- Режими одного та декількох голосів: легко генеруйте аудіо для одного "
 "голосу або створюйте динамічні діалоги з двома різними голосами. Просто "
 "відформатуйте текст за допомогою «ім'я голосу:», щоб призначити голоси.\n"
@@ -734,40 +862,93 @@ msgstr ""
 "введіть його в панелі налаштувань додатка, яка знаходиться в меню "
 "«Інструменти» NVDA."
 
-#: buildVars.py:18
+#. Translators: Short release notes shown for this add-on version.
+#: buildVars.py:26
 msgid ""
-"- Security: Gemini API keys are now stored with Windows DPAPI instead of "
-"plaintext config.\n"
-"- Stability: Preserved add-on configuration across updates so API keys are "
-"no longer wiped by the uninstall/update flow.\n"
-"- Deployment: Added GEMINI_API_KEY environment variable fallback for managed "
-"setups.\n"
-"- Talk With AI: Migrated to gemini-3.1-flash-live-preview with Live API "
-"thinking controls.\n"
-"- Talk With AI: Replaced the memory UI with No Thinking, Low, Medium, and "
-"High.\n"
-"- Talk With AI: Preserved reconnect continuity internally by replaying "
-"recent transcript history after reconnects.\n"
-"- Talk With AI: Kept style instructions as the Live API system instruction "
-"and retained Google Search grounding.\n"
-"- Talk With AI: Improved stream stability with reconnect backoff/retry and "
-"adaptive buffering.\n"
-"- Documentation: Added Spanish-language documentation.\n"
+"- Compatibility: Added support for NVDA 2026.1.\n"
+"- Dependencies now use the latest verified library package for each "
+"supported NVDA runtime.\n"
+"- Added Gemini Flash 3.1 Preview as the default TTS model.\n"
+"- See changelog.md for full details.\n"
 msgstr ""
-"- Безпека: Ключі API Gemini тепер зберігаються за допомогою Windows DPAPI "
-"замість відкритого тексту в конфігурації.\n"
-"- Стабільність: Конфігурація додатка тепер зберігається між оновленнями, "
-"тому ключі API більше не стираються під час видалення або оновлення.\n"
-"- Розгортання: Додано підтримку змінної середовища GEMINI_API_KEY для "
-"керованих середовищ.\n"
-"- Розмова з ШІ: Виконано перехід на gemini-3.1-flash-live-preview з "
-"елементами керування міркуванням у Live API.\n"
-"- Розмова з ШІ: Інтерфейс памяті замінено на варіанти Без роздумів, Низький, "
-"Середній і Високий.\n"
-"- Розмова з ШІ: Внутрішньо збережено безперервність після повторного "
-"підключення завдяки відтворенню недавньої історії транскрипцій.\n"
-"- Розмова з ШІ: Інструкції щодо стилю збережено як системну інструкцію Live "
-"API, а інтеграцію з Google Search залишено ввімкненою.\n"
-"- Розмова з ШІ: Покращено стабільність потоку завдяки повторним "
-"підключенням, повторам і адаптивній буферизації.\n"
-"- Документація: Додано документацію іспанською мовою.\n"
+"- Сумісність: додано підтримку NVDA 2026.1.\n"
+"- Залежності тепер використовують найновіший перевірений пакет бібліотек для "
+"кожного підтримуваного середовища виконання NVDA.\n"
+"- Додано Gemini Flash 3.1 Preview як початкову модель TTS.\n"
+"- Детальнішу інформацію дивіться у файлі changelog.md.\n"
+
+#~ msgid "Extraction complete."
+#~ msgstr "Видобування завершено."
+
+#~ msgid ""
+#~ "Are you sure you want to reinstall the libraries? This will redownload "
+#~ "the dependencies and require an NVDA restart."
+#~ msgstr ""
+#~ "Ви впевнені, що бажаєте перевстановити бібліотеки? Це призведе до "
+#~ "повторного завантаження залежностей і потребує перезапуску NVDA."
+
+#~ msgid "Confirm Reinstall"
+#~ msgstr "Підтвердити перевстановлення"
+
+#~ msgid "Flash (Standard Quality)"
+#~ msgstr "Flash (стандартна якість)"
+
+#~ msgid ""
+#~ "This will delete the existing library and restart NVDA to redownload it.\n"
+#~ "Are you sure?"
+#~ msgstr ""
+#~ "Це призведе до видалення існуючої бібліотеки та перезапуску NVDA для її "
+#~ "повторного завантаження.\n"
+#~ "Ви впевнені?"
+
+#~ msgid ""
+#~ "Library removed successfully. NVDA will now restart to download the "
+#~ "latest version."
+#~ msgstr ""
+#~ "Бібліотеку успішно видалено. Тепер NVDA перезапуститься, щоб завантажити "
+#~ "останню версію."
+
+#, python-brace-format
+#~ msgid ""
+#~ "Failed to remove library: {error}\n"
+#~ "Please check log."
+#~ msgstr ""
+#~ "Не вдалося видалити бібліотеку: {error}\n"
+#~ "Будь ласка, перевірте журнал."
+
+#~ msgid ""
+#~ "- Security: Gemini API keys are now stored with Windows DPAPI instead of "
+#~ "plaintext config.\n"
+#~ "- Stability: Preserved add-on configuration across updates so API keys "
+#~ "are no longer wiped by the uninstall/update flow.\n"
+#~ "- Deployment: Added GEMINI_API_KEY environment variable fallback for "
+#~ "managed setups.\n"
+#~ "- Talk With AI: Migrated to gemini-3.1-flash-live-preview with Live API "
+#~ "thinking controls.\n"
+#~ "- Talk With AI: Replaced the memory UI with No Thinking, Low, Medium, and "
+#~ "High.\n"
+#~ "- Talk With AI: Preserved reconnect continuity internally by replaying "
+#~ "recent transcript history after reconnects.\n"
+#~ "- Talk With AI: Kept style instructions as the Live API system "
+#~ "instruction and retained Google Search grounding.\n"
+#~ "- Talk With AI: Improved stream stability with reconnect backoff/retry "
+#~ "and adaptive buffering.\n"
+#~ "- Documentation: Added Spanish-language documentation.\n"
+#~ msgstr ""
+#~ "- Безпека: Ключі API Gemini тепер зберігаються за допомогою Windows DPAPI "
+#~ "замість відкритого тексту в конфігурації.\n"
+#~ "- Стабільність: Конфігурація додатка тепер зберігається між оновленнями, "
+#~ "тому ключі API більше не стираються під час видалення або оновлення.\n"
+#~ "- Розгортання: Додано підтримку змінної середовища GEMINI_API_KEY для "
+#~ "керованих середовищ.\n"
+#~ "- Розмова з ШІ: Виконано перехід на gemini-3.1-flash-live-preview з "
+#~ "елементами керування міркуванням у Live API.\n"
+#~ "- Розмова з ШІ: Інтерфейс памяті замінено на варіанти Без роздумів, "
+#~ "Низький, Середній і Високий.\n"
+#~ "- Розмова з ШІ: Внутрішньо збережено безперервність після повторного "
+#~ "підключення завдяки відтворенню недавньої історії транскрипцій.\n"
+#~ "- Розмова з ШІ: Інструкції щодо стилю збережено як системну інструкцію "
+#~ "Live API, а інтеграцію з Google Search залишено ввімкненою.\n"
+#~ "- Розмова з ШІ: Покращено стабільність потоку завдяки повторним "
+#~ "підключенням, повторам і адаптивній буферизації.\n"
+#~ "- Документація: Додано документацію іспанською мовою.\n"
