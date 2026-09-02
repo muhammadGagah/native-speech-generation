@@ -1,13 +1,16 @@
+import ctypes
 import glob
 import hashlib
 import json
 import os
 import shutil
+import ssl
 import struct
 import sys
 import tempfile
 import threading
 import time
+import urllib.parse
 import urllib.request
 import zipfile
 from collections.abc import Callable
@@ -45,6 +48,11 @@ USER_AGENT = "NativeSpeechGeneration-NVDA-Addon"
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 ADDON_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LIB_DIR = os.path.join(PACKAGE_DIR, "lib")
+
+_CERT_CHAIN_REFRESH_LOCK = threading.Lock()
+_CERT_CHAIN_REFRESHED_HOSTS: set[str] = set()
+_CERT_CHAIN_REFRESH_TIMEOUT = 20
+_CERT_CHAIN_REFRESH_TIMEOUT_MS = 15_000
 
 
 @dataclass(frozen=True)
@@ -433,9 +441,178 @@ def _readJsonUrl(url: str) -> dict[str, Any]:
 		return json.loads(response.read().decode("utf-8"))
 
 
+def _findCertificateVerificationError(error: BaseException) -> ssl.SSLCertVerificationError | None:
+	"""Find a certificate verification error wrapped by urllib or another client."""
+	pending: list[BaseException] = [error]
+	seen: set[int] = set()
+	while pending:
+		current = pending.pop()
+		if id(current) in seen:
+			continue
+		seen.add(id(current))
+		if isinstance(current, ssl.SSLCertVerificationError):
+			return current
+		for related in (
+			getattr(current, "reason", None),
+			getattr(current, "__cause__", None),
+			getattr(current, "__context__", None),
+		):
+			if isinstance(related, BaseException):
+				pending.append(related)
+	return None
+
+
+def _isMissingIssuerError(error: BaseException) -> bool:
+	certificateError = _findCertificateVerificationError(error)
+	if certificateError is None:
+		return False
+	verifyCode = getattr(certificateError, "verify_code", None)
+	if verifyCode in (20, 21):
+		return True
+	message = str(certificateError).lower()
+	return (
+		"unable to get local issuer certificate" in message
+		or "unable to verify the first certificate" in message
+	)
+
+
+def _getPeerCertificate(url: str, timeout: int) -> bytes:
+	"""Read only the peer certificate using a temporary unverified TLS probe."""
+	context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+	context.check_hostname = False
+	context.verify_mode = ssl.CERT_NONE
+	request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+	with urllib.request.urlopen(request, context=context, timeout=timeout) as response:
+		socket = getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None)
+		if socket is None or not hasattr(socket, "getpeercert"):
+			# Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
+			raise LibraryUpdateError(_("Unable to inspect the HTTPS peer certificate."))
+		certificate = socket.getpeercert(binary_form=True)
+		if not isinstance(certificate, bytes) or not certificate:
+			# Translators: Error shown when the HTTPS peer does not provide a certificate.
+			raise LibraryUpdateError(_("The HTTPS peer did not provide a certificate."))
+		return certificate
+
+
+def _refreshWindowsCertificateChain(certificate: bytes) -> bool:
+	"""Ask Windows CryptoAPI to build a chain and refresh missing trust roots."""
+	if os.name != "nt":
+		return False
+	winDll: Any = getattr(ctypes, "WinDLL", None)
+	if winDll is None:
+		return False
+
+	class CertificateEnhancedKeyUsage(ctypes.Structure):
+		_fields_ = [("count", ctypes.c_uint32), ("identifiers", ctypes.c_void_p)]
+
+	class CertificateUsageMatch(ctypes.Structure):
+		_fields_ = [("matchType", ctypes.c_uint32), ("usage", CertificateEnhancedKeyUsage)]
+
+	class CertificateChainParameters(ctypes.Structure):
+		_fields_ = [
+			("size", ctypes.c_uint32),
+			("requestedUsage", CertificateUsageMatch),
+			("requestedIssuancePolicy", CertificateUsageMatch),
+			("urlRetrievalTimeout", ctypes.c_uint32),
+			("checkRevocationFreshnessTime", ctypes.c_int),
+			("revocationFreshnessTime", ctypes.c_uint32),
+			("cacheResyncTime", ctypes.c_void_p),
+			("strongSignParameters", ctypes.c_void_p),
+			("strongSignFlags", ctypes.c_uint32),
+		]
+
+	try:
+		crypt32: Any = winDll("crypt32.dll", use_last_error=True)
+		createContext: Any = crypt32.CertCreateCertificateContext
+		createContext.argtypes = [
+			ctypes.c_uint32,
+			ctypes.POINTER(ctypes.c_ubyte),
+			ctypes.c_uint32,
+		]
+		createContext.restype = ctypes.c_void_p
+		getChain: Any = crypt32.CertGetCertificateChain
+		getChain.argtypes = [
+			ctypes.c_void_p,
+			ctypes.c_void_p,
+			ctypes.c_void_p,
+			ctypes.c_void_p,
+			ctypes.POINTER(CertificateChainParameters),
+			ctypes.c_uint32,
+			ctypes.c_void_p,
+			ctypes.POINTER(ctypes.c_void_p),
+		]
+		getChain.restype = ctypes.c_int
+		freeContext: Any = crypt32.CertFreeCertificateContext
+		freeContext.argtypes = [ctypes.c_void_p]
+		freeContext.restype = ctypes.c_int
+		freeChain: Any = crypt32.CertFreeCertificateChain
+		freeChain.argtypes = [ctypes.c_void_p]
+		freeChain.restype = None
+
+		encodedCertificate = (ctypes.c_ubyte * len(certificate)).from_buffer_copy(certificate)
+		certificateContext = createContext(0x00010001, encodedCertificate, len(certificate))
+		if not certificateContext:
+			log.debug(f"lib_updater: CertCreateCertificateContext failed ({ctypes.get_last_error()}).")
+			return False
+		chainContext = ctypes.c_void_p()
+		chainParameters = CertificateChainParameters()
+		chainParameters.size = ctypes.sizeof(CertificateChainParameters)
+		chainParameters.urlRetrievalTimeout = _CERT_CHAIN_REFRESH_TIMEOUT_MS
+		try:
+			result = bool(
+				getChain(
+					None,
+					certificateContext,
+					None,
+					None,
+					ctypes.byref(chainParameters),
+					0,
+					None,
+					ctypes.byref(chainContext),
+				),
+			)
+			if not result:
+				log.debug(f"lib_updater: CertGetCertificateChain failed ({ctypes.get_last_error()}).")
+			return result
+		finally:
+			if chainContext:
+				freeChain(chainContext)
+			freeContext(certificateContext)
+	except Exception as error:
+		log.debug(f"lib_updater: Windows certificate-chain refresh failed: {error}", exc_info=True)
+		return False
+
+
+def _refreshWindowsRootForUrl(url: str, timeout: int) -> bool:
+	if os.name != "nt":
+		return False
+	parsedUrl = urllib.parse.urlsplit(url)
+	host = parsedUrl.hostname
+	if parsedUrl.scheme.lower() != "https" or not host:
+		return False
+	with _CERT_CHAIN_REFRESH_LOCK:
+		if host in _CERT_CHAIN_REFRESHED_HOSTS:
+			return True
+		try:
+			certificate = _getPeerCertificate(url, min(timeout, _CERT_CHAIN_REFRESH_TIMEOUT))
+			refreshed = _refreshWindowsCertificateChain(certificate)
+			if refreshed:
+				_CERT_CHAIN_REFRESHED_HOSTS.add(host)
+			return refreshed
+		except Exception as error:
+			log.debug(f"lib_updater: Could not probe certificate for {host}: {error}", exc_info=True)
+			return False
+
+
 def _openUrl(url: str, *, timeout: int):
 	request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-	return urllib.request.urlopen(request, timeout=timeout)
+	try:
+		return urllib.request.urlopen(request, timeout=timeout)
+	except Exception as error:
+		if not _isMissingIssuerError(error) or not _refreshWindowsRootForUrl(url, timeout):
+			raise
+		log.debug(f"lib_updater: Retrying verified HTTPS request after Windows certificate refresh: {url}")
+		return urllib.request.urlopen(request, timeout=timeout)
 
 
 def _getResponseLength(response: Any) -> int:
