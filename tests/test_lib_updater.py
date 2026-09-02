@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import builtins
 import importlib.util
+import ssl
 import sys
 import tempfile
 import types
 import unittest
+import urllib.error
 import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LIB_UPDATER_PATH = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "lib_updater.py"
@@ -205,6 +208,46 @@ class LibUpdaterTests(unittest.TestCase):
 			with zipfile.ZipFile(zipPath, "r") as archive:
 				with self.assertRaises(self.libUpdater.LibraryUpdateError):
 					self.libUpdater._validateZipMembers(archive, tempDir)
+
+	def testOpenUrlRefreshesWindowsChainForMissingIssuer(self) -> None:
+		certificateError = ssl.SSLCertVerificationError(20, "unable to get local issuer certificate")
+		response = types.SimpleNamespace()
+		with (
+			mock.patch.object(
+				self.libUpdater.urllib.request,
+				"urlopen",
+				side_effect=[urllib.error.URLError(certificateError), response],
+			) as openUrl,
+			mock.patch.object(
+				self.libUpdater,
+				"_refreshWindowsRootForUrl",
+				return_value=True,
+			) as refresh,
+		):
+			self.assertIs(self.libUpdater._openUrl("https://pypi.org/example", timeout=20), response)
+		refresh.assert_called_once_with("https://pypi.org/example", 20)
+		self.assertEqual(openUrl.call_count, 2)
+
+	def testOpenUrlDoesNotRefreshForOtherErrors(self) -> None:
+		error = urllib.error.URLError("connection refused")
+		with (
+			mock.patch.object(self.libUpdater.urllib.request, "urlopen", side_effect=error),
+			mock.patch.object(self.libUpdater, "_refreshWindowsRootForUrl") as refresh,
+			self.assertRaises(urllib.error.URLError),
+		):
+			self.libUpdater._openUrl("https://pypi.org/example", timeout=20)
+		refresh.assert_not_called()
+
+	def testMissingIssuerDetectionExcludesHostnameMismatch(self) -> None:
+		issuerError = ssl.SSLCertVerificationError(20, "unable to get local issuer certificate")
+		hostnameError = ssl.SSLCertVerificationError(62, "Hostname mismatch")
+		self.assertTrue(self.libUpdater._isMissingIssuerError(urllib.error.URLError(issuerError)))
+		self.assertFalse(self.libUpdater._isMissingIssuerError(urllib.error.URLError(hostnameError)))
+
+	def testWindowsRootRefreshSkipsNonHttpsUrls(self) -> None:
+		with mock.patch.object(self.libUpdater, "_getPeerCertificate") as getCertificate:
+			self.assertFalse(self.libUpdater._refreshWindowsRootForUrl("http://example.test/file", 20))
+		getCertificate.assert_not_called()
 
 
 if __name__ == "__main__":

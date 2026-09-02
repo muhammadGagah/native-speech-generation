@@ -1,6 +1,12 @@
 # Changelog
 
-## version 1.8.0
+## version 1.8.1
+
+- Dependency installer: Added a Windows CryptoAPI certificate-chain refresh for systems that cannot verify the PyPI certificate because a trusted issuer is missing.
+- Dependency installer: Retries the original HTTPS request once after the refresh while preserving normal TLS validation and the pinned PyAudio SHA-256 check.
+- Compatibility: Retains NVDA 2024.1 as the minimum supported version and remains tested with NVDA 2026.2.
+
+Previous 1.8.0 changes are included in the release history.
 
 - Live API: Fixed binary WebSocket JSON frames being discarded, which caused Quick Speak and Talk With AI to time out during setup.
 - Live API: Added setup/response timeouts, server error and close-reason propagation, and clearer first-connection retry status.

@@ -21,13 +21,10 @@ Key Features:
 - Seamless Workflow: The add-on provides instant audio playback upon generation and allows you to save the resulting .wav file for later use.
 
 To get started, obtain a Gemini API key from Google AI Studio and enter it in the add-on's settings panel, found under NVDA's Tools menu."""),
-	addon_version="1.8.0",
+	addon_version="1.8.1",
 	# Translators: Short release notes shown for this add-on version.
-	addon_changelog=_("""- Added Quick Speak for selected text (NVDA+Alt+E) and clipboard text (NVDA+Alt+Shift+E), with configurable model, voice, style, volume, and internal playback.
-- Migrated Gemini Live features to a direct WebSocket API and improved connection timeouts, retries, server errors, and cancellation.
-- Improved Quick Speak with high thinking for Gemini 3.1 Flash Live Preview, silent routine states, protected-field blocking, focus preservation, key-repeat suppression, and stale playback protection.
-- Improved Talk With AI with saved audio devices and volume, better default-device selection, safer playback interruption and shutdown, and more reliable screen sharing.
-- Updated accessibility, error announcements, translations, and documentation. Tested through NVDA 2026.2 while retaining NVDA 2024.1 as the minimum supported version.
+	addon_changelog=_("""- Fixed dependency installation failures on some Windows systems by refreshing missing certificate chains through Windows CryptoAPI and retrying the verified HTTPS request once.
+- Preserved TLS certificate validation and the pinned PyAudio SHA-256 verification; no unverified connection is used for the downloaded package.
 - See changelog.md for full details.
 """),
 	addon_author="Muhammad <muha.aku@gmail.com>",

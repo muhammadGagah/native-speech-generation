@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: NativeSpeechGeneration 1.8.0\n"
+"Project-Id-Version: NativeSpeechGeneration 1.8.1\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
 "POT-Creation-Date: 2026-09-02 08:22+0700\n"
 "PO-Revision-Date: 2026-09-02 09:54+0700\n"
@@ -24,6 +24,14 @@ msgstr ""
 #, python-brace-format
 msgid "No approved checksum is bundled for {assetName}."
 msgstr "Tidak ada checksum yang disetujui yang disertakan untuk {assetName}."
+
+#. Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
+msgid "Unable to inspect the HTTPS peer certificate."
+msgstr "Tidak dapat memeriksa sertifikat peer HTTPS."
+
+#. Translators: Error shown when the HTTPS peer does not provide a certificate.
+msgid "The HTTPS peer did not provide a certificate."
+msgstr "Peer HTTPS tidak memberikan sertifikat."
 
 msgid ""
 "PyAudio checksum metadata does not match the checksum approved by this add-"
