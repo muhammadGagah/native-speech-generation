@@ -17,15 +17,17 @@ Key Features:
 - High-Quality Voices: Choose between Gemini Flash 3.1 Preview for powerful, low-latency short audio, Gemini Flash 2.5 for standard responsive generation, and Gemini Pro 2.5 for premium, life-like speech.
 - Single and Multi-Speaker Modes: Easily generate audio for a single speaker or create dynamic dialogues with two distinct speakers. Simply format your text with "SpeakerName:" to assign voices.
 - Advanced Voice Control: Fine-tune the output by adjusting the temperature for more creative or stable results, and provide custom style instructions.
-- Accessible Interface: All controls are fully accessible, including a collapsible panel for advanced settings to keep the interface clean and easy to navigate.
+- Quick Speak: Speak selected text or clipboard text immediately with separate model, voice, and style settings while keeping focus in the current application.
 - Seamless Workflow: The add-on provides instant audio playback upon generation and allows you to save the resulting .wav file for later use.
 
 To get started, obtain a Gemini API key from Google AI Studio and enter it in the add-on's settings panel, found under NVDA's Tools menu."""),
-	addon_version="1.7.0",
+	addon_version="1.8.0",
 	# Translators: Short release notes shown for this add-on version.
-	addon_changelog=_("""- Compatibility: Added support for NVDA 2026.1.
-- Dependencies now use the latest verified library package for each supported NVDA runtime.
-- Added Gemini Flash 3.1 Preview as the default TTS model.
+	addon_changelog=_("""- Added Quick Speak for selected text (NVDA+Alt+E) and clipboard text (NVDA+Alt+Shift+E), with configurable model, voice, style, volume, and internal playback.
+- Migrated Gemini Live features to a direct WebSocket API and improved connection timeouts, retries, server errors, and cancellation.
+- Improved Quick Speak with high thinking for Gemini 3.1 Flash Live Preview, silent routine states, protected-field blocking, focus preservation, key-repeat suppression, and stale playback protection.
+- Improved Talk With AI with saved audio devices and volume, better default-device selection, safer playback interruption and shutdown, and more reliable screen sharing.
+- Updated accessibility, error announcements, translations, and documentation. Tested through NVDA 2026.2 while retaining NVDA 2024.1 as the minimum supported version.
 - See changelog.md for full details.
 """),
 	addon_author="Muhammad <muha.aku@gmail.com>",
@@ -33,7 +35,7 @@ To get started, obtain a Gemini API key from Google AI Studio and enter it in th
 	addon_sourceURL="https://github.com/muhammadGagah/native-speech-generation/",
 	addon_docFileName="readme.html",
 	addon_minimumNVDAVersion="2024.1",
-	addon_lastTestedNVDAVersion="2026.1",
+	addon_lastTestedNVDAVersion="2026.2",
 	addon_updateChannel=None,
 	addon_license="GPL-2.0",
 	addon_licenseURL="https://www.gnu.org/licenses/gpl-2.0.html",
@@ -52,8 +54,7 @@ excludedFiles: list[str] = [
 	"**/__pycache__/*",
 	"**/*.pyc",
 	"**/*.pyo",
-	"**/lib.zip",
-	"**/lib64.zip",
+	"**/*.whl",
 	"**/.lib_staging_*/*",
 	"**/.lib_ready_*/*",
 	"**/lib_trash_*/*",

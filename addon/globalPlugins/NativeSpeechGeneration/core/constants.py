@@ -4,6 +4,13 @@ CONFIG_DOMAIN = "NativeSpeechGeneration"
 DEFAULT_MODEL = "gemini-3.1-flash-tts-preview"
 FLASH_25_MODEL = "gemini-2.5-flash-preview-tts"
 PRO_25_MODEL = "gemini-2.5-pro-preview-tts"
+LIVE_MODEL = "gemini-3.1-flash-live-preview"
+NATIVE_AUDIO_25_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+
+QUICK_SPEAK_DEFAULT_MODEL = LIVE_MODEL
+QUICK_SPEAK_DEFAULT_VOICE = "Kore"
+QUICK_SPEAK_DEFAULT_VOLUME = 80
+TALK_WITH_AI_DEFAULT_VOLUME = 80
 
 # Compute directories relative to this file
 _coreDir = os.path.dirname(os.path.abspath(__file__))

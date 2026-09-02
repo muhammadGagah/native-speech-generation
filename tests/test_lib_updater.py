@@ -113,118 +113,86 @@ class LibUpdaterTests(unittest.TestCase):
 	def setUp(self) -> None:
 		self.libUpdater = _loadLibUpdater()
 
-	def testNvdaVersionParsingAndRuntimeAssetSelection(self) -> None:
-		self.assertEqual(self.libUpdater.parseNvdaVersion("2026.1"), (2026, 1, 0))
-		self.assertEqual(self.libUpdater.parseNvdaVersion("NVDA 2025.3.3"), (2025, 3, 3))
-		self.assertIsNone(self.libUpdater.parseNvdaVersion("alpha"))
-		self.assertEqual(self.libUpdater.getRuntimeAssetName("2026.1"), "lib64.zip")
-		self.assertEqual(self.libUpdater.getRuntimeAssetName("2025.3.3"), "lib.zip")
-		self.assertEqual(self.libUpdater.getRuntimeAssetName("not-a-version"), "lib.zip")
+	def testRuntimeWheelSelectionUsesPythonAndArchitecture(self) -> None:
+		self.assertEqual(
+			self.libUpdater.getRuntimeAssetName((3, 11), 32),
+			"PyAudio-0.2.14-cp311-cp311-win32.whl",
+		)
+		self.assertEqual(
+			self.libUpdater.getRuntimeAssetName((3, 13), 64),
+			"PyAudio-0.2.14-cp313-cp313-win_amd64.whl",
+		)
+		with self.assertRaises(self.libUpdater.LibraryUpdateError):
+			self.libUpdater.getRuntimeAssetName((3, 13), 128)
 
-	def testApprovedLibraryAssetsArePinned(self) -> None:
-		lib32 = self.libUpdater.getApprovedLibraryAsset("lib.zip")
-		lib64 = self.libUpdater.getApprovedLibraryAsset("lib64.zip")
+	def testApprovedPyAudioWheelsArePinned(self) -> None:
+		wheel32 = "PyAudio-0.2.14-cp311-cp311-win32.whl"
+		wheel64 = "PyAudio-0.2.14-cp313-cp313-win_amd64.whl"
+		metadata = {
+			"urls": [
+				{
+					"filename": wheel32,
+					"url": f"https://example.test/{wheel32}",
+					"digests": {"sha256": self.libUpdater.APPROVED_LIBRARY_SHA256[wheel32]},
+				},
+				{
+					"filename": wheel64,
+					"url": f"https://example.test/{wheel64}",
+					"digests": {"sha256": self.libUpdater.APPROVED_LIBRARY_SHA256[wheel64]},
+				},
+			],
+		}
+		def readMetadata(_url: str) -> dict[str, Any]:
+			return metadata
 
-		self.assertEqual(lib32.version, "2.2.0")
-		self.assertEqual(lib32.source, "approved")
+		self.libUpdater._readJsonUrl = readMetadata
+
+		lib32 = self.libUpdater.getApprovedLibraryAsset(wheel32)
+		lib64 = self.libUpdater.getApprovedLibraryAsset(wheel64)
+
+		self.assertEqual(lib32.version, "0.2.14")
+		self.assertEqual(lib32.source, "pypi")
 		self.assertEqual(
 			lib32.sha256,
-			"96140636befa9880fbe48efc309f71f6057e80f48a7e58299d9657287df76d90",
+			"506b32a595f8693811682ab4b127602d404df7dfc453b499c91a80d0f7bad289",
 		)
-		self.assertEqual(lib64.version, "2.2.0")
-		self.assertEqual(lib64.source, "approved")
+		self.assertEqual(lib64.version, "0.2.14")
+		self.assertEqual(lib64.source, "pypi")
 		self.assertEqual(
 			lib64.sha256,
-			"f8082c18d503454728b8d7ab97dbc407cd74c8ee086f6e2a6fde27dff9945b37",
+			"692d8c1446f52ed2662120bcd9ddcb5aa2b71f38bda31e58b19fb4672fffba69",
 		)
 
-	def testLatestLibraryAssetUsesGithubDigest(self) -> None:
-		checksum = "d" * 64
-		release = {
-			"tag_name": "2.3.0",
-			"assets": [
-				{
-					"name": "lib64.zip",
-					"browser_download_url": "https://example.test/lib64.zip",
-					"digest": f"sha256:{checksum}",
-				},
-			],
-		}
+	def testPyAudioMetadataChecksumMustMatchPinnedValue(self) -> None:
+		wheel = "PyAudio-0.2.14-cp313-cp313-win_amd64.whl"
+		def readBadMetadata(_url: str) -> dict[str, Any]:
+			return {
+				"urls": [
+					{
+						"filename": wheel,
+						"url": "https://example.test/wheel",
+						"digests": {"sha256": "0" * 64},
+					},
+				],
+			}
 
-		def readJson(_url: str) -> dict[str, Any]:
-			return release
+		self.libUpdater._readJsonUrl = readBadMetadata
+		with self.assertRaisesRegex(self.libUpdater.LibraryUpdateError, "checksum metadata"):
+			self.libUpdater.getApprovedLibraryAsset(wheel)
 
-		self.libUpdater._readJsonUrl = readJson
-
-		asset = self.libUpdater.getLatestVerifiedLibraryAsset("lib64.zip")
-
-		self.assertEqual(asset.version, "2.3.0")
-		self.assertEqual(asset.name, "lib64.zip")
-		self.assertEqual(asset.url, "https://example.test/lib64.zip")
-		self.assertEqual(asset.sha256, checksum)
-		self.assertEqual(asset.source, "github")
-
-	def testResolveLibraryAssetUsesLatestReleaseByDefault(self) -> None:
-		checksum = "e" * 64
-		release = {
-			"tag_name": "2.3.0",
-			"assets": [
-				{
-					"name": "lib64.zip",
-					"browser_download_url": "https://example.test/lib64.zip",
-					"digest": f"sha256:{checksum}",
-				},
-			],
-		}
-
-		def readJson(_url: str) -> dict[str, Any]:
-			return release
-
-		self.libUpdater._readJsonUrl = readJson
-
-		asset = self.libUpdater._resolveLibraryAsset()
-
-		self.assertEqual(asset.version, "2.3.0")
-		self.assertEqual(asset.sha256, checksum)
-		self.assertEqual(asset.source, "github")
-
-	def testResolveLibraryAssetFallbackIsSkippedForForcedLatest(self) -> None:
-		def fail(_url: str) -> dict[str, Any]:
-			raise OSError("offline")
-
-		self.libUpdater._readJsonUrl = fail
-
-		asset = self.libUpdater._resolveLibraryAsset()
-
-		self.assertEqual(asset.version, "2.2.0")
-		self.assertEqual(asset.name, "lib64.zip")
-		self.assertEqual(asset.source, "approved")
-		with self.assertRaises(OSError):
-			self.libUpdater._resolveLibraryAsset(forceLatest=True)
-
-	def testReleaseAssetDigestCanBeParsedForMaintainerChecks(self) -> None:
-		checksum = "a" * 64
-		asset = {
-			"name": "lib.zip",
-			"browser_download_url": "https://example.test/lib.zip",
-			"digest": f"sha256:{checksum}",
-		}
-		release = {"assets": [asset]}
-
-		self.assertEqual(self.libUpdater._findReleaseChecksum(release, "lib.zip", asset), checksum)
-
-	def testChecksumTextRequiresMatchingAssetWhenReadingChecksumsFile(self) -> None:
-		checksum = "b" * 64
-		checksumText = f"{checksum}  lib64.zip\n{'c' * 64}  lib.zip\n"
-
-		self.assertEqual(
-			self.libUpdater._parseChecksumText(checksumText, "lib64.zip", allowFallback=False),
-			checksum,
-		)
-		self.assertEqual(
-			self.libUpdater._parseChecksumText(checksumText, "missing.zip", allowFallback=False),
-			"",
-		)
+	def testCurrentInstallRejectsLegacyDependencyFiles(self) -> None:
+		with tempfile.TemporaryDirectory() as tempDir:
+			self.libUpdater.LIB_DIR = tempDir
+			pythonTag, platformTag = self.libUpdater._getRuntimeTags()
+			pyaudioDir = Path(tempDir, "pyaudio")
+			pyaudioDir.mkdir()
+			Path(pyaudioDir, "__init__.py").write_text("", encoding="utf-8")
+			Path(pyaudioDir, f"_portaudio.{pythonTag}-{platformTag}.pyd").write_bytes(b"")
+			Path(tempDir, "anyio").mkdir()
+			self.assertFalse(self.libUpdater._isCurrentLibraryInstall())
+			Path(tempDir, "anyio").rmdir()
+			Path(tempDir, "PyAudio-0.2.14.dist-info").mkdir()
+			self.assertTrue(self.libUpdater._isCurrentLibraryInstall())
 
 	def testUnsafeZipMembersAreRejected(self) -> None:
 		with tempfile.TemporaryDirectory() as tempDir:

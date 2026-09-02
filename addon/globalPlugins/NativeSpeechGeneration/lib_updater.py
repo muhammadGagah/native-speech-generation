@@ -2,8 +2,9 @@ import glob
 import hashlib
 import json
 import os
-import re
 import shutil
+import struct
+import sys
 import tempfile
 import threading
 import time
@@ -19,20 +20,26 @@ import gui
 import wx
 from logHandler import log
 
+if __package__:
+	from .core.nvda_compat import shouldWriteToDisk
+else:
+	# Keep the updater unit-testable when loaded as a standalone module.
+	def shouldWriteToDisk() -> bool:
+		return True
+
 addonHandler.initTranslation()
 
-LIBRARY_RELEASE_API_URL = "https://api.github.com/repos/muhammadGagah/python-library-add-on-Native-Speech-Generation/releases/latest"
-LIBRARY_RELEASE_DOWNLOAD_BASE = (
-	"https://github.com/muhammadGagah/python-library-add-on-Native-Speech-Generation/releases/download"
-)
-APPROVED_LIBRARY_VERSION = "2.2.0"
+PYAUDIO_VERSION = "0.2.14"
+PYAUDIO_RELEASE_API_URL = f"https://pypi.org/pypi/PyAudio/{PYAUDIO_VERSION}/json"
 APPROVED_LIBRARY_SHA256 = {
-	"lib.zip": "96140636befa9880fbe48efc309f71f6057e80f48a7e58299d9657287df76d90",
-	"lib64.zip": "f8082c18d503454728b8d7ab97dbc407cd74c8ee086f6e2a6fde27dff9945b37",
+	"PyAudio-0.2.14-cp311-cp311-win32.whl": "506b32a595f8693811682ab4b127602d404df7dfc453b499c91a80d0f7bad289",
+	"PyAudio-0.2.14-cp311-cp311-win_amd64.whl": "bbeb01d36a2f472ae5ee5e1451cacc42112986abe622f735bb870a5db77cf903",
+	"PyAudio-0.2.14-cp312-cp312-win32.whl": "5fce4bcdd2e0e8c063d835dbe2860dac46437506af509353c7f8114d4bacbd5b",
+	"PyAudio-0.2.14-cp312-cp312-win_amd64.whl": "12f2f1ba04e06ff95d80700a78967897a489c05e093e3bffa05a84ed9c0a7fa3",
+	"PyAudio-0.2.14-cp313-cp313-win32.whl": "95328285b4dab57ea8c52a4a996cb52be6d629353315be5bfda403d15932a497",
+	"PyAudio-0.2.14-cp313-cp313-win_amd64.whl": "692d8c1446f52ed2662120bcd9ddcb5aa2b71f38bda31e58b19fb4672fffba69",
 }
-NVDA_2026_RUNTIME_VERSION = (2026, 1, 0)
 USER_AGENT = "NativeSpeechGeneration-NVDA-Addon"
-SHA256_RE = re.compile(r"\b([a-fA-F0-9]{64})\b")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 ADDON_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -54,13 +61,15 @@ class LibraryUpdateError(RuntimeError):
 
 def cleanupTrash() -> None:
 	"""Remove dependency update leftovers from previous sessions."""
+	if not shouldWriteToDisk():
+		return
 	for pattern in ("lib_trash_*", ".lib_staging_*", ".lib_ready_*"):
 		for trashDir in glob.glob(os.path.join(PACKAGE_DIR, pattern)):
 			if not os.path.isdir(trashDir):
 				continue
 			try:
 				shutil.rmtree(trashDir, ignore_errors=True)
-				log.info(f"lib_updater: Cleaned temporary directory: {trashDir}")
+				log.debug(f"lib_updater: Cleaned temporary directory: {trashDir}")
 			except Exception as error:
 				log.warning(f"lib_updater: Failed to clean temporary directory {trashDir}: {error}")
 
@@ -70,43 +79,35 @@ def initialize() -> None:
 	cleanupTrash()
 
 
-def parseNvdaVersion(versionText: str) -> tuple[int, int, int] | None:
-	match = re.search(r"(\d{4})\.(\d+)(?:\.(\d+))?", versionText)
-	if match is None:
-		return None
-	year = int(match.group(1))
-	major = int(match.group(2))
-	minor = int(match.group(3) or 0)
-	return year, major, minor
+def _getRuntimeTags(
+	pythonVersion: tuple[int, int] | None = None,
+	archBits: int | None = None,
+) -> tuple[str, str]:
+	if pythonVersion is None:
+		pythonVersion = (sys.version_info.major, sys.version_info.minor)
+	if archBits is None:
+		archBits = struct.calcsize("P") * 8
+	pythonTag = f"cp{pythonVersion[0]}{pythonVersion[1]}"
+	if archBits == 64:
+		platformTag = "win_amd64"
+	elif archBits == 32:
+		platformTag = "win32"
+	else:
+		raise LibraryUpdateError(f"Unsupported Python architecture: {archBits}-bit")
+	return pythonTag, platformTag
 
 
-def getCurrentNvdaVersionText() -> str:
-	try:
-		import buildVersion
-
-		return str(buildVersion.version)
-	except Exception as error:
-		log.warning(f"lib_updater: Could not read NVDA version: {error}", exc_info=True)
-		return ""
-
-
-def getRuntimeAssetName(versionText: str | None = None) -> str:
-	"""Return the dependency archive name for the running NVDA runtime."""
-	if versionText is None:
-		versionText = getCurrentNvdaVersionText()
-	nvdaVersion = parseNvdaVersion(versionText)
-	if nvdaVersion is None:
-		log.warning(
-			"lib_updater: Could not parse NVDA version for dependency selection; using lib.zip.",
-		)
-		return "lib.zip"
-	if nvdaVersion >= NVDA_2026_RUNTIME_VERSION:
-		return "lib64.zip"
-	return "lib.zip"
+def getRuntimeAssetName(
+	pythonVersion: tuple[int, int] | None = None,
+	archBits: int | None = None,
+) -> str:
+	"""Return the pinned PyAudio wheel matching NVDA's embedded Python runtime."""
+	pythonTag, platformTag = _getRuntimeTags(pythonVersion, archBits)
+	return f"PyAudio-{PYAUDIO_VERSION}-{pythonTag}-{pythonTag}-{platformTag}.whl"
 
 
 def getApprovedLibraryAsset(assetName: str | None = None) -> LibraryAsset:
-	"""Return the pinned dependency archive approved for stable add-on releases."""
+	"""Return the pinned, checksum-verified PyAudio wheel for this runtime."""
 	if assetName is None:
 		assetName = getRuntimeAssetName()
 	sha256 = APPROVED_LIBRARY_SHA256.get(assetName, "").strip()
@@ -115,38 +116,22 @@ def getApprovedLibraryAsset(assetName: str | None = None) -> LibraryAsset:
 			# Translators: Error shown when this add-on has no trusted checksum for a dependency archive.
 			_("No approved checksum is bundled for {assetName}.").format(assetName=assetName),
 		)
-	return LibraryAsset(
-		version=APPROVED_LIBRARY_VERSION,
-		name=assetName,
-		url=f"{LIBRARY_RELEASE_DOWNLOAD_BASE}/{APPROVED_LIBRARY_VERSION}/{assetName}",
-		sha256=sha256,
-		source="approved",
-	)
-
-
-def getLatestVerifiedLibraryAsset(assetName: str | None = None) -> LibraryAsset:
-	"""Return a checksum-verified asset from the latest GitHub release."""
-	if assetName is None:
-		assetName = getRuntimeAssetName()
-	release = _readJsonUrl(LIBRARY_RELEASE_API_URL)
-	version = str(release.get("tag_name") or "")
-	if not version:
+	asset = _findPypiWheel(_readJsonUrl(PYAUDIO_RELEASE_API_URL), assetName)
+	metadataChecksum = str(asset.get("digests", {}).get("sha256") or "")
+	if metadataChecksum.lower() != sha256.lower():
 		raise LibraryUpdateError(
-			# Translators: Error shown when the GitHub release metadata cannot identify the release version.
-			_("The latest library release does not include a version tag."),
+			_("PyAudio checksum metadata does not match the checksum approved by this add-on."),
 		)
-	asset = _findReleaseAsset(release, assetName)
-	checksum = _findReleaseChecksum(release, assetName, asset)
 	return LibraryAsset(
-		version=version,
+		version=PYAUDIO_VERSION,
 		name=assetName,
-		url=str(asset["browser_download_url"]),
-		sha256=checksum,
-		source="github",
+		url=str(asset["url"]),
+		sha256=sha256,
+		source="pypi",
 	)
 
 
-getVerifiedLibraryAsset = getLatestVerifiedLibraryAsset
+getVerifiedLibraryAsset = getApprovedLibraryAsset
 
 
 def downloadAndExtract(
@@ -158,7 +143,7 @@ def downloadAndExtract(
 	"""Download, verify, and install dependency libraries for this NVDA runtime."""
 	try:
 		if forceLatest:
-			log.info("lib_updater: User requested dependency reinstall from the latest verified release.")
+			log.debug("lib_updater: User requested a clean reinstall of the pinned PyAudio wheel.")
 		asset = _resolveLibraryAsset(forceLatest=forceLatest)
 		_installLibraryAsset(asset, progressCallback)
 		return True
@@ -178,8 +163,11 @@ def downloadAndExtract(
 
 def checkAndInstallDependencies(forceReinstall: bool = False) -> None:
 	"""Prompt the user and install dependency libraries when needed."""
-	if not forceReinstall and os.path.exists(LIB_DIR):
-		log.info("Dependencies already installed, skipping check.")
+	if not shouldWriteToDisk():
+		log.warning("Skipped dependency installation because NVDA must not write to disk.")
+		return
+	if not forceReinstall and _isCurrentLibraryInstall():
+		log.debug("Dependencies already installed, skipping check.")
 		return
 
 	def runInstallation() -> None:
@@ -230,14 +218,14 @@ def checkAndInstallDependencies(forceReinstall: bool = False) -> None:
 		if forceReinstall:
 			msg = _(
 				# Translators: Confirmation before reinstalling or updating external Python dependencies from GitHub.
-				"This will download the latest verified libraries for your NVDA version and require an NVDA restart. Continue?",
+				"This will reinstall the verified PyAudio wheel for NVDA's Python runtime and require an NVDA restart. Continue?",
 			)
 			# Translators: Title of the dialog confirming a dependency library reinstall.
 			title = _("Confirm Library Update")
 		else:
 			msg = _(
 				# Translators: Confirmation shown when required libraries are missing.
-				"Required libraries for Native Speech Generation are missing. Click OK to download the latest verified package for your NVDA version.",
+				"PyAudio is missing or incompatible. Click OK to download the verified wheel for NVDA's Python runtime.",
 			)
 			# Translators: Title of the dialog shown when dependency libraries are missing.
 			title = _("Missing Dependencies")
@@ -246,7 +234,7 @@ def checkAndInstallDependencies(forceReinstall: bool = False) -> None:
 		if res == wx.OK:
 			runInstallation()
 		else:
-			log.info("User cancelled dependency installation.")
+			log.debug("User cancelled dependency installation.")
 
 	wx.CallAfter(confirmAction)
 
@@ -257,23 +245,27 @@ def reinstallDependencies() -> None:
 
 
 def _resolveLibraryAsset(*, forceLatest: bool = False) -> LibraryAsset:
-	assetName = getRuntimeAssetName()
-	try:
-		return getLatestVerifiedLibraryAsset(assetName)
-	except Exception as error:
-		if forceLatest:
-			raise
-		log.warning(
-			f"lib_updater: Could not resolve latest verified {assetName}; falling back to approved release: {error}",
-			exc_info=True,
-		)
-		return getApprovedLibraryAsset(assetName)
+	return getApprovedLibraryAsset(getRuntimeAssetName())
+
+
+def _isCurrentLibraryInstall() -> bool:
+	pyaudioDir = os.path.join(LIB_DIR, "pyaudio")
+	if not os.path.isdir(pyaudioDir) or not os.path.isfile(os.path.join(pyaudioDir, "__init__.py")):
+		return False
+	pythonTag, platformTag = _getRuntimeTags()
+	expectedBinary = os.path.join(pyaudioDir, f"_portaudio.{pythonTag}-{platformTag}.pyd")
+	if not os.path.isfile(expectedBinary):
+		return False
+	allowedEntries = {"pyaudio", f"pyaudio-{PYAUDIO_VERSION}.dist-info", "__pycache__"}
+	return all(name.lower() in allowedEntries for name in os.listdir(LIB_DIR))
 
 
 def _installLibraryAsset(
 	asset: LibraryAsset,
 	progressCallback: Callable[[int, str], None],
 ) -> None:
+	if not shouldWriteToDisk():
+		raise LibraryUpdateError("NVDA is not allowed to write dependency files in the current mode.")
 	zipPath = ""
 	candidateDir = ""
 	try:
@@ -302,7 +294,7 @@ def _installLibraryAsset(
 			# Translators: Progress message shown after library extraction and installation.
 			_("Library installation complete."),
 		)
-		log.info(
+		log.debug(
 			f"lib_updater: Installed {asset.name} from {asset.source} release {asset.version}.",
 		)
 	finally:
@@ -440,11 +432,6 @@ def _readJsonUrl(url: str) -> dict[str, Any]:
 		return json.loads(response.read().decode("utf-8"))
 
 
-def _readTextUrl(url: str) -> str:
-	with _openUrl(url, timeout=20) as response:
-		return response.read().decode("utf-8", errors="replace")
-
-
 def _openUrl(url: str, *, timeout: int):
 	request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
 	return urllib.request.urlopen(request, timeout=timeout)
@@ -458,66 +445,13 @@ def _getResponseLength(response: Any) -> int:
 		return 0
 
 
-def _findReleaseAsset(release: dict[str, Any], assetName: str) -> dict[str, Any]:
-	for asset in release.get("assets", []):
-		if asset.get("name") == assetName and asset.get("browser_download_url"):
+def _findPypiWheel(release: dict[str, Any], assetName: str) -> dict[str, Any]:
+	for asset in release.get("urls", []):
+		if asset.get("filename") == assetName and asset.get("url"):
 			return asset
 	raise LibraryUpdateError(
-		# Translators: Error shown when a GitHub release lacks the dependency asset needed for this NVDA version.
-		_("The latest library release does not contain {assetName}.").format(assetName=assetName),
-	)
-
-
-def _findReleaseChecksum(release: dict[str, Any], assetName: str, asset: dict[str, Any]) -> str:
-	checksumAssetNames = (f"{assetName}.sha256", "checksums.txt")
-	for checksumAssetName in checksumAssetNames:
-		checksumAsset = _findOptionalReleaseAsset(release, checksumAssetName)
-		if checksumAsset is None:
-			continue
-		checksumText = _readTextUrl(str(checksumAsset["browser_download_url"]))
-		checksum = _parseChecksumText(
-			checksumText,
-			assetName,
-			allowFallback=checksumAssetName != "checksums.txt",
-		)
-		if checksum:
-			return checksum
-	checksum = _parseReleaseAssetDigest(asset)
-	if checksum:
-		return checksum
-	raise LibraryUpdateError(
-		# Translators: Error shown when a dependency release lacks checksum metadata.
-		_("The latest library release does not include a checksum for {assetName}.").format(
+		_("PyAudio {version} does not provide a wheel for this NVDA Python runtime: {assetName}.").format(
+			version=PYAUDIO_VERSION,
 			assetName=assetName,
 		),
 	)
-
-
-def _findOptionalReleaseAsset(release: dict[str, Any], assetName: str) -> dict[str, Any] | None:
-	for asset in release.get("assets", []):
-		if asset.get("name") == assetName and asset.get("browser_download_url"):
-			return asset
-	return None
-
-
-def _parseReleaseAssetDigest(asset: dict[str, Any]) -> str:
-	digest = str(asset.get("digest") or "")
-	if not digest.lower().startswith("sha256:"):
-		return ""
-	checksum = digest.split(":", 1)[1].strip()
-	if SHA256_RE.fullmatch(checksum) is None:
-		return ""
-	return checksum
-
-
-def _parseChecksumText(checksumText: str, assetName: str, *, allowFallback: bool) -> str:
-	fallback = ""
-	for line in checksumText.splitlines():
-		match = SHA256_RE.search(line)
-		if match is None:
-			continue
-		if assetName in line:
-			return match.group(1)
-		if not fallback:
-			fallback = match.group(1)
-	return fallback if allowFallback else ""
