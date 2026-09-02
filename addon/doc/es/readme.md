@@ -50,6 +50,18 @@ Este complemento está pensado para ofrecer un flujo de trabajo fluido, una inte
 * Las voces disponibles se obtienen dinámicamente desde la API de Gemini.
 * Los datos de voz se almacenan en caché durante **24 horas** para reducir llamadas a la API y acelerar el inicio.
 
+### Quick Speak
+
+* Pulsa **NVDA+Alt+E** para leer inmediatamente el texto seleccionado.
+* Pulsa **NVDA+Alt+Mayús+E** para leer texto sin formato del portapapeles.
+* El audio se reproduce internamente mediante el dispositivo de salida configurado en NVDA, por lo que el foco permanece en la aplicación actual.
+* Quick Speak tiene ajustes independientes de modelo, voz, volumen e instrucciones de pronunciación/estilo.
+* El volumen de Quick Speak va de 0 (silencio) a 100 (volumen máximo) y se conserva al reiniciar NVDA.
+* El texto seleccionado o del portapapeles se envía a Google Gemini para generar el audio.
+* Gemini 3.1 Flash Live Preview es la opción recomendada para baja latencia. Siguen aplicándose las cuotas de API y los límites de sesión Live. El servicio no es ilimitado.
+* Los modelos disponibles para Quick Speak son Gemini 3.1 Flash Live Preview, Gemini 2.5 Flash Native Audio, Gemini 3.1 Flash TTS Preview, Gemini 2.5 Flash TTS Preview y Gemini 2.5 Pro TTS Preview. El modelo Pro requiere una API de pago.
+* Pulsa de nuevo cualquiera de los comandos de Quick Speak para detener la solicitud o reproducción activa.
+
 ### Hablar con IA (conversación en vivo)
 
 * **Chat de voz en tiempo real**: mantén una conversación hablada natural y de baja latencia con Gemini.
@@ -64,7 +76,7 @@ Este complemento está pensado para ofrecer un flujo de trabajo fluido, una inte
 
 ## Requisitos
 
-* NVDA (se recomienda la versión más reciente).
+* NVDA 2024.1 o posterior. Probado hasta NVDA 2026.2.
 * Conexión activa a Internet.
 * Una **clave de API de Google Gemini** válida.
 
@@ -121,6 +133,15 @@ Abre el diálogo usando:
 
 ## Generación de voz
 
+### Quick Speak para texto seleccionado o del portapapeles
+
+1. Abre **Configuración de NVDA -> Native Speech Generation** y elige el modelo, la voz, el volumen y las instrucciones opcionales de pronunciación/estilo.
+2. Selecciona texto y pulsa **NVDA+Alt+E**, o copia texto y pulsa **NVDA+Alt+Mayús+E**.
+3. La voz se reproduce sin abrir un diálogo ni cambiar el foco de aplicación.
+4. Pulsa de nuevo cualquiera de los comandos para detener Quick Speak.
+
+Los estados rutinarios de inicio, finalización y reproducción permanecen en silencio. Solo se anuncian los errores que requieren una acción.
+
 ### Modo de hablante único
 
 1. Selecciona **Un solo hablante**.
@@ -166,7 +187,7 @@ Disfruta de una conversación de voz bidireccional y natural con Gemini.
      * *Nota: esta casilla se oculta mientras la conversación está activa. Detén la conversación para cambiarla.*
    * **Nivel de razonamiento**: elige entre `Sin razonamiento`, `Bajo`, `Medio` o `Alto`.
    * **Micrófono**: silencia o activa tu micrófono.
-   * **Volumen**: ajusta el volumen de reproducción de la IA.
+   * **Volumen**: ajusta el volumen de reproducción de la IA. El volumen y los dispositivos de entrada y salida seleccionados se guardan al cerrar el diálogo.
 
 ---
 
@@ -200,6 +221,10 @@ Personalizable desde:
 Gesto predeterminado:
 
 * **NVDA+Control+Shift+G** - Abrir el diálogo de Native Speech Generation.
+* **NVDA+Alt+E** - Leer texto seleccionado con Quick Speak o detener Quick Speak.
+* **NVDA+Alt+Mayús+E** - Leer texto del portapapeles con Quick Speak o detener Quick Speak.
+
+Todos los comandos pueden cambiarse o eliminarse en Gestos de entrada de NVDA.
 
 ---
 
@@ -230,28 +255,14 @@ Si quieres desarrollar o modificar este complemento, sigue los pasos siguientes.
 Solo para desarrollo local, instala las dependencias de audio de Talk With AI directamente en la ruta de bibliotecas del complemento usando la versión y arquitectura de Python que coincidan con el runtime de NVDA que estás probando:
 
 ```
-python.exe -m pip install google-genai pyaudio --target "D:/myAdd-on/Native-Speech-Generation/addon/globalPlugins/NativeSpeechGeneration/lib"
+python.exe -m pip install pyaudio --target "D:/myAdd-on/Native-Speech-Generation/addon/globalPlugins/NativeSpeechGeneration/lib"
 ```
 
 Ajusta la ruta según tu directorio local del código fuente del complemento.
 
-Para la implementación actual de Talk With AI basada solo en audio, no necesitas `opencv-python`, `pillow` ni `mss`.
+La función de compartir pantalla usa la captura de Windows/wx ya disponible en NVDA, por lo que no necesitas `opencv-python`, `pillow` ni `mss`.
 
-Para paquetes de lanzamiento, el complemento descarga el archivo de dependencias verificado más reciente según la versión de NVDA en ejecución:
-
-* `lib.zip` para NVDA 2025.3.3 y compilaciones anteriores compatibles.
-* `lib64.zip` para NVDA 2026.1 y versiones posteriores.
-
-El complemento lee los datos SHA-256 desde la versión de dependencias más reciente en GitHub, usando el digest del asset de la versión o archivos de checksum. Los checksums aprobados incluidos se conservan solo como fallback para primeras instalaciones cuando falla la consulta de la versión más reciente. La reinstalación manual de bibliotecas requiere la versión verificada más reciente. La carpeta extraída siempre se instala como `addon/globalPlugins/NativeSpeechGeneration/lib`.
-
-Después, copia lo siguiente desde tu instalación de Python a:
-
-```
-addon/globalPlugins/NativeSpeechGeneration/lib
-```
-
-* Carpeta `zoneinfo`
-* Archivo `secrets.py`
+Para los paquetes de lanzamiento, el complemento descarga únicamente la rueda fijada de PyAudio 0.2.14 que coincide con la ABI y la arquitectura de Python integradas en NVDA (`cp311` a `cp313`, `win32` o `win_amd64`). El SHA-256 está fijado en el complemento, se compara con los metadatos de PyPI y se verifica de nuevo después de la descarga. No se instala el SDK Google GenAI ni sus dependencias transitivas. La rueda se extrae en `addon/globalPlugins/NativeSpeechGeneration/lib`.
 
 ---
 

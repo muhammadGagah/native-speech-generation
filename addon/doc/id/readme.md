@@ -47,8 +47,19 @@ Add-on ini dirancang untuk alur kerja yang lancar, interaksi yang mengutamakan a
 
 ### Pemuatan Suara Cerdas dan Cache
 
-* Suara yang tersedia diambil secara dinamis dari API Gemini.
-* Data suara disimpan dalam cache selama **24 jam** untuk mengurangi panggilan API dan mempercepat proses awal.
+* Daftar suara Gemini yang didukung sudah tersedia di dalam add-on, sehingga dialog tidak perlu meminta daftar suara secara terpisah.
+
+### Quick Speak
+
+* Tekan **NVDA+Alt+E** untuk langsung membacakan teks yang sedang dipilih.
+* Tekan **NVDA+Alt+Shift+E** untuk membacakan teks biasa dari clipboard.
+* Audio diputar secara internal melalui perangkat output NVDA, sehingga fokus tetap berada di Word, Chrome, atau aplikasi aktif.
+* Model, suara, volume, serta instruksi pelafalan/gaya Quick Speak dapat diatur secara terpisah di Pengaturan NVDA.
+* Volume Quick Speak berkisar dari 0 (senyap) hingga 100 (volume penuh) dan tetap tersimpan setelah NVDA dimulai ulang.
+* Teks pilihan atau teks clipboard dikirim ke Google Gemini untuk menghasilkan audio yang diminta.
+* Gemini 3.1 Flash Live Preview direkomendasikan untuk latensi rendah. Kuota API dan batas sesi Live tetap berlaku. Layanan ini bukan layanan tanpa batas.
+* Model Quick Speak yang tersedia adalah Gemini 3.1 Flash Live Preview, Gemini 2.5 Flash Native Audio, Gemini 3.1 Flash TTS Preview, Gemini 2.5 Flash TTS Preview, dan Gemini 2.5 Pro TTS Preview. Model Pro memerlukan API berbayar.
+* Tekan kembali salah satu perintah Quick Speak untuk menghentikan permintaan atau pemutaran yang aktif.
 
 ### Bicara dengan AI (Percakapan Langsung)
 
@@ -64,7 +75,7 @@ Add-on ini dirancang untuk alur kerja yang lancar, interaksi yang mengutamakan a
 
 ## Persyaratan
 
-* NVDA (disarankan menggunakan versi terbaru).
+* NVDA 2024.1 atau yang lebih baru. Telah diuji hingga NVDA 2026.2.
 * Koneksi internet aktif.
 * **Kunci API Google Gemini** yang valid.
 
@@ -121,6 +132,15 @@ Buka dialog dengan:
 
 ## Menghasilkan Ucapan
 
+### Quick Speak untuk Teks Pilihan atau Clipboard
+
+1. Buka **Pengaturan NVDA -> Native Speech Generation**, lalu pilih model, suara, volume, dan instruksi pelafalan/gaya Quick Speak bila diperlukan.
+2. Pilih teks di aplikasi aktif lalu tekan **NVDA+Alt+E**, atau salin teks dan tekan **NVDA+Alt+Shift+E**.
+3. Ucapan diputar tanpa membuka dialog dan tanpa memindahkan fokus dari aplikasi.
+4. Tekan kembali salah satu perintah Quick Speak untuk menghentikan proses.
+
+Status rutin seperti mulai membuat dan selesai sengaja tidak diumumkan agar tidak bertabrakan dengan audio pelafalan. Kesalahan yang memerlukan tindakan tetap diumumkan.
+
 ### Mode Pembicara Tunggal
 
 1. Pilih **Pembicara tunggal**.
@@ -166,7 +186,7 @@ Rasakan percakapan suara dua arah yang alami dengan Gemini.
      * *Catatan: opsi ini disembunyikan saat percakapan sedang aktif. Hentikan percakapan untuk mengubahnya.*
    * **Tingkat penalaran**: pilih `Tanpa Penalaran`, `Rendah`, `Sedang`, atau `Tinggi`.
    * **Tombol mikrofon**: membisukan atau mengaktifkan mikrofon Anda.
-   * **Volume**: menyesuaikan volume pemutaran AI.
+   * **Volume**: menyesuaikan volume pemutaran AI. Volume serta perangkat input dan output yang dipilih disimpan ketika dialog ditutup.
 
 ---
 
@@ -200,6 +220,10 @@ Dapat disesuaikan melalui:
 Gestur default:
 
 * **NVDA+Control+Shift+G** - Membuka dialog Native Speech Generation.
+* **NVDA+Alt+E** - Membacakan teks pilihan dengan Quick Speak, atau menghentikan Quick Speak.
+* **NVDA+Alt+Shift+E** - Membacakan teks clipboard dengan Quick Speak, atau menghentikan Quick Speak.
+
+Semua perintah dapat diubah atau dihapus melalui dialog Gestur Input NVDA.
 
 ---
 
@@ -230,28 +254,14 @@ Jika Anda ingin mengembangkan atau memodifikasi add-on ini, ikuti langkah-langka
 Untuk pengembangan lokal saja, instal dependensi audio untuk Talk With AI langsung ke jalur pustaka add-on menggunakan versi dan arsitektur Python yang sesuai dengan runtime NVDA yang diuji:
 
 ```
-python.exe -m pip install google-genai pyaudio --target "D:/myAdd-on/Native-Speech-Generation/addon/globalPlugins/NativeSpeechGeneration/lib"
+python.exe -m pip install pyaudio --target "D:/myAdd-on/Native-Speech-Generation/addon/globalPlugins/NativeSpeechGeneration/lib"
 ```
 
 Sesuaikan jalur tersebut dengan direktori sumber add-on di komputer Anda.
 
-Untuk implementasi Talk With AI versi audio saat ini, Anda tidak memerlukan `opencv-python`, `pillow`, atau `mss`.
+Berbagi layar menggunakan penangkapan Windows/wx yang sudah tersedia di NVDA, sehingga Anda tidak memerlukan `opencv-python`, `pillow`, atau `mss`.
 
-Untuk paket rilis, add-on mengunduh arsip dependensi terverifikasi terbaru berdasarkan versi NVDA yang berjalan:
-
-* `lib.zip` untuk NVDA 2025.3.3 dan build lama yang masih didukung.
-* `lib64.zip` untuk NVDA 2026.1 dan yang lebih baru.
-
-Add-on membaca data SHA-256 dari rilis dependensi GitHub terbaru, menggunakan digest asset rilis atau file checksum. Checksum bawaan yang disetujui hanya disimpan sebagai fallback untuk instalasi pertama ketika lookup rilis terbaru gagal. Reinstall library manual mewajibkan rilis terbaru yang terverifikasi. Folder hasil ekstraksi selalu diinstal sebagai `addon/globalPlugins/NativeSpeechGeneration/lib`.
-
-Lalu salin file berikut dari instalasi Python Anda ke:
-
-```
-addon/globalPlugins/NativeSpeechGeneration/lib
-```
-
-* Folder `zoneinfo`
-* File `secrets.py`
+Untuk paket rilis, add-on hanya mengunduh wheel PyAudio 0.2.14 yang dipin dan cocok dengan ABI serta arsitektur Python bawaan NVDA (`cp311` sampai `cp313`, `win32` atau `win_amd64`). SHA-256 wheel dipin di dalam add-on, dicocokkan dengan metadata PyPI, lalu diverifikasi kembali setelah diunduh. Google GenAI SDK beserta dependensi turunannya tidak lagi diinstal. Wheel diekstrak ke `addon/globalPlugins/NativeSpeechGeneration/lib`.
 
 ---
 

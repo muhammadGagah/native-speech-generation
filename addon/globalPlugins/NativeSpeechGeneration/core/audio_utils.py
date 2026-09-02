@@ -89,7 +89,7 @@ def mergeWavFiles(inputPaths: list[str], outputPath: str) -> None:
 		wo.setparams(params)
 		for fr in frames:
 			wo.writeframes(fr)
-	log.info(f"Merged {len(inputPaths)} WAV files -> {outputPath}")
+	log.debug(f"Merged {len(inputPaths)} WAV files -> {outputPath}")
 
 
 def _getWavFormatParams(params: Any) -> tuple[int, int, int, str, str]:
@@ -102,7 +102,20 @@ def saveBinaryFile(fileName: str, data: bytes) -> None:
 	os.makedirs(os.path.dirname(fileName) or ".", exist_ok=True)
 	with open(fileName, "wb") as f:
 		f.write(data)
-	log.info(f"Saved audio file: {fileName}")
+	log.debug(f"Saved audio file: {fileName}")
+
+
+def normalizeAudioSavePath(sourcePath: str, destinationPath: str) -> str:
+	"""Keep the saved filename extension consistent with the generated audio format."""
+	sourceExtension = os.path.splitext(sourcePath)[1].lower()
+	if not sourceExtension:
+		raise ValueError("Generated audio has no file extension.")
+	destinationExtension = os.path.splitext(destinationPath)[1].lower()
+	if not destinationExtension:
+		return f"{destinationPath}{sourceExtension}"
+	if destinationExtension != sourceExtension:
+		raise ValueError(f"Generated audio must be saved with the {sourceExtension} extension.")
+	return destinationPath
 
 
 def safeStartFile(path: str) -> None:

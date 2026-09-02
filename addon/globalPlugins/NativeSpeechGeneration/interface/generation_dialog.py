@@ -1,5 +1,6 @@
 import mimetypes
 import os
+import shutil
 import tempfile
 import threading
 import urllib.request
@@ -7,7 +8,7 @@ import uuid
 import webbrowser
 import winsound
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import addonHandler
 import gui
@@ -17,7 +18,13 @@ from logHandler import log
 
 from .. import talkWithAI
 from ..core import config_store
-from ..core.audio_utils import convertToWav, mergeWavFiles, safeStartFile, saveBinaryFile
+from ..core.api_client import DirectApiError, generate_tts
+from ..core.audio_utils import (
+	convertToWav,
+	normalizeAudioSavePath,
+	safeStartFile,
+	saveBinaryFile,
+)
 from ..core.constants import (
 	DEFAULT_MODEL,
 	FALLBACK_VOICES,
@@ -25,7 +32,6 @@ from ..core.constants import (
 	PRO_25_MODEL,
 	VOICE_SAMPLE_BASE,
 )
-from ..core.gemini_imports import GENAI_AVAILABLE, GENAI_IMPORT_ERROR, genai, getRuntimeScope, types
 
 if TYPE_CHECKING:
 
@@ -57,9 +63,58 @@ class GenerationRequest:
 class NativeSpeechDialog(wx.Dialog):
 	"""Main dialog for generating Gemini TTS audio from user-provided text."""
 
+	textCtrl: wx.TextCtrl
+	styleCtrl: wx.TextCtrl
+	modelChoice: wx.Choice
+	modeSingleRb: wx.RadioButton
+	modeMultiRb: wx.RadioButton
+	modelDescriptionLabel: wx.StaticText
+	settingsCheckbox: wx.CheckBox
+	settingsPanel: wx.Panel
+	tempSlider: wx.Slider
+	tempValueLabel: wx.StaticText
+	voicePanelSingle: wx.Panel
+	voicePanelMulti: wx.Panel
+	generateBtn: wx.Button
+	playBtn: wx.Button
+	saveBtn: wx.Button
+	talkBtn: wx.Button
+	getKeyBtn: wx.Button
+	viewVoicesBtn: wx.Button
+	closeBtn: wx.Button
+	voiceChoiceSingle: wx.Choice
+	spk1NameCtrl: wx.TextCtrl
+	voiceChoiceMulti1: wx.Choice
+	spk2NameCtrl: wx.TextCtrl
+	voiceChoiceMulti2: wx.Choice
+
 	def __init__(self, parent: wx.Window) -> None:
 		# Translators: The title of the main dialog window for generating speech.
 		super().__init__(parent, title=_("Native Speech Generation (Gemini TTS)"))
+		self.textCtrl = cast(wx.TextCtrl, None)
+		self.styleCtrl = cast(wx.TextCtrl, None)
+		self.modelChoice = cast(wx.Choice, None)
+		self.modeSingleRb = cast(wx.RadioButton, None)
+		self.modeMultiRb = cast(wx.RadioButton, None)
+		self.modelDescriptionLabel = cast(wx.StaticText, None)
+		self.settingsCheckbox = cast(wx.CheckBox, None)
+		self.settingsPanel = cast(wx.Panel, None)
+		self.tempSlider = cast(wx.Slider, None)
+		self.tempValueLabel = cast(wx.StaticText, None)
+		self.voicePanelSingle = cast(wx.Panel, None)
+		self.voicePanelMulti = cast(wx.Panel, None)
+		self.generateBtn = cast(wx.Button, None)
+		self.playBtn = cast(wx.Button, None)
+		self.saveBtn = cast(wx.Button, None)
+		self.talkBtn = cast(wx.Button, None)
+		self.getKeyBtn = cast(wx.Button, None)
+		self.viewVoicesBtn = cast(wx.Button, None)
+		self.closeBtn = cast(wx.Button, None)
+		self.voiceChoiceSingle = cast(wx.Choice, None)
+		self.spk1NameCtrl = cast(wx.TextCtrl, None)
+		self.voiceChoiceMulti1 = cast(wx.Choice, None)
+		self.spk2NameCtrl = cast(wx.TextCtrl, None)
+		self.voiceChoiceMulti2 = cast(wx.Choice, None)
 
 		self.lastAudioPath: str | None = None
 		self.modelOptions = self._getModelOptions()
@@ -69,12 +124,15 @@ class NativeSpeechDialog(wx.Dialog):
 		self.selectedVoiceIdx = 0
 		self.selectedVoiceIdx2 = 0
 		self.isGenerating = False
-		self.client = None
-		self.currentStream = None
 		self.isClosed = False
+		self.talkDialog = None
+		self._generatedAudioPaths: set[str] = set()
+		self._audioPathsLock = threading.Lock()
+		self._restoreGenerateFocus = False
 		self._modelDescriptionAnnouncementId = 0
 
 		self._buildUi()
+		self._cleanupStaleGeneratedAudioFiles()
 		threading.Thread(target=self.loadVoices, daemon=True).start()
 		self.textCtrl.SetFocus()
 
@@ -97,7 +155,7 @@ class NativeSpeechDialog(wx.Dialog):
 			(
 				PRO_25_MODEL,
 				# Translators: Model option for the Gemini Pro text-to-speech preview.
-				_("Pro 2.5 (High Quality)"),
+				_("Pro 2.5 (High Quality, need paid API)"),
 				# Translators: Description for the Gemini Pro 2.5 model.
 				_("Premium speech generation with more realistic voices."),
 			),
@@ -243,7 +301,6 @@ class NativeSpeechDialog(wx.Dialog):
 		self.voiceChoiceSingle.SetSelection(0)
 		self.voiceChoiceSingle.Bind(wx.EVT_CHOICE, self.onVoiceChange)
 		self.voiceChoiceSingle.Bind(wx.EVT_CHAR_HOOK, self.onVoiceKeypressGeneric)
-		self.voiceChoiceSingle.Bind(wx.EVT_KEY_DOWN, self.onVoiceKeypressGeneric)
 		sizer.Add(label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
 		sizer.Add(self.voiceChoiceSingle, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
 		panel.SetSizer(sizer)
@@ -259,13 +316,13 @@ class NativeSpeechDialog(wx.Dialog):
 		# Translators: Default name for the first speaker in multi-speaker mode.
 		self.spk1NameCtrl = wx.TextCtrl(panel, value=_("Speaker1"), size=(100, -1))
 		# Translators: Label for choosing the first speaker voice in multi-speaker mode.
-		voice1Label = wx.StaticText(panel, label=_("Voice:"))
+		# Translators: Label for selecting the voice assigned to speaker 1 in multi-speaker mode.
+		voice1Label = wx.StaticText(panel, label=_("Speaker 1 &voice:"))
 		# Translators: Temporary item shown while the add-on prepares the voice list.
 		self.voiceChoiceMulti1 = wx.Choice(panel, choices=[_("Loading voices...")])
 		self.voiceChoiceMulti1.SetSelection(0)
 		self.voiceChoiceMulti1.Bind(wx.EVT_CHOICE, self.onVoiceChange)
 		self.voiceChoiceMulti1.Bind(wx.EVT_CHAR_HOOK, self.onVoiceKeypressGeneric)
-		self.voiceChoiceMulti1.Bind(wx.EVT_KEY_DOWN, self.onVoiceKeypressGeneric)
 		spk1Sizer.Add(spk1Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
 		spk1Sizer.Add(self.spk1NameCtrl, flag=wx.RIGHT, border=10)
 		spk1Sizer.Add(voice1Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
@@ -278,13 +335,13 @@ class NativeSpeechDialog(wx.Dialog):
 		# Translators: Default name for the second speaker in multi-speaker mode.
 		self.spk2NameCtrl = wx.TextCtrl(panel, value=_("Speaker2"), size=(100, -1))
 		# Translators: Label for choosing the second speaker voice in multi-speaker mode.
-		voice2Label = wx.StaticText(panel, label=_("Voice:"))
+		# Translators: Label for selecting the voice assigned to speaker 2 in multi-speaker mode.
+		voice2Label = wx.StaticText(panel, label=_("Speaker 2 v&oice:"))
 		# Translators: Temporary item shown while the add-on prepares the voice list.
 		self.voiceChoiceMulti2 = wx.Choice(panel, choices=[_("Loading voices...")])
 		self.voiceChoiceMulti2.SetSelection(0)
 		self.voiceChoiceMulti2.Bind(wx.EVT_CHOICE, self.onVoiceChange2)
 		self.voiceChoiceMulti2.Bind(wx.EVT_CHAR_HOOK, self.onVoiceKeypressGeneric)
-		self.voiceChoiceMulti2.Bind(wx.EVT_KEY_DOWN, self.onVoiceKeypressGeneric)
 		spk2Sizer.Add(spk2Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
 		spk2Sizer.Add(self.spk2NameCtrl, flag=wx.RIGHT, border=10)
 		spk2Sizer.Add(voice2Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
@@ -295,31 +352,22 @@ class NativeSpeechDialog(wx.Dialog):
 		return panel
 
 	def onClose(self, evt: wx.Event) -> None:
+		if self.isClosed:
+			return
 		self.isClosed = True
-		currentStream = self.currentStream
-		client = self.client
-		self.currentStream = None
-		self.client = None
-		if currentStream or client:
-			threading.Thread(
-				target=self._closeGenerationResources,
-				args=(currentStream, client),
-				daemon=True,
-			).start()
+		if self.talkDialog is not None:
+			try:
+				self.talkDialog.Close()
+			except RuntimeError:
+				pass
+			self.talkDialog = None
+		self._cleanupGeneratedAudioFiles()
 		self.Destroy()
 
-	def _closeGenerationResources(self, currentStream: Any, client: Any) -> None:
-		if currentStream:
-			self._closeRuntimeResource("generation stream", currentStream.close)
-		if client:
-			self._closeRuntimeResource("generation client", client.close)
-
-	def _closeRuntimeResource(self, label: str, closer: Any) -> None:
-		try:
-			with getRuntimeScope():
-				closer()
-		except Exception as error:
-			log.debug(f"Failed to close {label}: {error}", exc_info=True)
+	def requestClose(self) -> None:
+		"""Close this modeless dialog during add-on termination."""
+		if not self.isClosed:
+			self.Close()
 
 	def _tempToLabel(self, valInt: int) -> str:
 		return f"{valInt / 10.0:.1f}"
@@ -334,6 +382,12 @@ class NativeSpeechDialog(wx.Dialog):
 		self.settingsPanel.Show(isShown)
 		self.GetSizer().Layout()
 		self.Fit()
+		if isShown:
+			# Translators: Announcement after the advanced settings panel becomes visible.
+			ui.message(_("Advanced settings shown."))
+		else:
+			# Translators: Announcement after the advanced settings panel is hidden.
+			ui.message(_("Advanced settings hidden."))
 
 	def onModelChange(self, evt: wx.Event) -> None:
 		self._updateModelDescription(announce=True)
@@ -381,6 +435,12 @@ class NativeSpeechDialog(wx.Dialog):
 		self.voicePanelMulti.Show(self.modeMulti)
 		self.GetSizer().Layout()
 		self.Fit()
+		if self.modeMulti:
+			# Translators: Announcement after multi-speaker generation mode is selected.
+			ui.message(_("Multi-speaker mode. Speaker 1 and Speaker 2 controls shown."))
+		else:
+			# Translators: Announcement after single-speaker generation mode is selected.
+			ui.message(_("Single-speaker mode."))
 
 	def onVoiceChange(self, evt: wx.Event) -> None:
 		self.selectedVoiceIdx = evt.GetEventObject().GetSelection()
@@ -396,6 +456,7 @@ class NativeSpeechDialog(wx.Dialog):
 				idx = ctrl.GetSelection()
 				voiceName = self._getSelectedVoiceName(ctrl, idx)
 				self._playSampleForVoice(voiceName)
+				return
 			case _:
 				evt.Skip()
 
@@ -481,8 +542,8 @@ class NativeSpeechDialog(wx.Dialog):
 		try:
 			# Keep this dialog alive so the user's draft remains available if the
 			# Talk With AI dialog fails to initialize or after it closes.
-			dlg = talkWithAI.TalkWithAIDialog(self, apiKey, voiceName, styleInstructions)
-			dlg.ShowModal()
+			self.talkDialog = talkWithAI.TalkWithAIDialog(self, apiKey, voiceName, styleInstructions)
+			self.talkDialog.ShowModal()
 		except Exception as e:
 			log.error(f"Failed to open TalkWithAI dialog: {e}", exc_info=True)
 			wx.CallAfter(
@@ -491,6 +552,10 @@ class NativeSpeechDialog(wx.Dialog):
 				_("Error"),
 				wx.OK | wx.ICON_ERROR,
 			)
+		finally:
+			self.talkDialog = None
+			if not self.isClosed and self.IsShown() and self.talkBtn.IsEnabled():
+				self.talkBtn.SetFocus()
 
 	def _buildGenerationRequest(self, text: str, apiKey: str) -> GenerationRequest:
 		primaryVoiceCtrl = self.voiceChoiceMulti1 if self.modeMulti else self.voiceChoiceSingle
@@ -514,24 +579,6 @@ class NativeSpeechDialog(wx.Dialog):
 	def onGenerate(self, evt: wx.Event) -> None:
 		if self.isGenerating:
 			return
-		if not GENAI_AVAILABLE:
-			message = _(
-				# Translators: Error shown when the bundled google-genai dependency cannot be imported.
-				"google-genai is not available. Please restart NVDA after updating the add-on libraries.",
-			)
-			if GENAI_IMPORT_ERROR:
-				# Translators: Error details appended to a dependency import failure.
-				message = _("{baseMessage}\n\nImport detail: {errorDetail}").format(
-					baseMessage=message,
-					errorDetail=GENAI_IMPORT_ERROR,
-				)
-			wx.CallAfter(
-				wx.MessageBox,
-				message,
-				_("Error"),
-				wx.OK | wx.ICON_ERROR,
-			)
-			return
 		apiKey = self._resolveApiKeyForUse()
 		if not apiKey:
 			return
@@ -548,6 +595,10 @@ class NativeSpeechDialog(wx.Dialog):
 
 		generationRequest = self._buildGenerationRequest(text, apiKey)
 		self.isGenerating = True
+		if self.generateBtn.HasFocus():
+			self._restoreGenerateFocus = True
+			self.closeBtn.SetFocus()
+		self.generateBtn.Disable()
 		# Translators: Temporary Generate button label while speech generation is running.
 		self.generateBtn.SetLabel(_("Generating..."))
 		self.playBtn.Enable(False)
@@ -557,21 +608,7 @@ class NativeSpeechDialog(wx.Dialog):
 
 	def _generateThread(self, generationRequest: GenerationRequest) -> None:
 		# Translators: Status announcement made when speech generation starts.
-		ui.message(_("Generating speech, please wait..."))
-		try:
-			with getRuntimeScope():
-				self.client = genai.Client(api_key=generationRequest.apiKey)
-		except Exception as e:
-			log.error(f"Failed init genai client: {e}", exc_info=True)
-			if not self.isClosed:
-				wx.CallAfter(
-					wx.MessageBox,
-					_("Failed to initialize Google GenAI client: {error}").format(error=str(e)),
-					_("Error"),
-					wx.OK | wx.ICON_ERROR,
-				)
-				wx.CallAfter(self._restoreGenerateButton)
-			return
+		wx.CallAfter(self._announceIfOpen, _("Generating speech, please wait..."))
 
 		def handleSuccess(savedPath: str | None) -> None:
 			if self.isClosed:
@@ -588,75 +625,54 @@ class NativeSpeechDialog(wx.Dialog):
 			wx.CallAfter(self.saveBtn.Enable, True)
 
 		try:
-			with getRuntimeScope():
-				if generationRequest.styleInstructions:
-					finalText = f"{generationRequest.styleInstructions}\n{generationRequest.text}"
-				else:
-					finalText = f"Please read the following text aloud:\n{generationRequest.text}"
-
-				contents = [types.Content(role="user", parts=[types.Part.from_text(text=finalText)])]
-
-				if not generationRequest.modeMulti:
-					speechConfig = types.SpeechConfig(
-						voice_config=types.VoiceConfig(
-							prebuilt_voice_config=types.PrebuiltVoiceConfig(
-								voice_name=generationRequest.voiceName,
-							),
-						),
-					)
-				else:
-					speechConfig = types.SpeechConfig(
-						multi_speaker_voice_config=types.MultiSpeakerVoiceConfig(
-							speaker_voice_configs=[
-								types.SpeakerVoiceConfig(
-									speaker=generationRequest.speaker1Name,
-									voice_config=types.VoiceConfig(
-										prebuilt_voice_config=types.PrebuiltVoiceConfig(
-											voice_name=generationRequest.voiceName,
-										),
-									),
-								),
-								types.SpeakerVoiceConfig(
-									speaker=generationRequest.speaker2Name,
-									voice_config=types.VoiceConfig(
-										prebuilt_voice_config=types.PrebuiltVoiceConfig(
-											voice_name=generationRequest.voiceName2,
-										),
-									),
-								),
-							],
-						),
-					)
-
-				generateConfig = types.GenerateContentConfig(
-					temperature=generationRequest.temperature,
-					response_modalities=["audio"],
-					speech_config=speechConfig,
-				)
-			outPathBase = self._buildOutputPathBase()
-
 			if self.isClosed:
 				return
-
-			savedPath = self._streamAndSaveAudio(
-				self.client,
+			voices = [generationRequest.voiceName]
+			if generationRequest.modeMulti:
+				voices.append(generationRequest.voiceName2)
+			audioData, mimeType = generate_tts(
+				generationRequest.apiKey,
 				generationRequest.model,
-				contents,
-				generateConfig,
-				outPathBase,
+				generationRequest.text,
+				voices,
+				speaker_names=(
+					[generationRequest.speaker1Name, generationRequest.speaker2Name]
+					if generationRequest.modeMulti
+					else None
+				),
+				temperature=generationRequest.temperature,
+				style_instructions=generationRequest.styleInstructions,
 			)
+			outPathBase = self._buildOutputPathBase()
+			ext = mimetypes.guess_extension(mimeType or "") or ".wav"
+			if ext.lower() not in (".wav", ".mp3", ".ogg", ".flac"):
+				ext = ".wav"
+			dataToSave = audioData if ext != ".wav" else convertToWav(audioData, mimeType)
+			savedPath = f"{outPathBase}{ext}"
+			saveBinaryFile(savedPath, dataToSave)
+			with self._audioPathsLock:
+				self._generatedAudioPaths.add(savedPath)
 
 			if self.isClosed:
 				return
 
 			wx.CallAfter(handleSuccess, savedPath)
 
+		except DirectApiError as e:
+			if self.isClosed:
+				return
+			log.error(f"Direct API generation failed: {e}", exc_info=True)
+			wx.CallAfter(
+				wx.MessageBox,
+				_("Failed to generate speech: {error}").format(error=e),
+				_("Error"),
+				wx.OK | wx.ICON_ERROR,
+			)
 		except Exception as e:
 			if self.isClosed:
 				return
-			# Translators: Status announcement made when speech generation raises an unexpected error.
-			ui.message(_("An error occurred during generation."))
 			log.error(f"Unexpected error in generateThread: {e}", exc_info=True)
+			wx.CallAfter(self._announceIfOpen, _("An error occurred during generation."))
 			wx.CallAfter(
 				wx.MessageBox,
 				_("An unexpected error occurred: {error}").format(error=str(e)),
@@ -670,121 +686,55 @@ class NativeSpeechDialog(wx.Dialog):
 	def _restoreGenerateButton(self) -> None:
 		# Translators: Button label restored after speech generation finishes.
 		self.generateBtn.SetLabel(_("&Generate Speech"))
+		self.generateBtn.Enable()
 		self.talkBtn.Enable(True)
 		self.isGenerating = False
+		if self._restoreGenerateFocus and self.closeBtn.HasFocus():
+			self.generateBtn.SetFocus()
+		self._restoreGenerateFocus = False
 
 	def _buildOutputPathBase(self) -> str:
+		self._cleanupGeneratedAudioFiles()
 		os.makedirs(GENERATED_AUDIO_DIR, exist_ok=True)
 		return os.path.join(GENERATED_AUDIO_DIR, f"last_audio_generated_{uuid.uuid4().hex}")
 
-	def _iterResponseParts(self, chunk: Any) -> list[Any]:
-		parts = getattr(chunk, "parts", None)
-		if parts:
-			return list(parts)
-		collectedParts = []
-		for candidate in getattr(chunk, "candidates", []) or []:
-			content = getattr(candidate, "content", None)
-			candidateParts = getattr(content, "parts", None) if content else None
-			if candidateParts:
-				collectedParts.extend(candidateParts)
-		return collectedParts
+	def _cleanupStaleGeneratedAudioFiles(self) -> None:
+		if not os.path.isdir(GENERATED_AUDIO_DIR):
+			return
+		for name in os.listdir(GENERATED_AUDIO_DIR):
+			if not name.startswith(("last_audio_generated_", "voice_sample_")):
+				continue
+			path = os.path.join(GENERATED_AUDIO_DIR, name)
+			try:
+				if os.path.isfile(path):
+					os.remove(path)
+			except OSError as error:
+				log.debug(f"Failed to remove stale generated audio {path}: {error}")
 
-	def _streamAndSaveAudio(
-		self,
-		client: Any,
-		model: str,
-		contents: list[Any],
-		configObj: Any,
-		outPathBase: str,
-	) -> str | None:
-		fileIndex = 0
-		savedPaths = []
-		self.currentStream = None
+	def _cleanupGeneratedAudioFiles(self, *, keep: str | None = None) -> None:
+		with self._audioPathsLock:
+			paths = tuple(self._generatedAudioPaths)
+		for path in paths:
+			if path == keep:
+				continue
+			try:
+				if os.path.exists(path):
+					os.remove(path)
+			except OSError as error:
+				log.debug(f"Failed to remove temporary generated audio {path}: {error}")
+			else:
+				with self._audioPathsLock:
+					self._generatedAudioPaths.discard(path)
+
+	def _removeTrackedAudioFile(self, path: str) -> None:
 		try:
-			if self.isClosed:
-				return None
-			with getRuntimeScope():
-				self.currentStream = client.models.generate_content_stream(
-					model=model,
-					contents=contents,
-					config=configObj,
-				)
-
-			with getRuntimeScope():
-				for chunk in self.currentStream:
-					if self.isClosed:
-						try:
-							self.currentStream.close()
-						except Exception as error:
-							log.debug(
-								f"Failed to close generation stream during shutdown: {error}",
-								exc_info=True,
-							)
-						return None
-
-					for part in self._iterResponseParts(chunk):
-						if not getattr(part, "inline_data", None) or not getattr(
-							part.inline_data,
-							"data",
-							None,
-						):
-							continue
-						inline = part.inline_data
-						ext = mimetypes.guess_extension(inline.mime_type or "") or ""
-
-						if not ext or ext.lower() not in (".wav", ".mp3", ".ogg", ".flac"):
-							wavBytes = convertToWav(inline.data, inline.mime_type)
-							filename = f"{outPathBase}_{fileIndex}.wav"
-							saveBinaryFile(filename, wavBytes)
-						else:
-							filename = f"{outPathBase}_{fileIndex}{ext}"
-							saveBinaryFile(filename, inline.data)
-
-						savedPaths.append(filename)
-						fileIndex += 1
-
-			if not savedPaths:
-				wx.CallAfter(
-					wx.MessageBox,
-					_("No inline audio data returned by model."),
-					_("Error"),
-					wx.OK | wx.ICON_ERROR,
-				)
-				return None
-
-			if len(savedPaths) > 1 and self._shouldMergeAudioChunks(model, savedPaths):
-				outAll = f"{outPathBase}_combined.wav"
-				try:
-					mergeWavFiles(savedPaths, outAll)
-					return outAll
-				except Exception as e:
-					log.error(f"Failed to merge WAV parts: {e}", exc_info=True)
-					return self._selectBestGeneratedAudioPath(savedPaths)
-			if len(savedPaths) > 1:
-				return self._selectBestGeneratedAudioPath(savedPaths)
-			return savedPaths[0]
-
-		except Exception as e:
-			if self.isClosed:
-				return None
-			log.error(f"Error streaming/generating audio: {e}", exc_info=True)
-			wx.CallAfter(
-				wx.MessageBox,
-				_("Failed to generate speech: {error}").format(error=str(e)),
-				_("Error"),
-				wx.OK | wx.ICON_ERROR,
-			)
-			return None
-		finally:
-			self.currentStream = None
-
-	def _shouldMergeAudioChunks(self, model: str, savedPaths: list[str]) -> bool:
-		"""Return whether streamed audio parts should be concatenated."""
-		return model == DEFAULT_MODEL and all(path.lower().endswith(".wav") for path in savedPaths)
-
-	def _selectBestGeneratedAudioPath(self, savedPaths: list[str]) -> str:
-		"""Choose the most complete single audio file when stream chunks overlap."""
-		return max(savedPaths, key=os.path.getsize)
+			if os.path.exists(path):
+				os.remove(path)
+		except OSError as error:
+			log.debug(f"Failed to remove temporary audio {path}: {error}")
+		else:
+			with self._audioPathsLock:
+				self._generatedAudioPaths.discard(path)
 
 	def onPlay(self, evt: wx.Event) -> None:
 		if not self.lastAudioPath or not os.path.exists(self.lastAudioPath):
@@ -794,24 +744,47 @@ class NativeSpeechDialog(wx.Dialog):
 	def onSave(self, evt: wx.Event) -> None:
 		if not self.lastAudioPath or not os.path.exists(self.lastAudioPath):
 			return
+		sourceExtension = os.path.splitext(self.lastAudioPath)[1].lower()
+		formatName = {
+			".wav": "WAV",
+			".mp3": "MP3",
+			".ogg": "OGG",
+			".flac": "FLAC",
+		}.get(sourceExtension, "Audio")
+		# Translators: File type filter for saving generated audio. The placeholders contain the format name and extension.
+		wildcard = _("{formatName} files (*{extension})|*{extension}").format(
+			formatName=formatName,
+			extension=sourceExtension,
+		)
 		with wx.FileDialog(
 			self,
 			_("Save Audio File"),
-			wildcard=_("WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3"),
+			defaultFile=f"generated_audio{sourceExtension}",
+			wildcard=wildcard,
 			style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
 		) as dlg:
 			if dlg.ShowModal() == wx.ID_CANCEL:
 				return
 			dest = dlg.GetPath()
 			try:
+				dest = normalizeAudioSavePath(self.lastAudioPath, dest)
 				os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
-				with open(self.lastAudioPath, "rb") as src, open(dest, "wb") as dst:
-					dst.write(src.read())
+				shutil.copyfile(self.lastAudioPath, dest)
 				wx.CallAfter(
 					wx.MessageBox,
 					_("Audio saved to {path}").format(path=dest),
 					_("Success"),
 					wx.OK | wx.ICON_INFORMATION,
+				)
+			except ValueError:
+				wx.CallAfter(
+					wx.MessageBox,
+					# Translators: Error shown when the chosen filename extension does not match the generated audio format.
+					_("This audio must be saved with the {extension} extension.").format(
+						extension=sourceExtension,
+					),
+					_("Error"),
+					wx.OK | wx.ICON_ERROR,
 				)
 			except Exception as e:
 				wx.CallAfter(
@@ -827,6 +800,10 @@ class NativeSpeechDialog(wx.Dialog):
 		url = f"{VOICE_SAMPLE_BASE}/{voiceName}.wav"
 		threading.Thread(target=self._downloadAndPlaySample, args=(url,), daemon=True).start()
 
+	def _announceIfOpen(self, message: str) -> None:
+		if not self.isClosed:
+			ui.message(message)
+
 	def _downloadAndPlaySample(self, url: str) -> None:
 		try:
 			request = urllib.request.Request(url, headers={"User-Agent": "NativeSpeechGeneration-NVDA-Addon"})
@@ -834,24 +811,34 @@ class NativeSpeechDialog(wx.Dialog):
 				statusCode = getattr(response, "status", response.getcode())
 				content = response.read()
 			if statusCode != 200 or not content:
-				ui.message(_("Sample not available"))
+				wx.CallAfter(self._announceIfOpen, _("Sample not available"))
 				return
-			with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+			os.makedirs(GENERATED_AUDIO_DIR, exist_ok=True)
+			with tempfile.NamedTemporaryFile(
+				delete=False,
+				suffix=".wav",
+				dir=GENERATED_AUDIO_DIR,
+				prefix="voice_sample_",
+			) as tmp:
 				tmp.write(content)
 				tempPath = tmp.name
-			ui.message(_("Playing voice sample"))
+			with self._audioPathsLock:
+				self._generatedAudioPaths.add(tempPath)
+			wx.CallAfter(self._announceIfOpen, _("Playing voice sample"))
 			winsound.PlaySound(tempPath, winsound.SND_FILENAME | winsound.SND_ASYNC)
-			threading.Timer(10.0, lambda: os.remove(tempPath) if os.path.exists(tempPath) else None).start()
+			threading.Timer(10.0, self._removeTrackedAudioFile, args=(tempPath,)).start()
 		except Exception as e:
 			log.error(f"Failed to play sample: {e}", exc_info=True)
-			ui.message(_("Failed to play sample"))
+			wx.CallAfter(self._announceIfOpen, _("Failed to play sample"))
 
 	def loadVoices(self) -> None:
 		try:
-			log.info("Skipping API call for voices. Using fallback voices.")
+			log.debug("Skipping API call for voices. Using fallback voices.")
 			voices = [{"name": v, "label": v, "meta": {}} for v in FALLBACK_VOICES]
 
 			def updateUi() -> None:
+				if self.isClosed:
+					return
 				try:
 					self.voices = voices
 					voiceLabels = [v["label"] for v in voices]
@@ -867,6 +854,8 @@ class NativeSpeechDialog(wx.Dialog):
 						self.voiceChoiceMulti1.SetSelection(0)
 					if len(voices) > 1:
 						self.voiceChoiceMulti2.SetSelection(1)
+					# Translators: Announcement after the list of available voices is ready.
+					ui.message(_("Voice list loaded."))
 				except Exception as e:
 					log.error(f"Failed to update voice UI: {e}", exc_info=True)
 

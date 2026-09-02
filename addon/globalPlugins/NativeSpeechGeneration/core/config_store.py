@@ -7,7 +7,20 @@ from typing import Any, Final, Literal
 import config
 from logHandler import log
 
-from .constants import CONFIG_DOMAIN
+from .constants import (
+	CONFIG_DOMAIN,
+	DEFAULT_MODEL,
+	FALLBACK_VOICES,
+	FLASH_25_MODEL,
+	LIVE_MODEL,
+	NATIVE_AUDIO_25_MODEL,
+	PRO_25_MODEL,
+	QUICK_SPEAK_DEFAULT_MODEL,
+	QUICK_SPEAK_DEFAULT_VOICE,
+	QUICK_SPEAK_DEFAULT_VOLUME,
+	TALK_WITH_AI_DEFAULT_VOLUME,
+)
+from .nvda_compat import shouldWriteToDisk
 
 API_KEY_ENV_VAR: Final[str] = "GEMINI_API_KEY"
 _DPAPI_DESCRIPTION: Final[str] = "Native Speech Generation API Key"
@@ -15,7 +28,22 @@ _CRYPTPROTECT_UI_FORBIDDEN: Final[int] = 0x1
 _CONFIG_SPEC: Final[dict[str, str]] = {
 	"apiKey": "string(default='')",
 	"apiKeyEncrypted": "string(default='')",
+	"quickSpeakModel": f"string(default='{QUICK_SPEAK_DEFAULT_MODEL}')",
+	"quickSpeakVoice": f"string(default='{QUICK_SPEAK_DEFAULT_VOICE}')",
+	"quickSpeakStyle": "string(default='')",
+	"quickSpeakVolume": f"integer(default={QUICK_SPEAK_DEFAULT_VOLUME})",
+	"talkWithAIInputDevice": "string(default='')",
+	"talkWithAIOutputDevice": "string(default='')",
+	"talkWithAIVolume": f"integer(default={TALK_WITH_AI_DEFAULT_VOLUME})",
 }
+
+QUICK_SPEAK_MODELS: Final[tuple[str, ...]] = (
+	LIVE_MODEL,
+	NATIVE_AUDIO_25_MODEL,
+	DEFAULT_MODEL,
+	FLASH_25_MODEL,
+	PRO_25_MODEL,
+)
 
 ApiKeySource = Literal["stored", "environment", "missing"]
 ApiKeyStatus = Literal["stored", "environment", "missing", "undecryptable", "legacyMigrated"]
@@ -32,6 +60,21 @@ class ApiKeyStorageError(RuntimeError):
 	pass
 
 
+@dataclass(frozen=True)
+class QuickSpeakSettings:
+	model: str
+	voice: str
+	styleInstructions: str
+	volume: int
+
+
+@dataclass(frozen=True)
+class TalkWithAISettings:
+	inputDevice: str
+	outputDevice: str
+	volume: int
+
+
 class _DATA_BLOB(ctypes.Structure):
 	_fields_ = [
 		("cbData", ctypes.c_uint32),
@@ -46,6 +89,8 @@ def registerConfigSpec() -> None:
 
 def prepareConfigForStartup(*, persist: bool) -> bool:
 	registerConfigSpec()
+	if not shouldWriteToDisk():
+		return False
 	removedLegacyPlaintext = _removeLegacyPlaintextIfEncryptedExists()
 	migratedLegacyPlaintext = _migratePlaintextApiKey()
 	if persist and (removedLegacyPlaintext or migratedLegacyPlaintext):
@@ -74,6 +119,9 @@ def prepareApiKeyForStorage(value: str) -> tuple[str, str]:
 
 def writePreparedApiKey(cleanValue: str, encryptedValue: str) -> None:
 	registerConfigSpec()
+	if not shouldWriteToDisk():
+		log.warning("Skipped Gemini API key configuration update because NVDA must not write to disk.")
+		return
 	if not cleanValue:
 		_setTextSetting("apiKeyEncrypted", "")
 		_setTextSetting("apiKey", "")
@@ -85,6 +133,84 @@ def writePreparedApiKey(cleanValue: str, encryptedValue: str) -> None:
 def setStoredApiKey(value: str) -> None:
 	cleanValue, encryptedValue = prepareApiKeyForStorage(value)
 	writePreparedApiKey(cleanValue, encryptedValue)
+
+
+def getQuickSpeakSettings() -> QuickSpeakSettings:
+	registerConfigSpec()
+	model = _getTextSetting("quickSpeakModel").strip()
+	voice = _getTextSetting("quickSpeakVoice").strip()
+	volume = _getConfigSection().get("quickSpeakVolume", QUICK_SPEAK_DEFAULT_VOLUME)
+	try:
+		volume = int(volume)
+	except (TypeError, ValueError):
+		volume = QUICK_SPEAK_DEFAULT_VOLUME
+	return QuickSpeakSettings(
+		model=model if model in QUICK_SPEAK_MODELS else QUICK_SPEAK_DEFAULT_MODEL,
+		voice=voice if voice in FALLBACK_VOICES else QUICK_SPEAK_DEFAULT_VOICE,
+		styleInstructions=_getTextSetting("quickSpeakStyle").strip(),
+		volume=max(0, min(100, volume)),
+	)
+
+
+def setQuickSpeakSettings(
+	model: str,
+	voice: str,
+	styleInstructions: str,
+	volume: int = QUICK_SPEAK_DEFAULT_VOLUME,
+) -> None:
+	registerConfigSpec()
+	if not shouldWriteToDisk():
+		log.warning("Skipped Quick Speak configuration update because NVDA must not write to disk.")
+		return
+	_setTextSetting(
+		"quickSpeakModel",
+		model if model in QUICK_SPEAK_MODELS else QUICK_SPEAK_DEFAULT_MODEL,
+	)
+	_setTextSetting(
+		"quickSpeakVoice",
+		voice if voice in FALLBACK_VOICES else QUICK_SPEAK_DEFAULT_VOICE,
+	)
+	_setTextSetting("quickSpeakStyle", styleInstructions.strip())
+	try:
+		volume = int(volume)
+	except (TypeError, ValueError):
+		volume = QUICK_SPEAK_DEFAULT_VOLUME
+	_getConfigSection()["quickSpeakVolume"] = max(0, min(100, volume))
+
+
+def getTalkWithAISettings() -> TalkWithAISettings:
+	registerConfigSpec()
+	section = _getConfigSection()
+	volume = section.get("talkWithAIVolume", TALK_WITH_AI_DEFAULT_VOLUME)
+	try:
+		volume = int(volume)
+	except (TypeError, ValueError):
+		volume = TALK_WITH_AI_DEFAULT_VOLUME
+	return TalkWithAISettings(
+		inputDevice=str(section.get("talkWithAIInputDevice", "") or "").strip(),
+		outputDevice=str(section.get("talkWithAIOutputDevice", "") or "").strip(),
+		volume=max(0, min(100, volume)),
+	)
+
+
+def setTalkWithAISettings(inputDevice: str, outputDevice: str, volume: int) -> None:
+	registerConfigSpec()
+	if not shouldWriteToDisk():
+		log.warning("Skipped Talk With AI configuration update because NVDA must not write to disk.")
+		return
+	section = _getConfigSection()
+	if inputDevice.strip():
+		section["talkWithAIInputDevice"] = inputDevice.strip()
+	if outputDevice.strip():
+		section["talkWithAIOutputDevice"] = outputDevice.strip()
+	try:
+		volume = int(volume)
+	except (TypeError, ValueError):
+		volume = TALK_WITH_AI_DEFAULT_VOLUME
+	section["talkWithAIVolume"] = max(0, min(100, volume))
+	saveConfig = getattr(config, "save", None)
+	if callable(saveConfig):
+		saveConfig()
 
 
 def resolveApiKey() -> ApiKeyResolution:
@@ -137,7 +263,7 @@ def _removeLegacyPlaintextIfEncryptedExists() -> bool:
 	if not (legacyValue and encryptedValue):
 		return False
 	_setTextSetting("apiKey", "")
-	log.info("Removed legacy plaintext Gemini API key from configuration.")
+	log.debug("Removed legacy plaintext Gemini API key from configuration.")
 	return True
 
 
@@ -155,7 +281,7 @@ def _migratePlaintextApiKey() -> bool:
 		)
 		return False
 	_setTextSetting("apiKey", "")
-	log.info("Migrated legacy plaintext Gemini API key to DPAPI-protected storage.")
+	log.debug("Migrated legacy plaintext Gemini API key to DPAPI-protected storage.")
 	return True
 
 
