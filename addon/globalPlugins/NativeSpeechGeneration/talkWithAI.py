@@ -208,7 +208,8 @@ class TalkWithAIDialog(wx.Dialog):
 		else:
 			# Translators: Status shown when Talk With AI will use the operating system's default audio devices.
 			self.updateStatus(
-				_("No explicit audio devices found. System defaults will be used."), announce=True
+				_("No explicit audio devices found. System defaults will be used."),
+				announce=True,
 			)
 
 	@staticmethod
@@ -470,7 +471,8 @@ class TalkWithAIDialog(wx.Dialog):
 			self._stopScreenCapture()
 			# Translators: Status announced when screen sharing is blocked by NVDA's Screen Curtain.
 			self._announceStatus(
-				_("Screen sharing is unavailable while Screen Curtain is enabled"), force=True
+				_("Screen sharing is unavailable while Screen Curtain is enabled"),
+				force=True,
 			)
 			return
 		if self.shareScreen and self.sessionActive:
@@ -484,10 +486,17 @@ class TalkWithAIDialog(wx.Dialog):
 
 	def _startScreenCapture(self, sessionId: int) -> None:
 		self._stopScreenCapture()
+
+		def onBlocked() -> None:
+			wx.CallAfter(self._handleScreenCaptureBlocked, sessionId)
+
+		def onFailed() -> None:
+			wx.CallAfter(self._handleScreenCaptureFailed, sessionId)
+
 		self._screenCaptureWorker = ScreenCaptureWorker(
 			lambda frame: self._sendScreenFrame(sessionId, frame),
-			on_blocked=lambda: wx.CallAfter(self._handleScreenCaptureBlocked, sessionId),
-			on_failed=lambda: wx.CallAfter(self._handleScreenCaptureFailed, sessionId),
+			on_blocked=onBlocked,
+			on_failed=onFailed,
 		)
 		self._screenCaptureWorker.start()
 
@@ -1123,7 +1132,9 @@ class TalkWithAIDialog(wx.Dialog):
 						receiveTask = asyncio.create_task(self.receiveLoop(session, sessionId))
 						if not self.isPlaying:
 							playWorker = threading.Thread(
-								target=self._audioPlayerWorker, args=(sessionId,), daemon=True
+								target=self._audioPlayerWorker,
+								args=(sessionId,),
+								daemon=True,
 							)
 							self.isPlaying = True
 							self._audioPlayerThread = playWorker
@@ -1187,7 +1198,7 @@ class TalkWithAIDialog(wx.Dialog):
 			self._sessionHadError = True
 			# Translators: Error shown when Talk With AI cannot initialize its audio or session runtime.
 			message = _("Talk With AI could not start: {error}").format(
-				error=str(error) or _("Unknown error")
+				error=str(error) or _("Unknown error"),
 			)
 			wx.CallAfter(self._reportSessionError, sessionId, message)
 			self.sessionActive = False
