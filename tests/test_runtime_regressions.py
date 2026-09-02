@@ -203,6 +203,7 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog.outputChoice = types.SimpleNamespace(GetSelection=lambda: 0)
 		dialog.volSlider = types.SimpleNamespace(GetValue=lambda: 65)
 		saved: list[tuple[str, str, int]] = []
+
 		def saveSettings(inputDevice: str, outputDevice: str, volume: int) -> None:
 			saved.append((inputDevice, outputDevice, volume))
 
@@ -267,6 +268,7 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog.audioQueue = queue.Queue()
 		dialog._stopScreenCapture = lambda: None
 		dialog._savePersistentSettings = lambda: (_ for _ in ()).throw(RuntimeError("save failed"))
+
 		def ignoreCleanupFailure(_action: str, _error: BaseException) -> None:
 			pass
 
@@ -319,6 +321,7 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog._playbackGeneration = 0
 		dialog.outputStream = Stream()
 		dialog.outputLock = threading.Lock()
+
 		def ignoreCleanupFailure(_action: str, _error: BaseException) -> None:
 			pass
 

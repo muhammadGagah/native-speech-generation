@@ -36,7 +36,7 @@ class ApiClientTests(unittest.TestCase):
 				"output_audio": {
 					"data": base64.b64encode(b"pcm").decode(),
 					"mime_type": "audio/L16;rate=24000",
-				}
+				},
 			}
 
 		apiClient._json_request = fakeRequest
@@ -65,7 +65,7 @@ class ApiClientTests(unittest.TestCase):
 				"output_audio": {
 					"data": base64.b64encode(b"pcm").decode(),
 					"mime_type": "audio/L16;rate=24000",
-				}
+				},
 			}
 
 		apiClient._json_request = fakeRequest
@@ -321,7 +321,9 @@ class ApiClientTests(unittest.TestCase):
 
 		with (
 			mock.patch.object(apiClient.urllib.request, "proxy_bypass", return_value=False),
-			mock.patch.object(apiClient.urllib.request, "getproxies", return_value={"https": "socks5://localhost:1080"}),
+			mock.patch.object(
+				apiClient.urllib.request, "getproxies", return_value={"https": "socks5://localhost:1080"}
+			),
 			self.assertRaisesRegex(apiClient.DirectApiError, "SOCKS proxies are not supported"),
 		):
 			webSocket.connect()

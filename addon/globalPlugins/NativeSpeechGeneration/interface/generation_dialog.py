@@ -18,6 +18,7 @@ from logHandler import log
 
 from .. import talkWithAI
 from ..core import config_store
+from ..core.api_client import DirectApiError, generate_tts
 from ..core.audio_utils import (
 	convertToWav,
 	normalizeAudioSavePath,
@@ -31,7 +32,6 @@ from ..core.constants import (
 	PRO_25_MODEL,
 	VOICE_SAMPLE_BASE,
 )
-from ..core.api_client import DirectApiError, generate_tts
 
 if TYPE_CHECKING:
 
@@ -609,6 +609,7 @@ class NativeSpeechDialog(wx.Dialog):
 	def _generateThread(self, generationRequest: GenerationRequest) -> None:
 		# Translators: Status announcement made when speech generation starts.
 		wx.CallAfter(self._announceIfOpen, _("Generating speech, please wait..."))
+
 		def handleSuccess(savedPath: str | None) -> None:
 			if self.isClosed:
 				return
@@ -661,13 +662,23 @@ class NativeSpeechDialog(wx.Dialog):
 			if self.isClosed:
 				return
 			log.error(f"Direct API generation failed: {e}", exc_info=True)
-			wx.CallAfter(wx.MessageBox, _("Failed to generate speech: {error}").format(error=e), _("Error"), wx.OK | wx.ICON_ERROR)
+			wx.CallAfter(
+				wx.MessageBox,
+				_("Failed to generate speech: {error}").format(error=e),
+				_("Error"),
+				wx.OK | wx.ICON_ERROR,
+			)
 		except Exception as e:
 			if self.isClosed:
 				return
 			log.error(f"Unexpected error in generateThread: {e}", exc_info=True)
 			wx.CallAfter(self._announceIfOpen, _("An error occurred during generation."))
-			wx.CallAfter(wx.MessageBox, _("An unexpected error occurred: {error}").format(error=str(e)), _("Error"), wx.OK | wx.ICON_ERROR)
+			wx.CallAfter(
+				wx.MessageBox,
+				_("An unexpected error occurred: {error}").format(error=str(e)),
+				_("Error"),
+				wx.OK | wx.ICON_ERROR,
+			)
 		finally:
 			if not self.isClosed:
 				wx.CallAfter(self._restoreGenerateButton)

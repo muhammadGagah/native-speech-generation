@@ -26,9 +26,6 @@ def shouldWriteToDisk() -> bool:
 		import globalVars
 
 		appArgs = globalVars.appArgs
-		return not (
-			bool(getattr(appArgs, "secure", False))
-			or bool(getattr(appArgs, "launcher", False))
-		)
+		return not (bool(getattr(appArgs, "secure", False)) or bool(getattr(appArgs, "launcher", False)))
 	except (AttributeError, ImportError):
 		return True

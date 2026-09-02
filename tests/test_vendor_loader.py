@@ -9,7 +9,9 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-VENDOR_LOADER_PATH = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "core" / "vendor_loader.py"
+VENDOR_LOADER_PATH = (
+	REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "core" / "vendor_loader.py"
+)
 
 
 class _Log:

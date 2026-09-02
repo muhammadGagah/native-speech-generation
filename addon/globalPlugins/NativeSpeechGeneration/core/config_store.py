@@ -9,6 +9,7 @@ from logHandler import log
 
 from .constants import (
 	CONFIG_DOMAIN,
+	DEFAULT_MODEL,
 	FALLBACK_VOICES,
 	FLASH_25_MODEL,
 	LIVE_MODEL,
@@ -18,7 +19,6 @@ from .constants import (
 	QUICK_SPEAK_DEFAULT_VOICE,
 	QUICK_SPEAK_DEFAULT_VOLUME,
 	TALK_WITH_AI_DEFAULT_VOLUME,
-	DEFAULT_MODEL,
 )
 from .nvda_compat import shouldWriteToDisk
 

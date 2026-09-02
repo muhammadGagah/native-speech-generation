@@ -108,7 +108,9 @@ class ConfigStoreTests(unittest.TestCase):
 			"",
 		)
 
-		self.assertEqual(configStore.getQuickSpeakSettings().model, "gemini-2.5-flash-native-audio-preview-12-2025")
+		self.assertEqual(
+			configStore.getQuickSpeakSettings().model, "gemini-2.5-flash-native-audio-preview-12-2025"
+		)
 
 	def testInvalidQuickSpeakValuesFallBackSafely(self) -> None:
 		configStore, fakeConfig = _loadConfigStore()

@@ -218,9 +218,7 @@ class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 		voiceSelection = self.quickSpeakVoiceChoice.GetSelection()
 		if modelSelection == wx.NOT_FOUND or voiceSelection == wx.NOT_FOUND:
 			invalidChoice = (
-				self.quickSpeakModelChoice
-				if modelSelection == wx.NOT_FOUND
-				else self.quickSpeakVoiceChoice
+				self.quickSpeakModelChoice if modelSelection == wx.NOT_FOUND else self.quickSpeakVoiceChoice
 			)
 			wx.MessageBox(
 				# Translators: Error shown when a Quick Speak model or voice has not been selected.

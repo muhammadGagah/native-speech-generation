@@ -8,14 +8,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-COMPAT_PATH = (
-	REPO_ROOT
-	/ "addon"
-	/ "globalPlugins"
-	/ "NativeSpeechGeneration"
-	/ "core"
-	/ "nvda_compat.py"
-)
+COMPAT_PATH = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "core" / "nvda_compat.py"
 
 
 def _loadCompat() -> Any:

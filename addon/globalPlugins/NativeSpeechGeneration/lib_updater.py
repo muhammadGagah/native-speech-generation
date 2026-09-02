@@ -27,6 +27,7 @@ else:
 	def shouldWriteToDisk() -> bool:
 		return True
 
+
 addonHandler.initTranslation()
 
 PYAUDIO_VERSION = "0.2.14"

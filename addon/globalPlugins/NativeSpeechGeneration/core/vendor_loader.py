@@ -12,9 +12,7 @@ from logHandler import log
 
 _MISSING = object()
 _RUNTIME_LOCK = threading.RLock()
-_CONFLICT_PREFIXES = (
-	"pyaudio",
-)
+_CONFLICT_PREFIXES = ("pyaudio",)
 _BINARY_TAG_PATTERN = re.compile(r"\.(cp\d+)-(win32|win_amd64|win_arm64)\.pyd$", re.IGNORECASE)
 
 

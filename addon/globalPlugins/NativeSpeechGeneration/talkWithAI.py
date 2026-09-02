@@ -207,7 +207,9 @@ class TalkWithAIDialog(wx.Dialog):
 			self.updateStatus(_("Audio devices loaded"), announce=True)
 		else:
 			# Translators: Status shown when Talk With AI will use the operating system's default audio devices.
-			self.updateStatus(_("No explicit audio devices found. System defaults will be used."), announce=True)
+			self.updateStatus(
+				_("No explicit audio devices found. System defaults will be used."), announce=True
+			)
 
 	@staticmethod
 	def _findDeviceSelection(devices: list[dict[str, Any]], persistedName: str) -> int:
@@ -467,7 +469,9 @@ class TalkWithAIDialog(wx.Dialog):
 			self.shareScreenCb.SetValue(False)
 			self._stopScreenCapture()
 			# Translators: Status announced when screen sharing is blocked by NVDA's Screen Curtain.
-			self._announceStatus(_("Screen sharing is unavailable while Screen Curtain is enabled"), force=True)
+			self._announceStatus(
+				_("Screen sharing is unavailable while Screen Curtain is enabled"), force=True
+			)
 			return
 		if self.shareScreen and self.sessionActive:
 			self._startScreenCapture(self._sessionId)
@@ -912,7 +916,10 @@ class TalkWithAIDialog(wx.Dialog):
 							self._writeAudioChunk(data)
 						queueDepth = self.audioQueue.qsize()
 						now = time.monotonic()
-						if queueDepth > self.bufferThreshold + 3 and self.bufferThreshold > MIN_BUFFER_THRESHOLD:
+						if (
+							queueDepth > self.bufferThreshold + 3
+							and self.bufferThreshold > MIN_BUFFER_THRESHOLD
+						):
 							if now - self.lastBufferAdjustAt > 1.0:
 								self.bufferThreshold -= 1
 								self.lastBufferAdjustAt = now
@@ -924,7 +931,10 @@ class TalkWithAIDialog(wx.Dialog):
 					if not buffering and self._isSessionCurrent(sessionId):
 						buffering = True
 						now = time.monotonic()
-						if self.bufferThreshold < MAX_BUFFER_THRESHOLD and now - self.lastBufferAdjustAt > 0.8:
+						if (
+							self.bufferThreshold < MAX_BUFFER_THRESHOLD
+							and now - self.lastBufferAdjustAt > 0.8
+						):
 							self.bufferThreshold += 1
 							self.lastBufferAdjustAt = now
 					continue
@@ -1112,7 +1122,9 @@ class TalkWithAIDialog(wx.Dialog):
 						sendTask = asyncio.create_task(self.sendAudioLoop(session, sessionId))
 						receiveTask = asyncio.create_task(self.receiveLoop(session, sessionId))
 						if not self.isPlaying:
-							playWorker = threading.Thread(target=self._audioPlayerWorker, args=(sessionId,), daemon=True)
+							playWorker = threading.Thread(
+								target=self._audioPlayerWorker, args=(sessionId,), daemon=True
+							)
 							self.isPlaying = True
 							self._audioPlayerThread = playWorker
 							playWorker.start()
@@ -1174,7 +1186,9 @@ class TalkWithAIDialog(wx.Dialog):
 			log.error(f"TalkWithAI Fatal Error: {errorDetail}")
 			self._sessionHadError = True
 			# Translators: Error shown when Talk With AI cannot initialize its audio or session runtime.
-			message = _("Talk With AI could not start: {error}").format(error=str(error) or _("Unknown error"))
+			message = _("Talk With AI could not start: {error}").format(
+				error=str(error) or _("Unknown error")
+			)
 			wx.CallAfter(self._reportSessionError, sessionId, message)
 			self.sessionActive = False
 		finally:
@@ -1196,11 +1210,7 @@ class TalkWithAIDialog(wx.Dialog):
 			try:
 				currentFocus = wx.Window.FindFocus()
 				shouldRestoreFocus = self._restoreConnectFocus or currentFocus in (None, self.disconnectBtn)
-				canConnect = (
-					self._devicesLoaded
-					and not self.compatibilityError
-					and PYAUDIO_AVAILABLE
-				)
+				canConnect = self._devicesLoaded and not self.compatibilityError and PYAUDIO_AVAILABLE
 				self.connectBtn.Enable(canConnect)
 				self.disconnectBtn.Disable()
 				self.googleSearchCb.Show()

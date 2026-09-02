@@ -7,7 +7,6 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCREEN_CAPTURE_PATH = (
 	REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration" / "core" / "screen_capture.py"

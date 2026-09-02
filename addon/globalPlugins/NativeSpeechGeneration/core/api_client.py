@@ -23,7 +23,6 @@ from collections.abc import AsyncIterator, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
-
 REST_URL = "https://generativelanguage.googleapis.com/v1beta"
 LIVE_HOST = "generativelanguage.googleapis.com"
 LIVE_PATH = "/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
@@ -68,7 +67,7 @@ def _find_audio(value: Any) -> tuple[bytes, str] | None:
 			if isinstance(candidate, str) and key == "data":
 				try:
 					return base64.b64decode(candidate), str(
-						value.get("mime_type") or value.get("mimeType") or ""
+						value.get("mime_type") or value.get("mimeType") or "",
 					)
 				except (ValueError, TypeError):
 					pass
@@ -108,7 +107,11 @@ def generate_tts(
 	if not voices:
 		raise DirectApiError("At least one voice is required.")
 	input_text = f"{style_instructions.strip()}\n{text}" if style_instructions.strip() else text
-	request_timeout = timeout if timeout is not None else min(600.0, max(90.0, len(input_text) / 5 * (1.5 if len(voices) > 1 else 1.0)))
+	request_timeout = (
+		timeout
+		if timeout is not None
+		else min(600.0, max(90.0, len(input_text) / 5 * (1.5 if len(voices) > 1 else 1.0)))
+	)
 	speech_config: Any
 	if len(voices) == 1:
 		speech_config = [{"voice": voices[0]}]
@@ -147,8 +150,8 @@ def generate_tts(
 						"speakerVoiceConfigs": [
 							{"speaker": speaker, "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}
 							for speaker, voice in zip(speakers, voices)
-						]
-					}
+						],
+					},
 				}
 			),
 		},
@@ -295,7 +298,7 @@ class _MinimalWebSocket:
 				if not chunk:
 					raise DirectApiError("Live WebSocket disconnected.")
 				self._recv_buf += chunk
-			except socket.timeout:
+			except TimeoutError:
 				if deadline is not None and time.monotonic() >= deadline:
 					raise TimeoutError
 				continue
@@ -421,8 +424,8 @@ class DirectLiveSession:
 					"audio": {
 						"mimeType": "audio/pcm;rate=16000",
 						"data": base64.b64encode(audio).decode("ascii"),
-					}
-				}
+					},
+				},
 			}
 		elif video:
 			message = {"realtimeInput": {"video": {"mimeType": "image/jpeg", "data": video}}}
@@ -432,7 +435,8 @@ class DirectLiveSession:
 
 	async def send_client_content(self, turns: list[dict[str, Any]], turn_complete: bool = False) -> None:
 		await asyncio.to_thread(
-			self._ws.send_json, {"clientContent": {"turns": turns, "turnComplete": turn_complete}}
+			self._ws.send_json,
+			{"clientContent": {"turns": turns, "turnComplete": turn_complete}},
 		)
 
 	async def receive(self) -> AsyncIterator[dict[str, Any]]:

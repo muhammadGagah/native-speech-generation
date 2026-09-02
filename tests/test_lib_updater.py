@@ -142,6 +142,7 @@ class LibUpdaterTests(unittest.TestCase):
 				},
 			],
 		}
+
 		def readMetadata(_url: str) -> dict[str, Any]:
 			return metadata
 
@@ -165,6 +166,7 @@ class LibUpdaterTests(unittest.TestCase):
 
 	def testPyAudioMetadataChecksumMustMatchPinnedValue(self) -> None:
 		wheel = "PyAudio-0.2.14-cp313-cp313-win_amd64.whl"
+
 		def readBadMetadata(_url: str) -> dict[str, Any]:
 			return {
 				"urls": [

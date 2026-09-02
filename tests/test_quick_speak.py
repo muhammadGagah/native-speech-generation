@@ -182,7 +182,7 @@ def _loadQuickSpeak() -> tuple[Any, types.SimpleNamespace]:
 									"data": base64.b64encode(b"\x03\x04").decode("ascii"),
 									"mimeType": "audio/pcm;rate=24000",
 								},
-							}
+							},
 						],
 					},
 					"turnComplete": True,
@@ -417,6 +417,7 @@ class QuickSpeakTests(unittest.TestCase):
 		controller = quickSpeak.QuickSpeakController()
 		controller._token = 3
 		controller._active = True
+
 		def makeBrokenPlayer(**_kwargs: object) -> BrokenPlayer:
 			return BrokenPlayer()
 
@@ -460,7 +461,7 @@ class QuickSpeakTests(unittest.TestCase):
 										"data": base64.b64encode(b"\x03\x04").decode("ascii"),
 										"mimeType": "audio/pcm;rate=24000",
 									},
-								}
+								},
 							],
 						},
 						"turnComplete": True,

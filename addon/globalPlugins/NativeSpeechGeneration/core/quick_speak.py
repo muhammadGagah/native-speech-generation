@@ -180,10 +180,10 @@ class QuickSpeakController:
 				if not self._feedIfCurrent(
 					token,
 					player,
-								frames,
-								cancelSpeech=True,
-								bitsPerSample=bitsPerSample,
-								volume=settings.volume,
+					frames,
+					cancelSpeech=True,
+					bitsPerSample=bitsPerSample,
+					volume=settings.volume,
 				):
 					return
 				self._idlePlayer(player)
