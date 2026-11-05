@@ -23,6 +23,9 @@ class _Log:
 	def error(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
+	def exception(self, *_args: object, **_kwargs: object) -> None:
+		pass
+
 	def info(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
@@ -132,10 +135,10 @@ class RuntimeRegressionTests(unittest.TestCase):
 
 		class FakePyAudio:
 			terminated = False
-			devices: list[dict[str, object]] = [
+			devices: tuple[dict[str, Any], ...] = (
 				{"index": 2, "name": "MME microphone", "maxInputChannels": 1, "maxOutputChannels": 0},
 				{"index": 7, "name": "WASAPI speakers", "maxInputChannels": 0, "maxOutputChannels": 2},
-			]
+			)
 
 			def get_device_count(self) -> int:
 				return len(self.devices)
@@ -158,10 +161,10 @@ class RuntimeRegressionTests(unittest.TestCase):
 		talkWithAI = _loadTalkWithAI()
 
 		class FakePyAudio:
-			devices = [
+			devices: tuple[dict[str, Any], ...] = (
 				{"index": 2, "name": "First microphone", "maxInputChannels": 1, "maxOutputChannels": 0},
 				{"index": 7, "name": "Default microphone", "maxInputChannels": 1, "maxOutputChannels": 0},
-			]
+			)
 
 			def get_default_input_device_info(self) -> dict[str, int]:
 				return {"index": 7}

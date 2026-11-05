@@ -344,7 +344,8 @@ class _MinimalWebSocket:
 			return
 		try:
 			self._send_frame(8, b"")
-		except Exception:
+		except OSError:
+			# Best-effort close frame; the socket may already be gone.
 			pass
 		self.abort()
 
@@ -355,12 +356,13 @@ class _MinimalWebSocket:
 		try:
 			if self.sock:
 				self.sock.shutdown(socket.SHUT_RDWR)
-		except Exception:
+		except OSError:
+			# The peer may already have closed the connection.
 			pass
 		try:
 			if self.sock:
 				self.sock.close()
-		except Exception:
+		except OSError:
 			pass
 
 

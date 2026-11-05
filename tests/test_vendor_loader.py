@@ -63,10 +63,12 @@ class VendorLoaderTests(unittest.TestCase):
 				versions={},
 				pyaudioError=None,
 			)
-			with self.assertRaisesRegex(RuntimeError, "scoped failure"):
-				with vendorLoader.runtime_scope(runtime):
-					sys.modules["pyaudio.lazy"] = types.ModuleType("pyaudio.lazy")
-					raise RuntimeError("scoped failure")
+			with (
+				self.assertRaisesRegex(RuntimeError, "scoped failure"),
+				vendorLoader.runtime_scope(runtime),
+			):
+				sys.modules["pyaudio.lazy"] = types.ModuleType("pyaudio.lazy")
+				raise RuntimeError("scoped failure")
 
 		self.assertIn("pyaudio.lazy", runtime.modules)
 		self.assertIs(sys.modules.get("pyaudio.lazy"), None)

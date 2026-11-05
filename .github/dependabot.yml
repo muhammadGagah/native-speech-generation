@@ -4,6 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # Ruff is pinned in pyproject.toml and .pre-commit-config.yaml; upgrade both together on purpose.
+      - dependency-name: "ruff"
     groups:
       python-build:
         update-types:

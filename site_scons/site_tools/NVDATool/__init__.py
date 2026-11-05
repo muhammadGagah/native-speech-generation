@@ -33,7 +33,7 @@ from .manifests import generateManifest, generateTranslatedManifest
 
 
 def generate(env: Environment):
-	env.SetDefault(excludePatterns=tuple())
+	env.SetDefault(excludePatterns=())
 
 	def addon_action(target: list[Any], source: list[Any], env: Any):
 		return (

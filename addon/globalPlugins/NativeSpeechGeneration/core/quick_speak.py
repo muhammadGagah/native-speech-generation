@@ -190,23 +190,23 @@ class QuickSpeakController:
 		except QuickSpeakInputError as error:
 			self._queueError(token, str(error))
 		except QuickSpeakPlaybackError as error:
-			log.error(f"Quick Speak audio playback failed: {error}", exc_info=True)
+			log.exception(f"Quick Speak audio playback failed: {error}")
 			self._queueError(
 				token,
 				_("Quick Speak audio could not be played. Check NVDA's audio output device."),
 			)
 		except DirectApiError as error:
-			log.error(f"Quick Speak Gemini request failed: {error}", exc_info=True)
+			log.exception(f"Quick Speak Gemini request failed: {error}")
 			self._queueError(token, _describeApiError(error))
 		except Exception as error:
-			log.error(f"Unexpected Quick Speak failure: {error}", exc_info=True)
+			log.exception(f"Unexpected Quick Speak failure: {error}")
 			self._queueError(token, _("Quick Speak failed. Check your connection and try again."))
 		finally:
 			if session is not None:
 				try:
 					session.abort()
-				except Exception:
-					pass
+				except Exception as error:
+					log.debug(f"Failed to abort Quick Speak Live session: {error}", exc_info=True)
 			_closePlayer(player)
 			self._finishIfCurrent(token)
 

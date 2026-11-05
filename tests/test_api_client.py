@@ -302,7 +302,7 @@ class ApiClientTests(unittest.TestCase):
 			def connect() -> None:
 				try:
 					webSocket._openTcpConnection("example.com", 443)
-				except BaseException as error:
+				except BaseException as error:  # noqa: BLE001 - captured so the main thread can assert on it
 					errors.append(error)
 
 			thread = threading.Thread(target=connect)

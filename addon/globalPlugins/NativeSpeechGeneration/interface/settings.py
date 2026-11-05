@@ -205,7 +205,7 @@ class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 		)
 
 	def _showStorageError(self, error: config_store.ApiKeyStorageError) -> None:
-		log.error(f"Failed to store the Gemini API key securely: {error}", exc_info=True)
+		log.error(f"Failed to store the Gemini API key securely: {error}", exc_info=error)
 		wx.MessageBox(
 			# Translators: Error shown if Windows DPAPI storage fails while saving the API key.
 			_("Failed to save the Gemini API key securely: {error}").format(error=str(error)),

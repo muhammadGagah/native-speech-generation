@@ -66,7 +66,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 			return lib_updater.LIB_DIR
 		except Exception as error:
-			log.error(f"Failed to resolve Native Speech Generation library directory: {error}", exc_info=True)
+			log.exception(f"Failed to resolve Native Speech Generation library directory: {error}")
 			return os.path.join(pkgDir, "lib")
 
 	def _runDependencyStartupCleanup(self) -> None:
@@ -75,9 +75,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 			lib_updater.initialize()
 		except Exception as error:
-			log.error(
+			log.exception(
 				f"Failed to initialize Native Speech Generation dependency updater: {error}",
-				exc_info=True,
 			)
 
 	def _checkAndInstallDependencies(self) -> None:
@@ -86,7 +85,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 			lib_updater.checkAndInstallDependencies(forceReinstall=False)
 		except Exception as error:
-			log.error(f"Failed to run Native Speech Generation dependency check: {error}", exc_info=True)
+			log.exception(f"Failed to run Native Speech Generation dependency check: {error}")
 
 	def _registerSettingsPanel(self) -> None:
 		from .interface.settings import NativeSpeechSettingsPanel
@@ -198,7 +197,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			self.dialog.Bind(wx.EVT_CLOSE, self.onDialogClose)
 			self.dialog.Show()
 		except Exception as error:
-			log.error(f"Error showing NativeSpeechDialog: {error}", exc_info=True)
+			log.exception(f"Error showing NativeSpeechDialog: {error}")
 			wx.CallAfter(
 				wx.MessageBox,
 				# Translators: Error shown when the main add-on dialog cannot be opened.

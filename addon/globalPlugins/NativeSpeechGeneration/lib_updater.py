@@ -157,7 +157,7 @@ def downloadAndExtract(
 		_installLibraryAsset(asset, progressCallback)
 		return True
 	except Exception as error:
-		log.error(f"Failed to download or install libraries: {error}", exc_info=True)
+		log.exception(f"Failed to download or install libraries: {error}")
 		wx.CallAfter(
 			gui.messageBox,
 			# Translators: Error shown when dependency download, verification, or extraction fails.

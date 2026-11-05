@@ -251,7 +251,7 @@ class TalkWithAIDialog(wx.Dialog):
 		evt.Skip()
 
 	def _logCleanupFailure(self, action: str, error: BaseException) -> None:
-		log.debug(f"Talk With AI cleanup issue during {action}: {error}", exc_info=True)
+		log.debug(f"Talk With AI cleanup issue during {action}: {error}", exc_info=error)
 
 	def _getDeviceList(self, input: bool = True) -> list[dict[str, Any]]:
 		"""Returns a list of dicts: {'index': int, 'name': str}"""
@@ -768,7 +768,7 @@ class TalkWithAIDialog(wx.Dialog):
 		except RuntimeError as error:
 			self._logCleanupFailure("async loop shutdown", error)
 		except Exception as error:
-			log.error(f"Async Loop Error: {error}", exc_info=True)
+			log.exception(f"Async Loop Error: {error}")
 		finally:
 			try:
 				pending = asyncio.all_tasks(loop)
@@ -932,10 +932,13 @@ class TalkWithAIDialog(wx.Dialog):
 							if now - self.lastBufferAdjustAt > 1.0:
 								self.bufferThreshold -= 1
 								self.lastBufferAdjustAt = now
-						elif queueDepth <= 1 and self.bufferThreshold < MAX_BUFFER_THRESHOLD:
-							if now - self.lastBufferAdjustAt > 1.0:
-								self.bufferThreshold += 1
-								self.lastBufferAdjustAt = now
+						elif (
+							queueDepth <= 1
+							and self.bufferThreshold < MAX_BUFFER_THRESHOLD
+							and now - self.lastBufferAdjustAt > 1.0
+						):
+							self.bufferThreshold += 1
+							self.lastBufferAdjustAt = now
 				except queue.Empty:
 					if not buffering and self._isSessionCurrent(sessionId):
 						buffering = True
@@ -948,7 +951,7 @@ class TalkWithAIDialog(wx.Dialog):
 							self.lastBufferAdjustAt = now
 					continue
 		except Exception as error:
-			log.error(f"Audio Player Error: {error}", exc_info=True)
+			log.exception(f"Audio Player Error: {error}")
 			self._failSessionFromAudioWorker(sessionId, error)
 		finally:
 			if self._audioPlayerThread is threading.current_thread():
@@ -1163,12 +1166,12 @@ class TalkWithAIDialog(wx.Dialog):
 					if not self._isSessionCurrent(sessionId):
 						break
 					if self._isPermanentSessionError(error):
-						log.error(f"TalkWithAI Permanent Session Error: {error}", exc_info=True)
+						log.exception(f"TalkWithAI Permanent Session Error: {error}")
 						self._sessionHadError = True
 						self.sessionActive = False
 						wx.CallAfter(self._reportSessionError, sessionId, str(error))
 						break
-					log.error(f"TalkWithAI Session/Connection Error: {error}", exc_info=True)
+					log.exception(f"TalkWithAI Session/Connection Error: {error}")
 					retryAttempt += 1
 					delay = self._buildReconnectDelay(retryAttempt)
 					now = time.monotonic()

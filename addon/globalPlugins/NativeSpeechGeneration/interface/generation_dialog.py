@@ -471,7 +471,7 @@ class NativeSpeechDialog(wx.Dialog):
 		except IndexError:
 			return self.voices[0]["name"] if self.voices else "Zephyr"
 		except Exception as e:
-			log.error(f"Failed to get selected voice name: {e}", exc_info=True)
+			log.exception(f"Failed to get selected voice name: {e}")
 			return "Zephyr"
 
 	def _resolveApiKeyForUse(self) -> str | None:
@@ -545,7 +545,7 @@ class NativeSpeechDialog(wx.Dialog):
 			self.talkDialog = talkWithAI.TalkWithAIDialog(self, apiKey, voiceName, styleInstructions)
 			self.talkDialog.ShowModal()
 		except Exception as e:
-			log.error(f"Failed to open TalkWithAI dialog: {e}", exc_info=True)
+			log.exception(f"Failed to open TalkWithAI dialog: {e}")
 			wx.CallAfter(
 				wx.MessageBox,
 				_("Failed to open Talk With AI: {error}").format(error=str(e)),
@@ -661,7 +661,7 @@ class NativeSpeechDialog(wx.Dialog):
 		except DirectApiError as e:
 			if self.isClosed:
 				return
-			log.error(f"Direct API generation failed: {e}", exc_info=True)
+			log.exception(f"Direct API generation failed: {e}")
 			wx.CallAfter(
 				wx.MessageBox,
 				_("Failed to generate speech: {error}").format(error=e),
@@ -671,7 +671,7 @@ class NativeSpeechDialog(wx.Dialog):
 		except Exception as e:
 			if self.isClosed:
 				return
-			log.error(f"Unexpected error in generateThread: {e}", exc_info=True)
+			log.exception(f"Unexpected error in generateThread: {e}")
 			wx.CallAfter(self._announceIfOpen, _("An error occurred during generation."))
 			wx.CallAfter(
 				wx.MessageBox,
@@ -828,7 +828,7 @@ class NativeSpeechDialog(wx.Dialog):
 			winsound.PlaySound(tempPath, winsound.SND_FILENAME | winsound.SND_ASYNC)
 			threading.Timer(10.0, self._removeTrackedAudioFile, args=(tempPath,)).start()
 		except Exception as e:
-			log.error(f"Failed to play sample: {e}", exc_info=True)
+			log.exception(f"Failed to play sample: {e}")
 			wx.CallAfter(self._announceIfOpen, _("Failed to play sample"))
 
 	def loadVoices(self) -> None:
@@ -857,8 +857,8 @@ class NativeSpeechDialog(wx.Dialog):
 					# Translators: Announcement after the list of available voices is ready.
 					ui.message(_("Voice list loaded."))
 				except Exception as e:
-					log.error(f"Failed to update voice UI: {e}", exc_info=True)
+					log.exception(f"Failed to update voice UI: {e}")
 
 			wx.CallAfter(updateUi)
 		except Exception as e:
-			log.error(f"Unexpected error loading voices: {e}", exc_info=True)
+			log.exception(f"Unexpected error loading voices: {e}")

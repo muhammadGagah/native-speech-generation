@@ -20,6 +20,9 @@ class _Log:
 	def error(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
+	def exception(self, *_args: object, **_kwargs: object) -> None:
+		pass
+
 
 def _loadGlobalPlugin() -> tuple[Any, types.SimpleNamespace]:
 	def translate(message: str) -> str:

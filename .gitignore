@@ -12,3 +12,5 @@ manifest.ini
 .venv/
 .ruff_cache/
 /[0-9]*.[0-9]*.[0-9]*.json
+# Created when pre-commit installs the local Ruff hooks (language: python).
+*.egg-info/

@@ -25,6 +25,9 @@ class _Log:
 	def error(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
+	def exception(self, *_args: object, **_kwargs: object) -> None:
+		pass
+
 
 class _FakeConfig(dict[str, dict[str, Any]]):
 	def __init__(self) -> None:
