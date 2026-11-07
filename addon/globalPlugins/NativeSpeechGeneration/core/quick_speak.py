@@ -23,7 +23,7 @@ from logHandler import log
 from . import config_store
 from .api_client import DirectApiError, DirectLiveSession, generate_tts
 from .audio_utils import parseAudioMimeType
-from .constants import LIVE_MODEL, NATIVE_AUDIO_25_MODEL
+from .constants import LIVE_38_MODEL, LIVE_MODEL, NATIVE_AUDIO_25_MODEL
 
 LIVE_RESPONSE_TIMEOUT = 60.0
 LIVE_RESPONSE_TIMEOUT_PER_CHARACTER = 0.08
@@ -152,7 +152,7 @@ class QuickSpeakController:
 					_("No Gemini API key is configured. Set it in NVDA settings before using Quick Speak."),
 				)
 			settings = config_store.getQuickSpeakSettings()
-			if settings.model in (LIVE_MODEL, NATIVE_AUDIO_25_MODEL):
+			if settings.model in (LIVE_38_MODEL, LIVE_MODEL, NATIVE_AUDIO_25_MODEL):
 				session = DirectLiveSession(
 					apiResolution.value,
 					settings.model,
@@ -190,23 +190,23 @@ class QuickSpeakController:
 		except QuickSpeakInputError as error:
 			self._queueError(token, str(error))
 		except QuickSpeakPlaybackError as error:
-			log.error(f"Quick Speak audio playback failed: {error}", exc_info=True)
+			log.exception(f"Quick Speak audio playback failed: {error}")
 			self._queueError(
 				token,
 				_("Quick Speak audio could not be played. Check NVDA's audio output device."),
 			)
 		except DirectApiError as error:
-			log.error(f"Quick Speak Gemini request failed: {error}", exc_info=True)
+			log.exception(f"Quick Speak Gemini request failed: {error}")
 			self._queueError(token, _describeApiError(error))
 		except Exception as error:
-			log.error(f"Unexpected Quick Speak failure: {error}", exc_info=True)
+			log.exception(f"Unexpected Quick Speak failure: {error}")
 			self._queueError(token, _("Quick Speak failed. Check your connection and try again."))
 		finally:
 			if session is not None:
 				try:
 					session.abort()
-				except Exception:
-					pass
+				except Exception as error:
+					log.debug(f"Failed to abort Quick Speak Live session: {error}", exc_info=True)
 			_closePlayer(player)
 			self._finishIfCurrent(token)
 

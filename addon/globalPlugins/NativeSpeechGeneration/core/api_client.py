@@ -23,6 +23,8 @@ from collections.abc import AsyncIterator, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
+from .tts_requests import STRUCTURED_TTS_MODELS, buildTtsPayload
+
 REST_URL = "https://generativelanguage.googleapis.com/v1beta"
 LIVE_HOST = "generativelanguage.googleapis.com"
 LIVE_PATH = "/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
@@ -30,6 +32,17 @@ LIVE_PATH = "/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGener
 
 class DirectApiError(RuntimeError):
 	"""Raised when a direct Gemini API request fails."""
+
+	def __init__(self, message: str, *, code: int | None = None, status: str | None = None) -> None:
+		super().__init__(message)
+		self.code = code
+		self.status = status
+
+	@classmethod
+	def fromResponse(cls, error: Any) -> DirectApiError:
+		if isinstance(error, dict):
+			return cls(str(error.get("message", error)), code=error.get("code"), status=error.get("status"))
+		return cls(str(error))
 
 
 def _json_request(url: str, api_key: str, payload: dict[str, Any], timeout: float) -> dict[str, Any]:
@@ -49,7 +62,7 @@ def _json_request(url: str, api_key: str, payload: dict[str, Any], timeout: floa
 			return json.loads(response.read().decode("utf-8"))
 	except urllib.error.HTTPError as error:
 		detail = error.read().decode("utf-8", errors="replace")
-		raise DirectApiError(f"Gemini API HTTP {error.code}: {detail[:500]}") from error
+		raise DirectApiError(f"Gemini API HTTP {error.code}: {detail[:500]}", code=error.code) from error
 	except TimeoutError as error:
 		raise DirectApiError(f"Gemini API request timed out after {timeout:g} seconds.") from error
 	except (urllib.error.URLError, OSError) as error:
@@ -102,6 +115,26 @@ def generate_tts(
 
 	Older models are supported through the legacy generateContent fallback.
 	"""
+	if model in STRUCTURED_TTS_MODELS:
+		payload = buildTtsPayload(
+			model,
+			text,
+			list(voice_names),
+			speakerNames=list(speaker_names or ()),
+			styleInstructions=style_instructions,
+			temperature=temperature,
+		)
+		requestTimeout = (
+			timeout
+			if timeout is not None
+			else min(
+				600.0,
+				max(90.0, (len(text) + len(style_instructions)) / 5 * (1.5 if speaker_names else 1.0)),
+			)
+		)
+		response = _json_request(f"{REST_URL}/interactions", api_key, payload, requestTimeout)
+		return _readStructuredTtsAudio(response)
+
 	voices = [str(voice).strip() for voice in voice_names if str(voice).strip()]
 	speakers = [str(name).strip() for name in (speaker_names or []) if str(name).strip()]
 	if not voices:
@@ -168,6 +201,33 @@ def generate_tts(
 	return found
 
 
+def _readStructuredTtsAudio(response: dict[str, Any]) -> tuple[bytes, str]:
+	"""Read the last model audio block, never echoed inputs or an unrelated data field."""
+	if response.get("error"):
+		raise DirectApiError.fromResponse(response["error"])
+	audio = response.get("output_audio")
+	if not isinstance(audio, dict):
+		audio = None
+		for step in response.get("steps", []):
+			if not isinstance(step, dict) or step.get("type") != "model_output":
+				continue
+			for part in step.get("content", []):
+				if isinstance(part, dict) and part.get("type") == "audio":
+					audio = part
+	if not audio or not isinstance(audio.get("data"), str):
+		raise DirectApiError("Gemini returned no audio data.")
+	try:
+		data = base64.b64decode(audio["data"], validate=True)
+	except (ValueError, TypeError) as error:
+		raise DirectApiError("Gemini returned invalid audio data.") from error
+	if not data:
+		raise DirectApiError("Gemini returned empty audio data.")
+	# This path explicitly requests WAV. Do not wrap an unexpected encoding as PCM.
+	if data[:4] != b"RIFF" or data[8:12] != b"WAVE":
+		raise DirectApiError("Gemini did not return the requested WAV audio.")
+	return data, "audio/wav"
+
+
 class _MinimalWebSocket:
 	"""RFC 6455 client sufficient for the Gemini Live JSON protocol."""
 
@@ -178,6 +238,7 @@ class _MinimalWebSocket:
 		self.timeout = timeout
 		self.sock: socket.socket | ssl.SSLSocket | None = None
 		self._recv_buf = b""
+		self._fragments: bytearray | None = None
 		self.closed = False
 		self.close_reason = ""
 		self._send_lock = threading.Lock()
@@ -229,7 +290,9 @@ class _MinimalWebSocket:
 				raise DirectApiError("Live WebSocket handshake closed.")
 			response += chunk
 		if not response.startswith(b"HTTP/1.1 101"):
-			raise DirectApiError(f"Live WebSocket handshake failed: {response[:200]!r}")
+			statusParts = response.split(b"\r\n", 1)[0].split()
+			code = int(statusParts[1]) if len(statusParts) > 1 and statusParts[1].isdigit() else None
+			raise DirectApiError(f"Live WebSocket handshake failed: {response[:200]!r}", code=code)
 		expected_accept = base64.b64encode(
 			hashlib.sha1(f"{key}258EAFA5-E914-47DA-95CA-C5AB0DC85B11".encode("ascii")).digest(),
 		).decode("ascii")
@@ -287,7 +350,7 @@ class _MinimalWebSocket:
 	def send_json(self, payload: dict[str, Any]) -> None:
 		self._send_frame(1, json.dumps(payload, separators=(",", ":")).encode("utf-8"))
 
-	def _recv_exact(self, size: int, deadline: float | None) -> bytes:
+	def _recv_exact(self, size: int, deadline: float | None, *, consume: bool = True) -> bytes:
 		while len(self._recv_buf) < size:
 			if self.closed or self.sock is None:
 				raise DirectApiError("Live WebSocket is closed.")
@@ -302,24 +365,30 @@ class _MinimalWebSocket:
 				if deadline is not None and time.monotonic() >= deadline:
 					raise TimeoutError
 				continue
-		data, self._recv_buf = self._recv_buf[:size], self._recv_buf[size:]
+		data = self._recv_buf[:size]
+		if consume:
+			self._recv_buf = self._recv_buf[size:]
 		return data
 
 	def recv_json(self, timeout: float | None = None) -> dict[str, Any] | None:
 		deadline = time.monotonic() + timeout if timeout is not None else None
-		fragments = bytearray()
 		while True:
-			first, second = self._recv_exact(2, deadline)
+			# Keep the entire frame buffered until its payload is available, so a
+			# timeout at any boundary can safely resume on the next call.
+			first, second = self._recv_exact(2, deadline, consume=False)
 			finished = bool(first & 0x80)
 			opcode = first & 0x0F
 			if second & 0x80:
 				raise DirectApiError("Live WebSocket sent an invalid masked server frame.")
 			length = second & 0x7F
+			headerSize = 2
 			if length == 126:
-				length = struct.unpack(">H", self._recv_exact(2, deadline))[0]
+				headerSize = 4
+				length = struct.unpack(">H", self._recv_exact(headerSize, deadline, consume=False)[2:])[0]
 			elif length == 127:
-				length = struct.unpack(">Q", self._recv_exact(8, deadline))[0]
-			payload = self._recv_exact(length, deadline) if length else b""
+				headerSize = 10
+				length = struct.unpack(">Q", self._recv_exact(headerSize, deadline, consume=False)[2:])[0]
+			payload = self._recv_exact(headerSize + length, deadline)[headerSize:]
 			if opcode == 8:
 				if len(payload) >= 2:
 					code = struct.unpack(">H", payload[:2])[0]
@@ -331,12 +400,13 @@ class _MinimalWebSocket:
 				self._send_frame(10, payload)
 				continue
 			if opcode in (1, 2):
-				fragments = bytearray(payload)
-			elif opcode == 0 and fragments:
-				fragments.extend(payload)
+				self._fragments = bytearray(payload)
+			elif opcode == 0 and self._fragments is not None:
+				self._fragments.extend(payload)
 			else:
 				continue
 			if finished:
+				fragments, self._fragments = self._fragments, None
 				return json.loads(fragments.decode("utf-8"))
 
 	def close(self) -> None:
@@ -344,7 +414,8 @@ class _MinimalWebSocket:
 			return
 		try:
 			self._send_frame(8, b"")
-		except Exception:
+		except OSError:
+			# Best-effort close frame; the socket may already be gone.
 			pass
 		self.abort()
 
@@ -355,12 +426,13 @@ class _MinimalWebSocket:
 		try:
 			if self.sock:
 				self.sock.shutdown(socket.SHUT_RDWR)
-		except Exception:
+		except OSError:
+			# The peer may already have closed the connection.
 			pass
 		try:
 			if self.sock:
 				self.sock.close()
-		except Exception:
+		except OSError:
 			pass
 
 
@@ -411,7 +483,7 @@ class DirectLiveSession:
 				raise DirectApiError("Live API closed before setup completed.")
 			if "error" in message:
 				error = message.get("error")
-				raise DirectApiError(str(error.get("message") if isinstance(error, dict) else error))
+				raise DirectApiError.fromResponse(error)
 			if message.get("setupComplete") is not None:
 				break
 		if history:
@@ -453,7 +525,7 @@ class DirectLiveSession:
 				break
 			if "error" in message:
 				error = message.get("error")
-				raise DirectApiError(str(error.get("message") if isinstance(error, dict) else error))
+				raise DirectApiError.fromResponse(error)
 			yield message
 
 	async def close(self) -> None:

@@ -75,7 +75,7 @@ Add-on ini dirancang untuk alur kerja yang lancar, interaksi yang mengutamakan a
 
 ## Persyaratan
 
-* NVDA 2024.1 atau yang lebih baru. Telah diuji hingga NVDA 2026.2.
+* NVDA 2024.1 atau yang lebih baru. Telah diuji hingga NVDA 2026.3.
 * Koneksi internet aktif.
 * **Kunci API Google Gemini** yang valid.
 

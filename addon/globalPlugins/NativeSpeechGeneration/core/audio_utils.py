@@ -123,7 +123,7 @@ def safeStartFile(path: str) -> None:
 	try:
 		os.startfile(path)
 	except Exception as e:
-		log.error(f"Failed to open file: {e}", exc_info=True)
+		log.exception(f"Failed to open file: {e}")
 		wx.CallAfter(
 			wx.MessageBox,
 			# Translators: Message shown when generated audio was saved but could not be opened automatically.

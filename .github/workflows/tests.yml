@@ -1,0 +1,39 @@
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+  # build_addon.yml calls this workflow for pull requests and tags, so a release
+  # cannot be published unless the test suite passes.
+  workflow_call:
+
+jobs:
+  unit_tests:
+    name: Unit tests (Python ${{ matrix.python-version }} ${{ matrix.architecture }})
+    # The add-on and its tests use Windows-only modules such as winsound and ctypes.windll,
+    # so the suite cannot run on Linux runners.
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # NVDA 2024.1 through 2025.x run add-ons on 32-bit Python 3.11 (minimum supported version).
+          - python-version: "3.11"
+            architecture: x86
+          # NVDA 2026.1 and newer run add-ons on 64-bit Python 3.13.
+          - python-version: "3.13"
+            architecture: x64
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+
+      # The suite uses only the standard library and stubs NVDA, wx, and network access.
+      - name: Run unit tests
+        run: python -B -m unittest discover -s tests -v

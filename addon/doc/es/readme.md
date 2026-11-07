@@ -76,7 +76,7 @@ Este complemento está pensado para ofrecer un flujo de trabajo fluido, una inte
 
 ## Requisitos
 
-* NVDA 2024.1 o posterior. Probado hasta NVDA 2026.2.
+* NVDA 2024.1 o posterior. Probado hasta NVDA 2026.3.
 * Conexión activa a Internet.
 * Una **clave de API de Google Gemini** válida.
 

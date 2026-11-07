@@ -25,6 +25,9 @@ class _Log:
 	def error(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
+	def exception(self, *_args: object, **_kwargs: object) -> None:
+		pass
+
 	def info(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
@@ -205,9 +208,11 @@ class LibUpdaterTests(unittest.TestCase):
 			with zipfile.ZipFile(zipPath, "w") as archive:
 				archive.writestr("../evil.txt", "no")
 
-			with zipfile.ZipFile(zipPath, "r") as archive:
-				with self.assertRaises(self.libUpdater.LibraryUpdateError):
-					self.libUpdater._validateZipMembers(archive, tempDir)
+			with (
+				zipfile.ZipFile(zipPath, "r") as archive,
+				self.assertRaises(self.libUpdater.LibraryUpdateError),
+			):
+				self.libUpdater._validateZipMembers(archive, tempDir)
 
 	def testOpenUrlRefreshesWindowsChainForMissingIssuer(self) -> None:
 		certificateError = ssl.SSLCertVerificationError(20, "unable to get local issuer certificate")

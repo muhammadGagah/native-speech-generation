@@ -67,18 +67,27 @@ repos:
       # This adds a trailing comma to args/iterable items in case it was missed.
       - id: add-trailing-comma
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Matches Ruff version in pyproject.
-    rev: v0.16.6
-    hooks:
-      - id: ruff
-        name: lint with ruff
-        args: [--fix]
-      - id: ruff-format
-        name: format with ruff
-
   - repo: local
     hooks:
+      # Ruff runs as a local hook so pre-commit.ci autoupdate cannot move it away from
+      # the version pinned in pyproject.toml. Upgrade both pins together, on purpose.
+      # Entries mirror the hooks published by astral-sh/ruff-pre-commit.
+      - id: ruff
+        name: lint with ruff
+        entry: ruff check --force-exclude
+        args: [--fix]
+        language: python
+        additional_dependencies: ["ruff==0.17.4"]
+        types_or: [python, pyi, jupyter]
+        require_serial: true
+      - id: ruff-format
+        name: format with ruff
+        entry: ruff format --force-exclude
+        language: python
+        additional_dependencies: ["ruff==0.17.4"]
+        types_or: [python, pyi, jupyter]
+        require_serial: true
+
       - id: pyright
         name: type check with pyright
         entry: uv run pyright

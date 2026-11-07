@@ -24,6 +24,9 @@ class _Log:
 	def error(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
+	def exception(self, *_args: object, **_kwargs: object) -> None:
+		pass
+
 	def warning(self, *_args: object, **_kwargs: object) -> None:
 		pass
 
@@ -208,6 +211,7 @@ def _loadQuickSpeak() -> tuple[Any, types.SimpleNamespace]:
 
 	constants = types.ModuleType(f"{packageName}.core.constants")
 	constants.LIVE_MODEL = "live-model"
+	constants.LIVE_38_MODEL = "gemini-3.8-live"
 	constants.NATIVE_AUDIO_25_MODEL = "native-audio-model"
 	sys.modules[constants.__name__] = constants
 
@@ -365,6 +369,20 @@ class QuickSpeakTests(unittest.TestCase):
 		_args, kwargs = state.liveSessionArgs[0]
 		self.assertEqual(kwargs, {"thinking_level": None})
 		self.assertFalse(controller.isActive)
+
+	def testLive38UsesLiveSessionWithoutThinkingAndPreservesStyle(self) -> None:
+		quickSpeak, state = _loadQuickSpeak()
+		state.quickSpeakSettings.model = "gemini-3.8-live"
+		state.quickSpeakSettings.styleInstructions = "British English pronunciation"
+		controller = quickSpeak.QuickSpeakController()
+		controller._token = 1
+		controller._active = True
+		controller._run(1, "through")
+		self.assertEqual(len(state.liveSessionArgs), 1)
+		args, kwargs = state.liveSessionArgs[0]
+		self.assertEqual(args[1], "gemini-3.8-live")
+		self.assertIn("British English pronunciation", args[3])
+		self.assertEqual(kwargs, {"thinking_level": None})
 
 	def testStopInvalidatesQueuedErrorsAndClosesResources(self) -> None:
 		quickSpeak, state = _loadQuickSpeak()

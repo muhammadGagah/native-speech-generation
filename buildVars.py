@@ -14,17 +14,29 @@ addon_info = AddonInfo(
 	addon_description=_("""Harness the power of Google's state-of-the-art Gemini AI for high-quality speech generation directly within NVDA. This add-on provides a user-friendly dialog to convert text into natural-sounding audio.
 
 Key Features:
-- High-Quality Voices: Choose between Gemini Flash 3.1 Preview for powerful, low-latency short audio, Gemini Flash 2.5 for standard responsive generation, and Gemini Pro 2.5 for premium, life-like speech.
+- High-Quality Voices: Choose Gemini Flash-Lite 3.8 TTS for everyday narration or Gemini Flash 3.8 TTS for expressive dialogue. Previous Gemini 3.1 and 2.5 TTS models remain available.
 - Single and Multi-Speaker Modes: Easily generate audio for a single speaker or create dynamic dialogues with two distinct speakers. Simply format your text with "SpeakerName:" to assign voices.
 - Advanced Voice Control: Fine-tune the output by adjusting the temperature for more creative or stable results, and provide custom style instructions.
 - Quick Speak: Speak selected text or clipboard text immediately with separate model, voice, and style settings while keeping focus in the current application.
 - Seamless Workflow: The add-on provides instant audio playback upon generation and allows you to save the resulting .wav file for later use.
 
 To get started, obtain a Gemini API key from Google AI Studio and enter it in the add-on's settings panel, found under NVDA's Tools menu."""),
-	addon_version="1.8.1",
+	addon_version="1.8.3",
 	# Translators: Short release notes shown for this add-on version.
-	addon_changelog=_("""- Fixed dependency installation failures on some Windows systems by refreshing missing certificate chains through Windows CryptoAPI and retrying the verified HTTPS request once.
-- Preserved TLS certificate validation and the pinned PyAudio SHA-256 verification; no unverified connection is used for the downloaded package.
+	addon_changelog=_("""- Tested with NVDA 2026.3.
+- Fixed Voice Library caching, voice creation, and dialog closing issues, and updated the Indonesian translation.
+- Added Voice Remix to create a new voice by describing changes to an existing voice in Voice Library.
+- Grouped Voice Design and Voice Replication under New voice with descriptions.
+- Added Voice Replication with reference and consent WAV uploads, consent verification, and a paid-tier notice.
+- Clarified that Voice Design requires an API key from a project with billing enabled.
+- Added Voice Design to create custom voices from descriptions in Voice Library.
+- Added Gender, Pitch, Persona, and Use case filters to Voice Library.
+- Fixed existing samples for extended voice IDs such as en-us-fola and en-us-rami.
+- Native Speech Generation stage 2: Added a searchable Voice Library with type and language filters, 70 verified voice samples and explicitly generated previews with editable text, cached catalogs, and saved narrator/speaker voices for Gemini 3.8 TTS.
+- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash TTS, structured style and speaker metadata, script validation, and Script Help.
+- Added Gemini 3.8 Live for Quick Speak and Talk with AI, and Gemini 3.8 Live Extended Thinking for Talk with AI.
+- Applied model-specific thinking settings while preserving existing model preferences.
+- Fixed interrupted WebSocket reads, permanent API error handling, reconnect status, and keyboard focus preservation.
 - See changelog.md for full details.
 """),
 	addon_author="Muhammad <muha.aku@gmail.com>",
@@ -32,7 +44,7 @@ To get started, obtain a Gemini API key from Google AI Studio and enter it in th
 	addon_sourceURL="https://github.com/muhammadGagah/native-speech-generation/",
 	addon_docFileName="readme.html",
 	addon_minimumNVDAVersion="2024.1",
-	addon_lastTestedNVDAVersion="2026.2",
+	addon_lastTestedNVDAVersion="2026.3",
 	addon_updateChannel=None,
 	addon_license="GPL-2.0",
 	addon_licenseURL="https://www.gnu.org/licenses/gpl-2.0.html",

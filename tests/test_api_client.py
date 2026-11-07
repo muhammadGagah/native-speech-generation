@@ -3,8 +3,11 @@ from __future__ import annotations
 import asyncio
 import base64
 import importlib.util
+import io
+import struct
 import sys
 import threading
+import types
 import unittest
 from pathlib import Path
 from typing import Any
@@ -15,17 +18,107 @@ API_CLIENT_PATH = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneratio
 
 
 def _loadApiClient() -> Any:
-	moduleName = "nsg_api_client_under_test"
+	packageName = "nsg_api_core_under_test"
+	moduleName = f"{packageName}.api_client"
 	sys.modules.pop(moduleName, None)
 	spec = importlib.util.spec_from_file_location(moduleName, API_CLIENT_PATH)
 	assert spec is not None and spec.loader is not None
 	module = importlib.util.module_from_spec(spec)
+	package = types.ModuleType(packageName)
+	package.__path__ = [str(API_CLIENT_PATH.parent)]
+	sys.modules[packageName] = package
 	sys.modules[moduleName] = module
 	spec.loader.exec_module(module)
 	return module
 
 
 class ApiClientTests(unittest.TestCase):
+	def testWebSocketResumesAfterTimeoutAtEveryFrameBoundary(self) -> None:
+		payload = b'{"ok":true}'
+		frames = (
+			b"\x81" + bytes([len(payload)]) + payload,
+			b"\x82\x7e" + struct.pack(">H", len(payload)) + payload,
+			b"\x81\x7f" + struct.pack(">Q", len(payload)) + payload,
+			b'\x01\x06{"ok":\x89\x01x\x80\x05true}',
+			b"\x01\x00\x80" + bytes([len(payload)]) + payload,
+		)
+		for frame in frames:
+			for boundary in range(1, len(frame)):
+				with self.subTest(frame=frame, boundary=boundary):
+					apiClient = _loadApiClient()
+					clock = [0.0]
+					chunks = iter([frame[:boundary], None, frame[boundary:]])
+
+					class Socket:
+						def recv(self, size):
+							chunk = next(chunks)
+							if chunk is None:
+								clock[0] = 2.0
+								raise TimeoutError
+							return chunk
+
+						def sendall(self, data):
+							pass
+
+					webSocket = apiClient._MinimalWebSocket("example.com", "/")
+					webSocket.sock = Socket()
+					with mock.patch.object(apiClient.time, "monotonic", side_effect=lambda: clock[0]):
+						with self.assertRaises(TimeoutError):
+							webSocket.recv_json(1.0)
+						self.assertEqual(webSocket.recv_json(1.0), {"ok": True})
+
+	def testLiveErrorsPreserveMetadataDuringSetupAndReceive(self) -> None:
+		apiClient = _loadApiClient()
+
+		class Socket:
+			def connect(self):
+				pass
+
+			def send_json(self, message):
+				pass
+
+			def recv_json(self, timeout):
+				return {
+					"error": {
+						"code": 400,
+						"status": "INVALID_ARGUMENT",
+						"message": "thinkingLevel is not supported for this model",
+					},
+				}
+
+		for duringSetup in (True, False):
+			with self.subTest(duringSetup=duringSetup):
+				session = apiClient.DirectLiveSession("key", "model", "Kore", "Help")
+				session._ws = Socket()
+
+				async def run():
+					if duringSetup:
+						await session.connect()
+					else:
+						async for _message in session.receive():
+							pass
+
+				with self.assertRaises(apiClient.DirectApiError) as raised:
+					asyncio.run(run())
+				self.assertEqual(raised.exception.code, 400)
+				self.assertEqual(raised.exception.status, "INVALID_ARGUMENT")
+
+	def testHttpErrorPreservesStatusCode(self) -> None:
+		apiClient = _loadApiClient()
+		error = apiClient.urllib.error.HTTPError(
+			"https://example.com",
+			403,
+			"Forbidden",
+			{},
+			io.BytesIO(b"denied"),
+		)
+		with (
+			mock.patch.object(apiClient.urllib.request, "urlopen", side_effect=error),
+			self.assertRaises(apiClient.DirectApiError) as raised,
+		):
+			apiClient._json_request("https://example.com", "key", {}, 1.0)
+		self.assertEqual(raised.exception.code, 403)
+
 	def testMultiSpeakerPayloadPreservesNamesAndVoices(self) -> None:
 		apiClient = _loadApiClient()
 		requests: list[dict[str, Any]] = []
@@ -163,6 +256,39 @@ class ApiClientTests(unittest.TestCase):
 		asyncio.run(session.connect())
 
 		self.assertNotIn("thinkingConfig", sent[0]["setup"]["generationConfig"])
+
+	def testModelSpecificThinkingSetupPayloads(self) -> None:
+		apiClient = _loadApiClient()
+		for model, level in (
+			("gemini-3.8-live", None),
+			("gemini-3.8-live-extended-thinking", "low"),
+			("gemini-3.8-live-extended-thinking", "medium"),
+			("gemini-3.8-live-extended-thinking", "high"),
+			("gemini-3.1-flash-live-preview", "minimal"),
+			("gemini-3.1-flash-live-preview", "high"),
+		):
+			with self.subTest(model=model, level=level):
+				sent = []
+
+				class Socket:
+					def connect(self):
+						pass
+
+					def send_json(self, message):
+						sent.append(message)
+
+					def recv_json(self, timeout):
+						return {"setupComplete": {}}
+
+				session = apiClient.DirectLiveSession("key", model, "Kore", "Help", thinking_level=level)
+				session._ws = Socket()
+				asyncio.run(session.connect())
+				setup = sent[0]["setup"]
+				self.assertEqual(setup["model"], f"models/{model}")
+				if level is None:
+					self.assertNotIn("thinkingConfig", setup["generationConfig"])
+				else:
+					self.assertEqual(setup["generationConfig"]["thinkingConfig"], {"thinkingLevel": level})
 
 	def testWebSocketReadsBufferedAndFragmentedFrames(self) -> None:
 		apiClient = _loadApiClient()
@@ -302,7 +428,7 @@ class ApiClientTests(unittest.TestCase):
 			def connect() -> None:
 				try:
 					webSocket._openTcpConnection("example.com", 443)
-				except BaseException as error:
+				except BaseException as error:  # noqa: BLE001 - captured so the main thread can assert on it
 					errors.append(error)
 
 			thread = threading.Thread(target=connect)
