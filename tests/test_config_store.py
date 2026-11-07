@@ -97,10 +97,41 @@ class ConfigStoreTests(unittest.TestCase):
 
 		settings = configStore.getQuickSpeakSettings()
 
-		self.assertEqual(settings.model, "gemini-3.1-flash-live-preview")
+		self.assertEqual(settings.model, "gemini-3.8-live")
 		self.assertEqual(settings.voice, "Kore")
 		self.assertEqual(settings.styleInstructions, "")
 		self.assertEqual(settings.volume, 80)
+
+	def testExistingQuickSpeakModelAndStyleSurviveUpgrade(self) -> None:
+		configStore, fakeConfig = _loadConfigStore()
+		fakeConfig[configStore.CONFIG_DOMAIN].update(
+			{
+				"quickSpeakModel": "gemini-3.1-flash-live-preview",
+				"quickSpeakStyle": "British pronunciation",
+			},
+		)
+		settings = configStore.getQuickSpeakSettings()
+		self.assertEqual(settings.model, "gemini-3.1-flash-live-preview")
+		self.assertEqual(settings.styleInstructions, "British pronunciation")
+
+	def testConversationModelAndThinkingPersistWithValidation(self) -> None:
+		configStore, fakeConfig = _loadConfigStore()
+		for model, level, expected in (
+			("gemini-3.8-live", "high", "high"),
+			("gemini-3.8-live-extended-thinking", "minimal", "minimal"),
+			("gemini-3.8-live-extended-thinking", "high", "high"),
+			("gemini-3.1-flash-live-preview", "minimal", "minimal"),
+		):
+			with self.subTest(model=model, level=level):
+				configStore.setTalkWithAISettings("", "", 80, model=model, thinkingLevel=level)
+				settings = configStore.getTalkWithAISettings()
+				self.assertEqual(settings.model, model)
+				self.assertEqual(settings.thinkingLevel, expected)
+		fakeConfig[configStore.CONFIG_DOMAIN]["talkWithAIModel"] = "unsupported"
+		fakeConfig[configStore.CONFIG_DOMAIN]["talkWithAIThinkingLevel"] = "invalid"
+		settings = configStore.getTalkWithAISettings()
+		self.assertEqual(settings.model, "gemini-3.1-flash-live-preview")
+		self.assertEqual(settings.thinkingLevel, "minimal")
 
 	def testNativeAudioModelIsAcceptedForQuickSpeak(self) -> None:
 		configStore, _fakeConfig = _loadConfigStore()
@@ -125,7 +156,7 @@ class ConfigStoreTests(unittest.TestCase):
 
 		settings = configStore.getQuickSpeakSettings()
 
-		self.assertEqual(settings.model, "gemini-3.1-flash-live-preview")
+		self.assertEqual(settings.model, "gemini-3.8-live")
 		self.assertEqual(settings.voice, "Kore")
 		self.assertEqual(settings.styleInstructions, "British English pronunciation")
 		self.assertEqual(settings.volume, 80)

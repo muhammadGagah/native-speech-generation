@@ -12,6 +12,7 @@ from ..core.constants import (
 	DEFAULT_MODEL,
 	FALLBACK_VOICES,
 	FLASH_25_MODEL,
+	LIVE_38_MODEL,
 	LIVE_MODEL,
 	NATIVE_AUDIO_25_MODEL,
 	PRO_25_MODEL,
@@ -81,7 +82,9 @@ class NativeSpeechSettingsPanel(gui.settingsDialogs.SettingsPanel):
 
 		self.quickSpeakModels = [
 			# Translators: Recommended low-latency model for Quick Speak.
-			(_("Gemini 3.1 Flash Live Preview (recommended)"), LIVE_MODEL),
+			(_("Gemini 3.8 Live (recommended)"), LIVE_38_MODEL),
+			# Translators: Previous Live model for Quick Speak, retaining its existing thinking settings.
+			(_("Gemini 3.1 Flash Live Preview"), LIVE_MODEL),
 			# Translators: Low-latency native audio model for Quick Speak.
 			(_("Gemini 2.5 Flash Native Audio"), NATIVE_AUDIO_25_MODEL),
 			# Translators: Gemini text-to-speech model choice for Quick Speak.

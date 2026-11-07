@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NativeSpeechGeneration"
-version = "1.8.1"
+version = "1.8.3"
 description = "NVDA add-on for Gemini-based native speech generation."
 maintainers = [
 	{name = "Muhammad", email = "muha.aku@gmail.com"},
@@ -92,6 +92,9 @@ logger-objects = ["logHandler.log"]
 # Add-on code runs inside NVDA, where an escaping exception can break speech or the add-on.
 # Broad `except Exception` handlers there are deliberate safety nets and always log or report.
 "addon/**/*.py" = ["BLE001"]
+# Tests define fake sockets, callbacks, and closures inside subTest loops. Each one is
+# created and consumed within the same iteration, so late binding cannot leak across cases.
+"tests/**/*.py" = ["B023"]
 
 [tool.pyright]
 venvPath = ".venv"

@@ -6,32 +6,90 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: NativeSpeechGeneration 1.8.1\n"
-"Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2026-09-02 08:22+0700\n"
+"Project-Id-Version: NativeSpeechGeneration 1.8.3\n"
+"Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
+"POT-Creation-Date: 2026-11-06 05:11+0700\n"
 "PO-Revision-Date: 2026-09-02 09:54+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 "X-Generator: Poedit 3.9\n"
 
+#. Translators: Name of the add-on in the NVDA Tools menu.
+msgid "&Native Speech Generation"
+msgstr "&Native Speech Generation"
+
+#. Translators: Tooltip or description for the Native Speech Generation Tools menu item.
+msgid "Generate speech using Gemini TTS"
+msgstr "Hasilkan ucapan menggunakan Gemini TTS"
+
+#. Translators: Input gesture description for opening the Native Speech Generation dialog.
+msgid "Open the Native Speech Generation dialog"
+msgstr "Buka dialog Native Speech Generation"
+
+#. Translators: Input gestures category name for Native Speech Generation.
+#. Translators: Title of the settings panel in NVDA preferences.
+#. Translators: Summary for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
+msgid "Native Speech Generation"
+msgstr "Native Speech Generation"
+
+#. Translators: Input gesture description for speaking the selected text with Quick Speak.
+msgid "Speak selected text with Quick Speak, or stop Quick Speak"
+msgstr "Bacakan teks terpilih dengan Quick Speak, atau hentikan Quick Speak"
+
+#. Translators: Input gesture description for speaking clipboard text with Quick Speak.
+msgid "Speak clipboard text with Quick Speak, or stop Quick Speak"
+msgstr "Bacakan teks clipboard dengan Quick Speak, atau hentikan Quick Speak"
+
+#. Translators: Error announced when Quick Speak is invoked in a restricted NVDA mode.
+msgid "Quick Speak is unavailable in this NVDA mode."
+msgstr "Quick Speak tidak tersedia dalam mode NVDA ini."
+
+#. Translators: Warning shown when the user tries to open the add-on dialog twice.
+msgid ""
+"The Native Speech Generation add-on is already open. Please close the dialog "
+"before opening it again."
+msgstr ""
+"Add-on Native Speech Generation sudah terbuka. Harap tutup dialog sebelum "
+"membukanya lagi."
+
+#. Translators: Title of warning dialog when the user tries to open the add-on twice.
+msgid "Add-on Already Running"
+msgstr "Add-on sudah berjalan"
+
+#. Translators: Error shown when the main add-on dialog cannot be opened.
+#, python-brace-format
+msgid "Failed to open Native Speech Generation dialog: {error}"
+msgstr "Gagal membuka dialog Native Speech Generation: {error}"
+
+#. Translators: Title of a dependency installation error dialog.
+#. Translators: Title of an error dialog in Talk With AI.
+#. Translators: Status shown when Talk With AI enters an error state.
+#. Translators: Title of an API key configuration error dialog.
+msgid "Error"
+msgstr "Kesalahan"
+
+#. Translators: Message shown when dependency installation is still pending.
+msgid ""
+"Native Speech Generation is installing dependencies. Please restart NVDA for "
+"the changes to take effect."
+msgstr ""
+"Native Speech Generation sedang memasang dependensi. Silakan mulai ulang "
+"NVDA agar perubahan diterapkan."
+
+#. Translators: Title of the information dialog recommending an NVDA restart.
+msgid "Restart Required"
+msgstr "Perlu Mulai Ulang"
+
 #. Translators: Error shown when this add-on has no trusted checksum for a dependency archive.
 #, python-brace-format
 msgid "No approved checksum is bundled for {assetName}."
 msgstr "Tidak ada checksum yang disetujui yang disertakan untuk {assetName}."
-
-#. Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
-msgid "Unable to inspect the HTTPS peer certificate."
-msgstr "Tidak dapat memeriksa sertifikat peer HTTPS."
-
-#. Translators: Error shown when the HTTPS peer does not provide a certificate.
-msgid "The HTTPS peer did not provide a certificate."
-msgstr "Peer HTTPS tidak memberikan sertifikat."
 
 msgid ""
 "PyAudio checksum metadata does not match the checksum approved by this add-"
@@ -51,13 +109,6 @@ msgstr ""
 "tidak berfungsi dengan benar.\n"
 "\n"
 "Kesalahan: {error}"
-
-#. Translators: Title of a dependency installation error dialog.
-#. Translators: Title of an error dialog in Talk With AI.
-#. Translators: Status shown when Talk With AI enters an error state.
-#. Translators: Title of an API key configuration error dialog.
-msgid "Error"
-msgstr "Kesalahan"
 
 #. Translators: Title of a progress dialog shown while installing add-on dependencies.
 msgid "Installing Dependencies"
@@ -157,6 +208,14 @@ msgstr ""
 "Checksum library tidak cocok. Nilai yang diharapkan: {expected}; nilai "
 "aktual: {actual}."
 
+#. Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
+msgid "Unable to inspect the HTTPS peer certificate."
+msgstr "Tidak dapat memeriksa sertifikat peer HTTPS."
+
+#. Translators: Error shown when the HTTPS peer does not provide a certificate.
+msgid "The HTTPS peer did not provide a certificate."
+msgstr "Peer HTTPS tidak memberikan sertifikat."
+
 #, python-brace-format
 msgid ""
 "PyAudio {version} does not provide a wheel for this NVDA Python runtime: "
@@ -185,6 +244,19 @@ msgstr "Sedang"
 msgid "High"
 msgstr "Tinggi"
 
+#. Translators: Low-latency voice conversation model.
+msgid "Gemini 3.8 Live"
+msgstr "Gemini 3.8 Live"
+
+#. Translators: Voice conversation model with configurable background reasoning.
+msgid "Gemini 3.8 Live Extended Thinking"
+msgstr "Gemini 3.8 Live Extended Thinking"
+
+#. Translators: Previous voice conversation model, with its original thinking levels.
+#. Translators: Previous Live model for Quick Speak, retaining its existing thinking settings.
+msgid "Gemini 3.1 Flash Live Preview"
+msgstr "Gemini 3.1 Flash Live Preview"
+
 msgid ""
 "PyAudio is not available. This feature requires a working PyAudio "
 "installation."
@@ -196,7 +268,6 @@ msgstr ""
 msgid "Audio devices loaded"
 msgstr "Perangkat audio telah dimuat"
 
-#. Translators: Status shown when Talk With AI will use the operating system's default audio devices.
 msgid "No explicit audio devices found. System defaults will be used."
 msgstr ""
 "Tidak ditemukan perangkat audio khusus. Perangkat bawaan sistem akan "
@@ -248,9 +319,13 @@ msgstr "Grounding dengan Google Search"
 msgid "Share screen with AI"
 msgstr "Bagikan layar dengan AI"
 
+#. Translators: Label for the model used for voice conversations, separate from Quick Speak.
+msgid "Conversation &model:"
+msgstr "&Model percakapan:"
+
 #. Translators: Label for choosing the reasoning depth in Talk With AI.
-msgid "Thinking level:"
-msgstr "Tingkat penalaran:"
+msgid "&Thinking level:"
+msgstr "&Tingkat penalaran:"
 
 #. Translators: Label for the Talk With AI playback volume slider.
 msgid "Volume:"
@@ -268,7 +343,6 @@ msgstr "Terhubung"
 msgid "Microphone: OFF"
 msgstr "Mikrofon: NONAKTIF"
 
-#. Translators: Status announced when screen sharing is blocked by NVDA's Screen Curtain.
 msgid "Screen sharing is unavailable while Screen Curtain is enabled"
 msgstr "Berbagi layar tidak tersedia saat Tirai Layar diaktifkan"
 
@@ -313,6 +387,14 @@ msgstr "Pemutaran audio gagal: {error}"
 msgid "Audio output device is no longer available."
 msgstr "Perangkat output audio tidak lagi tersedia."
 
+#. Translators: The model may still be reasoning after an audio turn finishes.
+msgid "AI processing"
+msgstr "AI sedang memproses"
+
+#. Translators: All model processing is complete; the conversation remains connected.
+msgid "AI ready for input"
+msgstr "AI siap menerima masukan"
+
 #. Translators: Status shown when the first Talk With AI connection attempt failed.
 #, python-brace-format
 msgid "Connection failed. Retrying in {seconds:.1f}s"
@@ -334,65 +416,6 @@ msgstr "Kesalahan tidak diketahui"
 #. Translators: Status shown when Talk With AI is ready for a new session.
 msgid "Ready"
 msgstr "Siap"
-
-#. Translators: Name of the add-on in the NVDA Tools menu.
-msgid "&Native Speech Generation"
-msgstr "&Native Speech Generation"
-
-#. Translators: Tooltip or description for the Native Speech Generation Tools menu item.
-msgid "Generate speech using Gemini TTS"
-msgstr "Hasilkan ucapan menggunakan Gemini TTS"
-
-#. Translators: Input gesture description for opening the Native Speech Generation dialog.
-msgid "Open the Native Speech Generation dialog"
-msgstr "Buka dialog Native Speech Generation"
-
-#. Translators: Input gestures category name for Native Speech Generation.
-#. Translators: Title of the settings panel in NVDA preferences.
-#. Translators: Summary for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
-msgid "Native Speech Generation"
-msgstr "Native Speech Generation"
-
-#. Translators: Input gesture description for speaking the selected text with Quick Speak.
-msgid "Speak selected text with Quick Speak, or stop Quick Speak"
-msgstr "Bacakan teks terpilih dengan Quick Speak, atau hentikan Quick Speak"
-
-#. Translators: Input gesture description for speaking clipboard text with Quick Speak.
-msgid "Speak clipboard text with Quick Speak, or stop Quick Speak"
-msgstr "Bacakan teks clipboard dengan Quick Speak, atau hentikan Quick Speak"
-
-#. Translators: Error announced when Quick Speak is invoked in a restricted NVDA mode.
-msgid "Quick Speak is unavailable in this NVDA mode."
-msgstr "Quick Speak tidak tersedia dalam mode NVDA ini."
-
-#. Translators: Warning shown when the user tries to open the add-on dialog twice.
-msgid ""
-"The Native Speech Generation add-on is already open. Please close the dialog "
-"before opening it again."
-msgstr ""
-"Add-on Native Speech Generation sudah terbuka. Harap tutup dialog sebelum "
-"membukanya lagi."
-
-#. Translators: Title of warning dialog when the user tries to open the add-on twice.
-msgid "Add-on Already Running"
-msgstr "Add-on sudah berjalan"
-
-#. Translators: Error shown when the main add-on dialog cannot be opened.
-#, python-brace-format
-msgid "Failed to open Native Speech Generation dialog: {error}"
-msgstr "Gagal membuka dialog Native Speech Generation: {error}"
-
-#. Translators: Message shown when dependency installation is still pending.
-msgid ""
-"Native Speech Generation is installing dependencies. Please restart NVDA for "
-"the changes to take effect."
-msgstr ""
-"Native Speech Generation sedang memasang dependensi. Silakan mulai ulang "
-"NVDA agar perubahan diterapkan."
-
-#. Translators: Title of the information dialog recommending an NVDA restart.
-msgid "Restart Required"
-msgstr "Perlu Mulai Ulang"
 
 #. Translators: Message shown when generated audio was saved but could not be opened automatically.
 #, python-brace-format
@@ -460,7 +483,28 @@ msgstr ""
 msgid "Native Speech Generation (Gemini TTS)"
 msgstr "Native Speech Generation (Gemini TTS)"
 
-#. Translators: Model option for the newest Gemini Flash text-to-speech preview.
+#. Translators: Model option for Gemini 3.8 Flash-Lite text-to-speech.
+msgid "Flash-Lite 3.8 TTS"
+msgstr "Flash-Lite 3.8 TTS"
+
+#. Translators: Description of the default model in the speech generation dialog.
+msgid "Fast, efficient speech generation for everyday reading and narration."
+msgstr ""
+"Pembuatan ucapan yang cepat dan efisien untuk membaca dan narasi sehari-hari."
+
+#. Translators: Model option for Gemini 3.8 Flash text-to-speech.
+msgid "Flash 3.8 TTS"
+msgstr "Flash 3.8 TTS"
+
+#. Translators: Description of the creative Gemini 3.8 speech model.
+msgid ""
+"Expressive speech generation for narration, acting, and multi-speaker "
+"dialogue."
+msgstr ""
+"Pembuatan ucapan yang ekspresif untuk narasi, akting, dan dialog multi-"
+"pembicara."
+
+#. Translators: Model option for the previous Gemini Flash text-to-speech preview.
 msgid "Flash 3.1 Preview"
 msgstr "Flash 3.1 Preview"
 
@@ -551,6 +595,10 @@ msgstr "Pilih &Suara:"
 msgid "Loading voices..."
 msgstr "Memuat suara..."
 
+#. Translators: Opens the library for the single narrator; applies only to TTS generation.
+msgid "View voice &library"
+msgstr "Lihat pustaka &suara"
+
 #. Translators: Label for entering the first speaker name in multi-speaker mode.
 msgid "Speaker 1 Name:"
 msgstr "Nama Pembicara 1:"
@@ -565,6 +613,9 @@ msgstr "Pembicara 1"
 msgid "Speaker 1 &voice:"
 msgstr "&Suara pembicara 1:"
 
+msgid "Speaker 1 voice &library"
+msgstr "&Pustaka suara pembicara 1"
+
 #. Translators: Label for entering the second speaker name in multi-speaker mode.
 msgid "Speaker 2 Name:"
 msgstr "Nama Pembicara 2:"
@@ -578,6 +629,79 @@ msgstr "Pembicara 2"
 #. Translators: Label for selecting the voice assigned to speaker 2 in multi-speaker mode.
 msgid "Speaker 2 v&oice:"
 msgstr "S&uara pembicara 2:"
+
+msgid "Speaker 2 voice li&brary"
+msgstr "Pusta&ka suara pembicara 2"
+
+#. Translators: Opens keyboard-readable instructions for writing a two-speaker script.
+msgid "Script &Help"
+msgstr "&Bantuan Skrip"
+
+#. Translators: Speaker identities used in library labels and announcements.
+msgid "Narrator"
+msgstr "Narator"
+
+msgid "Speaker 1"
+msgstr "Pembicara 1"
+
+msgid "Speaker 2"
+msgstr "Pembicara 2"
+
+#. Translators: No TTS library override is selected for this speaker.
+#, python-brace-format
+msgid "{speaker}: use library voice for Gemini 3.8 (none selected)"
+msgstr "{speaker}: gunakan suara pustaka untuk Gemini 3.8 (belum dipilih)"
+
+#. Translators: Speaker-specific TTS override; unchecking returns to the built-in voice picker.
+#, python-brace-format
+msgid "{speaker}: use library voice for Gemini 3.8: {name}"
+msgstr "{speaker}: gunakan suara pustaka untuk Gemini 3.8: {name}"
+
+#. Translators: Selection works now but cannot be restored after NVDA restarts.
+msgid "Library preferences apply for this session but could not be saved."
+msgstr "Preferensi pustaka berlaku untuk sesi ini tetapi tidak dapat disimpan."
+
+msgid "Select a Gemini 3.8 TTS model to use the voice library."
+msgstr "Pilih model Gemini 3.8 TTS untuk menggunakan pustaka suara."
+
+#, python-brace-format
+msgid "{speaker} generation voice selected: {name}"
+msgstr "Suara pembuatan untuk {speaker} dipilih: {name}"
+
+msgid ""
+"For Gemini 3.8, write one spoken turn per line as Name: text. Use the "
+"speaker names exactly as entered, including capitalization. Each nonblank "
+"line needs a name and spoken text; blank lines are ignored. Names must be "
+"different even when capitalization is ignored, and cannot contain a colon. "
+"Put delivery directions in Style instructions; they apply to both speakers."
+msgstr ""
+"Untuk Gemini 3.8, tulis satu giliran bicara per baris dengan format Nama: "
+"teks. Gunakan nama pembicara persis seperti yang dimasukkan, termasuk huruf "
+"besar dan kecil. Setiap baris yang tidak kosong harus berisi nama dan teks "
+"yang diucapkan; baris kosong diabaikan. Nama harus berbeda meskipun huruf "
+"besar dan kecil diabaikan, dan tidak boleh berisi titik dua. Tulis arahan "
+"penyampaian di Instruksi gaya; arahan itu berlaku untuk kedua pembicara."
+
+#. Translators: Instructions for multi-speaker scripts when an older model is selected.
+msgid ""
+"Label each speaker's dialogue with the matching speaker name followed by a "
+"colon."
+msgstr ""
+"Beri label dialog setiap pembicara dengan nama pembicara yang sesuai, "
+"diikuti titik dua."
+
+#. Translators: A two-line script example. Keep each speaker placeholder followed by a colon.
+#, python-brace-format
+msgid ""
+"{speaker1}: Hello!\n"
+"{speaker2}: Good morning!"
+msgstr ""
+"{speaker1}: Halo!\n"
+"{speaker2}: Selamat pagi!"
+
+#. Translators: Title of the multi-speaker script instructions dialog.
+msgid "Multi-speaker script help"
+msgstr "Bantuan skrip multi-pembicara"
 
 #. Translators: Announcement after the advanced settings panel becomes visible.
 msgid "Advanced settings shown."
@@ -632,6 +756,13 @@ msgstr "Batasan Fitur"
 msgid "Failed to open Talk With AI: {error}"
 msgstr "Gagal membuka Bicara dengan AI: {error}"
 
+msgid ""
+"This library voice requires Gemini 3.8 TTS. Select a 3.8 model or uncheck "
+"the library voice."
+msgstr ""
+"Suara pustaka ini memerlukan Gemini 3.8 TTS. Pilih model 3.8 atau hapus "
+"centang suara pustaka."
+
 #. Translators: Error shown when the user tries to generate speech without entering text.
 msgid "Please enter text to generate."
 msgstr "Harap masukkan teks terlebih dahulu."
@@ -639,6 +770,47 @@ msgstr "Harap masukkan teks terlebih dahulu."
 #. Translators: Temporary Generate button label while speech generation is running.
 msgid "Generating..."
 msgstr "Sedang memproses..."
+
+#. Translators: Title of a speech generation input validation error.
+msgid "Check speech input"
+msgstr "Periksa masukan ucapan"
+
+#. Translators: Error shown when a voice is missing for one of the speakers being generated.
+msgid "Select a voice for each speaker, then try again."
+msgstr "Pilih suara untuk setiap pembicara, lalu coba lagi."
+
+#. Translators: Error shown when the text or speaker settings cannot be sent for generation.
+msgid "Check the text and speaker settings, then try again."
+msgstr "Periksa teks dan pengaturan pembicara, lalu coba lagi."
+
+#, python-brace-format
+msgid ""
+"Speaker {number} must have a different name from the other speaker, even "
+"when capitalization is ignored."
+msgstr ""
+"Pembicara {number} harus memiliki nama yang berbeda dari pembicara lainnya, "
+"meskipun huruf besar dan kecil diabaikan."
+
+#. Translators: Validation error for a missing or invalid speaker name.
+#, python-brace-format
+msgid "Enter a name for Speaker {number} without a colon or line break."
+msgstr ""
+"Masukkan nama untuk Pembicara {number} tanpa titik dua atau baris baru."
+
+#. Translators: Validation error for a script line with a speaker but no spoken text.
+#, python-brace-format
+msgid "Line {line}: enter spoken text after the speaker name and colon."
+msgstr ""
+"Baris {line}: masukkan teks yang diucapkan setelah nama pembicara dan titik "
+"dua."
+
+#, python-brace-format
+msgid ""
+"Line {line}: start with '{speaker1}:' or '{speaker2}:' using the exact "
+"speaker name."
+msgstr ""
+"Baris {line}: awali dengan '{speaker1}:' atau '{speaker2}:' menggunakan nama "
+"pembicara yang persis sama."
 
 #. Translators: Status announcement made when speech generation starts.
 msgid "Generating speech, please wait..."
@@ -700,6 +872,35 @@ msgstr "Gagal memutar sampel suara"
 msgid "Voice list loaded."
 msgstr "Daftar suara telah dimuat."
 
+#. Translators: Choose how to create a custom voice.
+msgid "Create voice"
+msgstr "Buat suara"
+
+msgid ""
+"Choose how to create your voice. Both options require a Gemini API key from "
+"a project with billing enabled (paid tier)."
+msgstr ""
+"Pilih cara membuat suara Anda. Kedua opsi memerlukan kunci API Gemini dari "
+"proyek dengan penagihan aktif (tingkat berbayar)."
+
+msgid ""
+"Voice &Design\n"
+"Create a voice from a text description of its age,\n"
+"tone, accent, and delivery."
+msgstr ""
+"&Desain Suara\n"
+"Buat suara dari deskripsi teks tentang usia,\n"
+"nada, aksen, dan cara penyampaiannya."
+
+msgid ""
+"Voice &Replication\n"
+"Create a voice from a reference recording,\n"
+"with the speaker's recorded consent verified by Google."
+msgstr ""
+"&Replikasi Suara\n"
+"Buat suara dari rekaman referensi,\n"
+"dengan persetujuan terekam dari pembicara yang diverifikasi oleh Google."
+
 msgid "&Gemini API Key:"
 msgstr "&Kunci API Gemini:"
 
@@ -712,8 +913,8 @@ msgid "Quick Speak"
 msgstr "Quick Speak"
 
 #. Translators: Recommended low-latency model for Quick Speak.
-msgid "Gemini 3.1 Flash Live Preview (recommended)"
-msgstr "Gemini 3.1 Flash Live Preview (direkomendasikan)"
+msgid "Gemini 3.8 Live (recommended)"
+msgstr "Gemini 3.8 Live (direkomendasikan)"
 
 #. Translators: Low-latency native audio model for Quick Speak.
 msgid "Gemini 2.5 Flash Native Audio"
@@ -791,6 +992,464 @@ msgstr "Gagal menyimpan kunci API Gemini dengan aman: {error}"
 msgid "Select both a Quick Speak model and voice."
 msgstr "Pilih model dan suara Quick Speak."
 
+#. Translators: Title of the form for creating a custom voice from a description.
+msgid "Voice Design"
+msgstr "Desain Suara"
+
+msgid ""
+"Voice Design requires a Gemini API key from a project with billing enabled "
+"(paid tier). Free-tier API keys cannot create voices. Describe the voice's "
+"age, tone, accent, and delivery. Create voice uses API quota and saves the "
+"voice in your Google project immediately. Closing the library does not "
+"cancel creation or delete the voice."
+msgstr ""
+"Desain Suara memerlukan kunci API Gemini dari proyek dengan penagihan aktif "
+"(tingkat berbayar). Kunci API tingkat gratis tidak dapat membuat suara. "
+"Jelaskan usia, nada, aksen, dan cara penyampaian suara. Buat suara "
+"menggunakan kuota API dan langsung menyimpan suara di proyek Google Anda. "
+"Menutup pustaka tidak membatalkan pembuatan atau menghapus suara."
+
+#. Translators: Required display name of the new designed voice.
+#. Translators: Name of the new replicated voice.
+msgid "Voice &name:"
+msgstr "&Nama suara:"
+
+msgid "Voice &description:"
+msgstr "&Deskripsi suara:"
+
+#. Translators: Optional BCP-47 language tag for catalog metadata.
+msgid "&Language tag (optional, e.g. id-ID):"
+msgstr "Tag &bahasa (opsional, misalnya id-ID):"
+
+msgid "&Gender:"
+msgstr "&Gender:"
+
+#. Translators: Voices whose catalog entry has no language tag.
+msgid "Unspecified"
+msgstr "Tidak ditentukan"
+
+msgid "Female"
+msgstr "Perempuan"
+
+msgid "Male"
+msgstr "Laki-laki"
+
+msgid "Neutral"
+msgstr "Netral"
+
+#. Translators: Explicitly create and store a voice using the API.
+msgid "&Create voice"
+msgstr "B&uat suara"
+
+#. Translators: Required voice name validation.
+msgid "Enter a voice name, up to 100 characters."
+msgstr "Masukkan nama suara, maksimal 100 karakter."
+
+msgid "Enter a voice description, up to 2000 characters."
+msgstr "Masukkan deskripsi suara, maksimal 2000 karakter."
+
+msgid "Enter a language tag such as id-ID, or leave it blank."
+msgstr "Masukkan tag bahasa seperti id-ID, atau biarkan kosong."
+
+msgid "Voice library"
+msgstr "Pustaka suara"
+
+msgid ""
+"Select a voice and press Space or Enter to play its sample. Use Generate "
+"preview to create audio from the preview text using API quota."
+msgstr ""
+"Pilih suara lalu tekan Spasi atau Enter untuk memutar sampelnya. Gunakan "
+"Hasilkan pratinjau untuk membuat audio dari teks pratinjau dengan kuota API."
+
+#. Translators: Search field in the voice library; searches names, language, accent, and descriptions.
+msgid "&Search voices:"
+msgstr "&Cari suara:"
+
+msgid "Voice &type:"
+msgstr "&Jenis suara:"
+
+#. Translators: Voice library type filters, in order: all, built-in catalog, designed, replicated.
+msgid "All voices"
+msgstr "Semua suara"
+
+#. Translators: Readable voice metadata; the ID distinguishes voices with identical display names.
+msgid "Prebuilt"
+msgstr "Bawaan"
+
+msgid "Designed"
+msgstr "Desain"
+
+msgid "Replicated"
+msgstr "Replikasi"
+
+#. Translators: Filter by the language tag in the voice catalog, for example id-ID or en-US.
+msgid "&Language:"
+msgstr "&Bahasa:"
+
+msgid "G&ender:"
+msgstr "G&ender:"
+
+msgid "&Pitch:"
+msgstr "&Tinggi nada:"
+
+msgid "Perso&na:"
+msgstr "Perso&na:"
+
+msgid "Use c&ase:"
+msgstr "Kegun&aan:"
+
+#. Translators: Native list of voices matching the search and filter.
+msgid "Available &voices:"
+msgstr "&Suara yang tersedia:"
+
+msgid "Voice &details:"
+msgstr "&Detail suara:"
+
+#. Translators: Text synthesized only when the user activates Generate preview.
+msgid "Preview te&xt:"
+msgstr "Te&ks pratinjau:"
+
+#. Translators: Default short utterance for generated previews. Users can edit it in any language.
+msgid "Hello! This is a short preview of my voice."
+msgstr "Halo! Ini adalah pratinjau singkat suara saya."
+
+#. Translators: Read-only status of voice library loading, filtering, and preview.
+msgid "Status:"
+msgstr "Status:"
+
+#. Translators: Reload the complete catalog from Google.
+msgid "&Refresh"
+msgstr "&Muat ulang"
+
+#. Translators: Choose Voice Design or Voice Replication.
+msgid "Ne&w voice"
+msgstr "Suara bar&u"
+
+#. Translators: Explicitly generate a preview of the selected voice using API quota.
+msgid "&Generate preview"
+msgstr "&Hasilkan pratinjau"
+
+#. Translators: Creates a new voice by modifying the selected voice; the original is unchanged.
+msgid "Re&mix selected voice"
+msgstr "Rem&iks suara terpilih"
+
+#. Translators: Stop playing or waiting for a downloaded sample.
+msgid "St&op sample"
+msgstr "Hentikan sam&pel"
+
+#. Translators: Apply the selected voice to the speaker whose library was opened.
+msgid "&Use selected voice"
+msgstr "&Gunakan suara terpilih"
+
+#. Translators: Editing the preview text stops playback or discards a pending response.
+#. Translators: Selecting another voice cancels preview; native selection speech identifies the voice.
+#. Translators: Playback or retrieval of the sample was stopped locally.
+msgid "Sample stopped."
+msgstr "Sampel dihentikan."
+
+#. Translators: Show all catalog voices regardless of language metadata.
+msgid "All languages"
+msgstr "Semua bahasa"
+
+#. Translators: Catalog filter choices: no restriction, or missing metadata.
+msgid "All"
+msgstr "Semua"
+
+#. Translators: Number of voices matching the current filters; selection is never changed automatically.
+#, python-brace-format
+msgid "{count} voices found."
+msgstr "{count} suara ditemukan."
+
+msgid ""
+"The previous voice is not in these results. Choose a voice or change the "
+"filters."
+msgstr "Suara sebelumnya tidak ada di hasil ini. Pilih suara atau ubah filter."
+
+#, python-brace-format
+msgid ""
+"Name: {name}\n"
+"ID: {id}\n"
+"Type: {type}\n"
+"Language: {language}\n"
+"Accent: {accent}\n"
+"Gender: {gender}\n"
+"Pitch: {pitch}\n"
+"Persona: {persona}\n"
+"Use case: {context}\n"
+"Description: {description}"
+msgstr ""
+"Nama: {name}\n"
+"ID: {id}\n"
+"Jenis: {type}\n"
+"Bahasa: {language}\n"
+"Aksen: {accent}\n"
+"Gender: {gender}\n"
+"Tinggi nada: {pitch}\n"
+"Persona: {persona}\n"
+"Kegunaan: {context}\n"
+"Deskripsi: {description}"
+
+#. Translators: Avoid overlapping catalog refresh with creation of a persistent voice.
+msgid "Voice creation is still in progress."
+msgstr "Pembuatan suara masih berlangsung."
+
+#. Keep the focused button enabled; ignore repeated activation until this request completes.
+#. Translators: Voice catalog request is in progress; existing results remain usable.
+msgid "Loading voices. Current results remain available."
+msgstr "Memuat suara. Hasil saat ini tetap tersedia."
+
+#. Translators: The explicit create request is being sent; closing cannot cancel the server operation.
+msgid ""
+"Creating voice using API quota. It will be saved in your Google project."
+msgstr ""
+"Membuat suara menggunakan kuota API. Suara akan disimpan di proyek Google "
+"Anda."
+
+msgid ""
+"Checking recordings and creating voice using API quota. Google will verify "
+"consent."
+msgstr ""
+"Memeriksa rekaman dan membuat suara menggunakan kuota API. Google akan "
+"memverifikasi persetujuan."
+
+msgid ""
+"Select a prebuilt or designed voice to remix. Replicated voices cannot be "
+"remixed."
+msgstr ""
+"Pilih suara bawaan atau desain untuk diremiks. Suara replikasi tidak dapat "
+"diremiks."
+
+#. Translators: Status while a remixed voice is being created.
+msgid ""
+"Remixing voice using API quota. It will be saved in your Google project."
+msgstr ""
+"Meremiks suara menggunakan kuota API. Suara akan disimpan di proyek Google "
+"Anda."
+
+msgid ""
+"Reference recording must be a readable 24 kHz mono 16-bit PCM WAV file of 10–"
+"30 seconds."
+msgstr ""
+"Rekaman referensi harus berupa file WAV PCM 16-bit mono 24 kHz yang dapat "
+"dibaca, berdurasi 10–30 detik."
+
+msgid ""
+"Consent recording must be a readable 24 kHz mono 16-bit PCM WAV file, up to "
+"60 seconds."
+msgstr ""
+"Rekaman persetujuan harus berupa file WAV PCM 16-bit mono 24 kHz yang dapat "
+"dibaca, maksimal 60 detik."
+
+msgid ""
+"Nothing was uploaded. Open New voice, then Voice Replication to choose the "
+"files again."
+msgstr ""
+"Tidak ada yang diunggah. Buka Suara baru, lalu Replikasi Suara untuk memilih "
+"file lagi."
+
+msgid ""
+"Could not confirm voice creation. Refresh the library before trying again; "
+"the voice may already have been saved. Check billing, API access, quota, "
+"and, for replication, the consent recording if it is missing."
+msgstr ""
+"Pembuatan suara tidak dapat dikonfirmasi. Muat ulang pustaka sebelum mencoba "
+"lagi; suara mungkin sudah tersimpan. Periksa penagihan, akses API, kuota, "
+"dan, untuk replikasi, rekaman persetujuan jika tidak ada."
+
+#, python-brace-format
+msgid ""
+"Voice {name} created and saved in Google. Filters cleared to show it. Press "
+"Space or Enter on the voice to hear its sample, or use Use selected voice."
+msgstr ""
+"Suara {name} dibuat dan disimpan di Google. Filter dikosongkan agar suara "
+"ini terlihat. Tekan Spasi atau Enter pada suara untuk mendengar sampelnya, "
+"atau gunakan Gunakan suara terpilih."
+
+#, python-brace-format
+msgid ""
+"Voice {name} created and saved in Google. Filters cleared to show it. Use "
+"Generate preview to hear it using API quota, or Use selected voice."
+msgstr ""
+"Suara {name} dibuat dan disimpan di Google. Filter dikosongkan agar suara "
+"ini terlihat. Gunakan Hasilkan pratinjau untuk mendengarnya dengan kuota "
+"API, atau Gunakan suara terpilih."
+
+#. Translators: The server operation succeeded but local metadata persistence failed.
+msgid "The local cache could not be saved."
+msgstr "Cache lokal tidak dapat disimpan."
+
+msgid ""
+"Could not refresh voices. Previous results kept. Check the API key or "
+"connection and retry."
+msgstr ""
+"Suara tidak dapat dimuat ulang. Hasil sebelumnya dipertahankan. Periksa "
+"kunci API atau koneksi, lalu coba lagi."
+
+#. Translators: Voices loaded successfully but could not be persisted in this NVDA session.
+msgid "Voices loaded for this session. The cache could not be saved."
+msgstr "Suara dimuat untuk sesi ini. Cache tidak dapat disimpan."
+
+#. Translators: A sample shortcut was used without a selected result.
+msgid "Select a voice first."
+msgstr "Pilih suara terlebih dahulu."
+
+#. Translators: NVDA is not allowing temporary audio files in this session.
+msgid "Samples are unavailable while file saving is disabled."
+msgstr "Sampel tidak tersedia saat penyimpanan file dinonaktifkan."
+
+#. Translators: Fetching an existing sample, without synthesizing speech.
+msgid "Loading sample..."
+msgstr "Memuat sampel..."
+
+msgid ""
+"Sample not available for this voice. Use Generate preview to create one "
+"using API quota."
+msgstr ""
+"Sampel tidak tersedia untuk suara ini. Gunakan Hasilkan pratinjau untuk "
+"membuatnya dengan kuota API."
+
+#. Translators: Validation for the short text used to generate a missing voice sample.
+msgid "Enter preview text, up to 300 characters."
+msgstr "Masukkan teks pratinjau, maksimal 300 karakter."
+
+#. Translators: Generating a preview consumes the user's API quota.
+msgid "Generating preview using API quota..."
+msgstr "Menghasilkan pratinjau menggunakan kuota API..."
+
+#. Translators: Retrieving, generating, or playing the voice sample failed.
+msgid "Could not play the sample. Please try again."
+msgstr "Sampel tidak dapat diputar. Silakan coba lagi."
+
+#, python-brace-format
+msgid "Playing sample for {name}."
+msgstr "Memutar sampel untuk {name}."
+
+#. Translators: The voice preview has finished playing.
+msgid "Sample complete."
+msgstr "Sampel selesai."
+
+#. Translators: Local cancellation cannot undo a request already submitted to Google.
+msgid "A submitted generation request may still use API quota."
+msgstr ""
+"Permintaan pembuatan yang sudah dikirim mungkin tetap menggunakan kuota API."
+
+#. Translators: Title of the dialog that creates a new voice by modifying an existing one.
+msgid "Voice Remix"
+msgstr "Remiks Suara"
+
+#, python-brace-format
+msgid ""
+"Voice Remix creates a new voice based on {name}. The original voice is not "
+"changed. It requires a Gemini API key from a project with billing enabled "
+"(paid tier). Describe one or two changes, such as age, pitch, energy, "
+"pacing, tone, or accent. Create voice uses API quota and saves the new voice "
+"in your Google project immediately. Closing the library does not cancel "
+"creation or delete the voice."
+msgstr ""
+"Remiks Suara membuat suara baru berdasarkan {name}. Suara aslinya tidak "
+"diubah. Fitur ini memerlukan kunci API Gemini dari proyek dengan penagihan "
+"aktif (tingkat berbayar). Jelaskan satu atau dua perubahan, seperti usia, "
+"tinggi nada, energi, tempo, nada bicara, atau aksen. Buat suara menggunakan "
+"kuota API dan langsung menyimpan suara baru di proyek Google Anda. Menutup "
+"pustaka tidak membatalkan pembuatan atau menghapus suara."
+
+#. Translators: Read-only field showing the voice that will be remixed.
+msgid "&Base voice:"
+msgstr "Suara &dasar:"
+
+#. Translators: Optional name for the new remixed voice.
+msgid "New voice &name (optional):"
+msgstr "&Nama suara baru (opsional):"
+
+#. Translators: Field describing how the base voice should change.
+msgid "&Changes to make:"
+msgstr "&Perubahan yang diinginkan:"
+
+#. Translators: Button that submits a voice remix request.
+msgid "Create &voice"
+msgstr "&Buat suara"
+
+#. Translators: Validation error for an overly long remixed voice name.
+msgid "Enter a voice name of up to 100 characters, or leave it blank."
+msgstr "Masukkan nama suara maksimal 100 karakter, atau biarkan kosong."
+
+#. Translators: Validation error when remix instructions are missing or too long.
+msgid "Describe the changes to make, up to 2000 characters."
+msgstr "Jelaskan perubahan yang diinginkan, maksimal 2000 karakter."
+
+msgid "Voice Replication"
+msgstr "Replikasi Suara"
+
+msgid ""
+"Voice Replication requires a Gemini API key from a project with billing "
+"enabled (paid tier). Free-tier API keys cannot create voices. Use two real "
+"recordings from the same adult speaker. This version accepts 24 kHz mono 16-"
+"bit PCM WAV files: reference speech of 10–30 seconds and a consent recording "
+"of up to 60 seconds. Record the exact statement below. Create voice uploads "
+"both recordings to Google for verification, uses API quota, and saves the "
+"voice in your Google project. Closing the library does not cancel creation "
+"or delete the voice."
+msgstr ""
+"Replikasi Suara memerlukan kunci API Gemini dari proyek dengan penagihan "
+"aktif (tingkat berbayar). Kunci API tingkat gratis tidak dapat membuat "
+"suara. Gunakan dua rekaman asli dari pembicara dewasa yang sama. Versi ini "
+"menerima file WAV PCM 16-bit mono 24 kHz: ucapan referensi berdurasi 10–30 "
+"detik dan rekaman persetujuan maksimal 60 detik. Rekam pernyataan di bawah "
+"ini persis seperti tertulis. Buat suara mengunggah kedua rekaman ke Google "
+"untuk verifikasi, menggunakan kuota API, dan menyimpan suara di proyek "
+"Google Anda. Menutup pustaka tidak membatalkan pembuatan atau menghapus "
+"suara."
+
+msgid "Consent statement &language:"
+msgstr "&Bahasa pernyataan persetujuan:"
+
+msgid "Indonesian"
+msgstr "Bahasa Indonesia"
+
+msgid "English"
+msgstr "Bahasa Inggris"
+
+msgid "Statement to &record:"
+msgstr "Pernyataan yang &direkam:"
+
+#. Translators: Local reference audio file path.
+msgid "Reference &audio file:"
+msgstr "File &audio referensi:"
+
+#. Translators: Choose the reference recording from disk.
+msgid "&Browse reference…"
+msgstr "&Telusuri referensi…"
+
+#. Translators: Local consent audio file path.
+msgid "&Consent audio file:"
+msgstr "File audio &persetujuan:"
+
+#. Translators: Choose the consent recording from disk.
+msgid "Browse con&sent…"
+msgstr "Telu&suri persetujuan…"
+
+msgid ""
+"I con&firm these are recordings of the same adult speaker who gave the "
+"recorded consent."
+msgstr ""
+"Saya &konfirmasi bahwa ini adalah rekaman dari pembicara dewasa yang sama "
+"yang memberikan persetujuan terekam."
+
+#. Translators: Explicit paid upload and creation action.
+msgid "Cr&eate voice"
+msgstr "B&uat suara"
+
+msgid "Choose WAV recording"
+msgstr "Pilih rekaman WAV"
+
+#. Translators: Missing local audio file; nothing has been uploaded.
+msgid "Choose an existing WAV recording."
+msgstr "Pilih rekaman WAV yang ada."
+
+#. Translators: Required consent confirmation; Google also verifies the recording.
+msgid "Confirm the speaker's recorded consent before creating the voice."
+msgstr "Konfirmasi persetujuan terekam dari pembicara sebelum membuat suara."
+
 msgid ""
 "Native Speech Generation now uses a WebSocket connection. For the best "
 "performance and compatibility, restart NVDA, open NVDA Settings, select "
@@ -811,9 +1470,9 @@ msgid ""
 "dialog to convert text into natural-sounding audio.\n"
 "\n"
 "Key Features:\n"
-"- High-Quality Voices: Choose between Gemini Flash 3.1 Preview for powerful, "
-"low-latency short audio, Gemini Flash 2.5 for standard responsive "
-"generation, and Gemini Pro 2.5 for premium, life-like speech.\n"
+"- High-Quality Voices: Choose Gemini Flash-Lite 3.8 TTS for everyday "
+"narration or Gemini Flash 3.8 TTS for expressive dialogue. Previous Gemini "
+"3.1 and 2.5 TTS models remain available.\n"
 "- Single and Multi-Speaker Modes: Easily generate audio for a single speaker "
 "or create dynamic dialogues with two distinct speakers. Simply format your "
 "text with \"SpeakerName:\" to assign voices.\n"
@@ -828,41 +1487,301 @@ msgid ""
 "To get started, obtain a Gemini API key from Google AI Studio and enter it "
 "in the add-on's settings panel, found under NVDA's Tools menu."
 msgstr ""
+"Manfaatkan teknologi AI Gemini Google untuk menghasilkan ucapan berkualitas "
+"tinggi langsung di NVDA. Add-on ini menyediakan dialog yang mudah digunakan "
+"untuk mengubah teks menjadi audio yang terdengar alami.\n"
+"\n"
+"Fitur Utama:\n"
+"- Suara Berkualitas Tinggi: Pilih Gemini Flash-Lite 3.8 TTS untuk narasi "
+"sehari-hari atau Gemini Flash 3.8 TTS untuk dialog yang ekspresif. Model TTS "
+"Gemini 3.1 dan 2.5 sebelumnya tetap tersedia.\n"
+"- Mode Satu dan Multi-Pembicara: Buat audio untuk satu pembicara atau dialog "
+"dinamis dengan dua suara berbeda. Format teks dengan \"NamaPembicara:\" "
+"untuk menetapkan suara.\n"
+"- Kontrol Suara Lanjutan: Sesuaikan temperature untuk hasil yang lebih "
+"kreatif atau stabil dan berikan instruksi gaya khusus.\n"
+"- Quick Speak: Bacakan teks terpilih atau teks clipboard secara langsung "
+"dengan pengaturan model, suara, dan gaya terpisah tanpa memindahkan fokus "
+"dari aplikasi saat ini.\n"
+"- Alur Kerja Mulus: Add-on memutar audio segera setelah dibuat dan "
+"memungkinkan file .wav disimpan untuk digunakan nanti.\n"
+"\n"
+"Untuk memulai, dapatkan kunci API Gemini dari Google AI Studio dan masukkan "
+"di panel pengaturan add-on pada menu Tools NVDA."
 
 #. Translators: Short release notes shown for this add-on version.
 msgid ""
-"- Added Quick Speak for selected text (NVDA+Alt+E) and clipboard text "
-"(NVDA+Alt+Shift+E), with configurable model, voice, style, volume, and "
-"internal playback.\n"
-"- Migrated Gemini Live features to a direct WebSocket API and improved "
-"connection timeouts, retries, server errors, and cancellation.\n"
-"- Improved Quick Speak with high thinking for Gemini 3.1 Flash Live Preview, "
-"silent routine states, protected-field blocking, focus preservation, key-"
-"repeat suppression, and stale playback protection.\n"
-"- Improved Talk With AI with saved audio devices and volume, better default-"
-"device selection, safer playback interruption and shutdown, and more "
-"reliable screen sharing.\n"
-"- Updated accessibility, error announcements, translations, and "
-"documentation. Tested through NVDA 2026.2 while retaining NVDA 2024.1 as the "
-"minimum supported version.\n"
+"- Tested with NVDA 2026.3.\n"
+"- Fixed Voice Library caching, voice creation, and dialog closing issues, "
+"and updated the Indonesian translation.\n"
+"- Added Voice Remix to create a new voice by describing changes to an "
+"existing voice in Voice Library.\n"
+"- Grouped Voice Design and Voice Replication under New voice with "
+"descriptions.\n"
+"- Added Voice Replication with reference and consent WAV uploads, consent "
+"verification, and a paid-tier notice.\n"
+"- Clarified that Voice Design requires an API key from a project with "
+"billing enabled.\n"
+"- Added Voice Design to create custom voices from descriptions in Voice "
+"Library.\n"
+"- Added Gender, Pitch, Persona, and Use case filters to Voice Library.\n"
+"- Fixed existing samples for extended voice IDs such as en-us-fola and en-us-"
+"rami.\n"
+"- Native Speech Generation stage 2: Added a searchable Voice Library with "
+"type and language filters, 70 verified voice samples and explicitly "
+"generated previews with editable text, cached catalogs, and saved narrator/"
+"speaker voices for Gemini 3.8 TTS.\n"
+"- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash "
+"TTS, structured style and speaker metadata, script validation, and Script "
+"Help.\n"
+"- Added Gemini 3.8 Live for Quick Speak and Talk with AI, and Gemini 3.8 "
+"Live Extended Thinking for Talk with AI.\n"
+"- Applied model-specific thinking settings while preserving existing model "
+"preferences.\n"
+"- Fixed interrupted WebSocket reads, permanent API error handling, reconnect "
+"status, and keyboard focus preservation.\n"
 "- See changelog.md for full details.\n"
 msgstr ""
-"- Menambahkan Quick Speak untuk teks terpilih (NVDA+Alt+E) dan teks clipboard "
-"(NVDA+Alt+Shift+E), dengan model, suara, gaya, volume, dan pemutaran internal "
-"yang dapat dikonfigurasi.\n"
-"- Memigrasikan fitur Gemini Live ke API WebSocket langsung dan meningkatkan "
-"batas waktu koneksi, percobaan ulang, penanganan error server, serta "
-"pembatalan.\n"
-"- Meningkatkan Quick Speak dengan thinking high untuk Gemini 3.1 Flash Live "
-"Preview, status rutin senyap, pemblokiran kolom terlindungi, pemeliharaan "
-"fokus, pencegahan pengulangan tombol, dan perlindungan dari pemutaran usang.\n"
-"- Meningkatkan Talk With AI dengan penyimpanan perangkat audio dan volume, "
-"pemilihan perangkat default yang lebih baik, interupsi dan penghentian "
-"pemutaran yang lebih aman, serta berbagi layar yang lebih andal.\n"
-"- Memperbarui aksesibilitas, pengumuman error, terjemahan, dan dokumentasi. "
-"Diuji hingga NVDA 2026.2 dengan NVDA 2024.1 tetap sebagai versi minimum yang "
-"didukung.\n"
+"- Diuji dengan NVDA 2026.3.\n"
+"- Memperbaiki masalah cache Pustaka Suara, pembuatan suara, dan penutupan "
+"dialog, serta memperbarui terjemahan bahasa Indonesia.\n"
+"- Menambahkan Remiks Suara untuk membuat suara baru dengan menjelaskan "
+"perubahan pada suara yang ada di Pustaka Suara.\n"
+"- Mengelompokkan Desain Suara dan Replikasi Suara di bawah Suara baru, "
+"lengkap dengan deskripsinya.\n"
+"- Menambahkan Replikasi Suara dengan unggahan WAV referensi dan persetujuan, "
+"verifikasi persetujuan, serta pemberitahuan tingkat berbayar.\n"
+"- Memperjelas bahwa Desain Suara memerlukan kunci API dari proyek dengan "
+"penagihan aktif.\n"
+"- Menambahkan Desain Suara untuk membuat suara khusus dari deskripsi di "
+"Pustaka Suara.\n"
+"- Menambahkan filter Gender, Tinggi nada, Persona, dan Kegunaan ke Pustaka "
+"Suara.\n"
+"- Memperbaiki sampel yang ada untuk ID suara tambahan seperti en-us-fola dan "
+"en-us-rami.\n"
+"- Native Speech Generation tahap 2: Menambahkan Pustaka Suara yang dapat "
+"dicari dengan filter jenis dan bahasa, 70 sampel suara terverifikasi dan "
+"pratinjau yang dibuat secara eksplisit dengan teks yang dapat diubah, "
+"katalog dalam cache, serta suara narator/pembicara tersimpan untuk Gemini "
+"3.8 TTS.\n"
+"- Native Speech Generation tahap 1: Menambahkan Gemini 3.8 Flash-Lite dan "
+"Flash TTS, metadata gaya dan pembicara terstruktur, validasi skrip, dan "
+"Bantuan Skrip.\n"
+"- Menambahkan Gemini 3.8 Live untuk Quick Speak dan Talk with AI, serta "
+"Gemini 3.8 Live Extended Thinking untuk Talk with AI.\n"
+"- Menerapkan pengaturan thinking sesuai model sambil mempertahankan "
+"preferensi model yang sudah tersimpan.\n"
+"- Memperbaiki pembacaan WebSocket yang terputus, penanganan error API "
+"permanen, status setelah koneksi ulang, dan pemeliharaan fokus keyboard.\n"
 "- Lihat changelog.md untuk detail lengkap.\n"
+
+#~ msgid ""
+#~ "- Tested with NVDA 2026.3.\n"
+#~ "- Fixed Voice Library caching, voice creation, and dialog closing issues, "
+#~ "and updated the Indonesian translation.\n"
+#~ "- Added Voice Remix to create a new voice by describing changes to an "
+#~ "existing voice in Voice Library.\n"
+#~ "- Grouped Voice Design and Voice Replication under New voice with "
+#~ "descriptions.\n"
+#~ "- Added Voice Replication with reference and consent WAV uploads, consent "
+#~ "verification, and a paid-tier notice.\n"
+#~ "- Clarified that Voice Design requires an API key from a project with "
+#~ "billing enabled.\n"
+#~ "- Added Voice Design to create custom voices from descriptions in Voice "
+#~ "Library.\n"
+#~ "- Added Gender, Pitch, Persona, and Use case filters to Voice Library.\n"
+#~ "- Fixed existing samples for extended voice IDs such as en-us-fola and en-"
+#~ "us-rami.\n"
+#~ "- Native Speech Generation stage 2: Added a searchable Voice Library with "
+#~ "type and language filters, 70 verified voice samples and explicitly "
+#~ "generated previews with editable text, cached catalogs, and saved "
+#~ "narrator/speaker voices for Gemini 3.8 TTS.\n"
+#~ "- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash "
+#~ "TTS, structured style and speaker metadata, script validation, and Script "
+#~ "Help.\n"
+#~ "- Earlier updates added Gemini 3.8 Live for Quick Speak and Talk with AI, "
+#~ "and Gemini 3.8 Live Extended Thinking for Talk with AI.\n"
+#~ "- Applied model-specific thinking settings while preserving existing "
+#~ "model preferences.\n"
+#~ "- Fixed interrupted WebSocket reads, permanent API error handling, "
+#~ "reconnect status, and keyboard focus preservation.\n"
+#~ "- See changelog.md for full details.\n"
+#~ msgstr ""
+#~ "- Diuji dengan NVDA 2026.3.\n"
+#~ "- Memperbaiki masalah cache Pustaka Suara, pembuatan suara, dan penutupan "
+#~ "dialog, serta memperbarui terjemahan bahasa Indonesia.\n"
+#~ "- Menambahkan Remiks Suara untuk membuat suara baru dengan menjelaskan "
+#~ "perubahan pada suara yang ada di Pustaka Suara.\n"
+#~ "- Mengelompokkan Desain Suara dan Replikasi Suara di bawah Suara baru, "
+#~ "lengkap dengan deskripsinya.\n"
+#~ "- Menambahkan Replikasi Suara dengan unggahan WAV referensi dan "
+#~ "persetujuan, verifikasi persetujuan, serta pemberitahuan tingkat "
+#~ "berbayar.\n"
+#~ "- Memperjelas bahwa Desain Suara memerlukan kunci API dari proyek dengan "
+#~ "penagihan aktif.\n"
+#~ "- Menambahkan Desain Suara untuk membuat suara khusus dari deskripsi di "
+#~ "Pustaka Suara.\n"
+#~ "- Menambahkan filter Gender, Tinggi nada, Persona, dan Kegunaan ke "
+#~ "Pustaka Suara.\n"
+#~ "- Memperbaiki sampel yang ada untuk ID suara tambahan seperti en-us-fola "
+#~ "dan en-us-rami.\n"
+#~ "- Native Speech Generation tahap 2: Menambahkan Pustaka Suara yang dapat "
+#~ "dicari dengan filter jenis dan bahasa, 70 sampel suara terverifikasi dan "
+#~ "pratinjau yang dibuat secara eksplisit dengan teks yang dapat diubah, "
+#~ "katalog dalam cache, serta suara narator/pembicara tersimpan untuk Gemini "
+#~ "3.8 TTS.\n"
+#~ "- Native Speech Generation tahap 1: Menambahkan Gemini 3.8 Flash-Lite dan "
+#~ "Flash TTS, metadata gaya dan pembicara terstruktur, validasi skrip, dan "
+#~ "Bantuan Skrip.\n"
+#~ "- Pembaruan sebelumnya menambahkan Gemini 3.8 Live untuk Quick Speak dan "
+#~ "Talk with AI, serta Gemini 3.8 Live Extended Thinking untuk Talk with "
+#~ "AI.\n"
+#~ "- Menerapkan pengaturan thinking sesuai model sambil mempertahankan "
+#~ "preferensi model yang sudah tersimpan.\n"
+#~ "- Memperbaiki pembacaan WebSocket yang terputus, penanganan error API "
+#~ "permanen, status setelah koneksi ulang, dan pemeliharaan fokus keyboard.\n"
+#~ "- Lihat changelog.md untuk detail lengkap.\n"
+
+#~ msgid ""
+#~ "- Added Voice Remix to create a new voice by describing changes to an "
+#~ "existing voice in Voice Library.\n"
+#~ "- Grouped Voice Design and Voice Replication under New voice with "
+#~ "descriptions.\n"
+#~ "- Added Voice Replication with reference and consent WAV uploads, consent "
+#~ "verification, and a paid-tier notice.\n"
+#~ "- Clarified that Voice Design requires an API key from a project with "
+#~ "billing enabled.\n"
+#~ "- Added Voice Design to create custom voices from descriptions in Voice "
+#~ "Library.\n"
+#~ "- Added Gender, Pitch, Persona, and Use case filters to Voice Library.\n"
+#~ "- Fixed existing samples for extended voice IDs such as en-us-fola and en-"
+#~ "us-rami.\n"
+#~ "- Native Speech Generation stage 2: Added a searchable Voice Library with "
+#~ "type and language filters, 70 verified voice samples and explicitly "
+#~ "generated previews with editable text, cached catalogs, and saved "
+#~ "narrator/speaker voices for Gemini 3.8 TTS.\n"
+#~ "- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash "
+#~ "TTS, structured style and speaker metadata, script validation, and Script "
+#~ "Help.\n"
+#~ "- Earlier updates added Gemini 3.8 Live for Quick Speak and Talk with AI, "
+#~ "and Gemini 3.8 Live Extended Thinking for Talk with AI.\n"
+#~ "- Applied model-specific thinking settings while preserving existing "
+#~ "model preferences.\n"
+#~ "- Fixed interrupted WebSocket reads, permanent API error handling, "
+#~ "reconnect status, and keyboard focus preservation.\n"
+#~ "- See changelog.md for full details.\n"
+#~ msgstr ""
+#~ "- Menambahkan Remiks Suara untuk membuat suara baru dengan menjelaskan "
+#~ "perubahan pada suara yang ada di Pustaka Suara.\n"
+#~ "- Mengelompokkan Desain Suara dan Replikasi Suara di bawah Suara baru, "
+#~ "lengkap dengan deskripsinya.\n"
+#~ "- Menambahkan Replikasi Suara dengan unggahan WAV referensi dan "
+#~ "persetujuan, verifikasi persetujuan, serta pemberitahuan tingkat "
+#~ "berbayar.\n"
+#~ "- Memperjelas bahwa Desain Suara memerlukan kunci API dari proyek dengan "
+#~ "penagihan aktif.\n"
+#~ "- Menambahkan Desain Suara untuk membuat suara khusus dari deskripsi di "
+#~ "Pustaka Suara.\n"
+#~ "- Menambahkan filter Gender, Tinggi nada, Persona, dan Kegunaan ke "
+#~ "Pustaka Suara.\n"
+#~ "- Memperbaiki sampel yang ada untuk ID suara tambahan seperti en-us-fola "
+#~ "dan en-us-rami.\n"
+#~ "- Native Speech Generation tahap 2: Menambahkan Pustaka Suara yang dapat "
+#~ "dicari dengan filter jenis dan bahasa, 70 sampel suara terverifikasi dan "
+#~ "pratinjau yang dibuat secara eksplisit dengan teks yang dapat diubah, "
+#~ "katalog dalam cache, serta suara narator/pembicara tersimpan untuk Gemini "
+#~ "3.8 TTS.\n"
+#~ "- Native Speech Generation tahap 1: Menambahkan Gemini 3.8 Flash-Lite dan "
+#~ "Flash TTS, metadata gaya dan pembicara terstruktur, validasi skrip, dan "
+#~ "Bantuan Skrip.\n"
+#~ "- Pembaruan sebelumnya menambahkan Gemini 3.8 Live untuk Quick Speak dan "
+#~ "Talk with AI, serta Gemini 3.8 Live Extended Thinking untuk Talk with "
+#~ "AI.\n"
+#~ "- Menerapkan pengaturan thinking sesuai model sambil mempertahankan "
+#~ "preferensi model yang sudah tersimpan.\n"
+#~ "- Memperbaiki pembacaan WebSocket yang terputus, penanganan error API "
+#~ "permanen, status setelah koneksi ulang, dan pemeliharaan fokus keyboard.\n"
+#~ "- Lihat changelog.md untuk detail lengkap.\n"
+
+#~ msgid ""
+#~ "- Grouped Voice Design and Voice Replication under New voice with "
+#~ "descriptions.\n"
+#~ "- Added Voice Replication with reference and consent WAV uploads, consent "
+#~ "verification, and a paid-tier notice.\n"
+#~ "- Clarified that Voice Design requires an API key from a project with "
+#~ "billing enabled.\n"
+#~ "- Added Voice Design to create custom voices from descriptions in Voice "
+#~ "Library.\n"
+#~ "- Added Gender, Pitch, Persona, and Use case filters to Voice Library.\n"
+#~ "- Fixed existing samples for extended voice IDs such as en-us-fola and en-"
+#~ "us-rami.\n"
+#~ "- Native Speech Generation stage 2: Added a searchable Voice Library with "
+#~ "type and language filters, 70 verified voice samples and explicitly "
+#~ "generated previews with editable text, cached catalogs, and saved "
+#~ "narrator/speaker voices for Gemini 3.8 TTS.\n"
+#~ "- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash "
+#~ "TTS, structured style and speaker metadata, script validation, and Script "
+#~ "Help.\n"
+#~ "- Earlier updates added Gemini 3.8 Live for Quick Speak and Talk with AI, "
+#~ "and Gemini 3.8 Live Extended Thinking for Talk with AI.\n"
+#~ "- Applied model-specific thinking settings while preserving existing "
+#~ "model preferences.\n"
+#~ "- Fixed interrupted WebSocket reads, permanent API error handling, "
+#~ "reconnect status, and keyboard focus preservation.\n"
+#~ "- See changelog.md for full details.\n"
+#~ msgstr ""
+#~ "- Mengelompokkan Desain Suara dan Replikasi Suara di bawah Suara baru, "
+#~ "lengkap dengan deskripsinya.\n"
+#~ "- Menambahkan Replikasi Suara dengan unggahan WAV referensi dan "
+#~ "persetujuan, verifikasi persetujuan, serta pemberitahuan tingkat "
+#~ "berbayar.\n"
+#~ "- Memperjelas bahwa Desain Suara memerlukan kunci API dari proyek dengan "
+#~ "penagihan aktif.\n"
+#~ "- Menambahkan Desain Suara untuk membuat suara khusus dari deskripsi di "
+#~ "Pustaka Suara.\n"
+#~ "- Menambahkan filter Gender, Tinggi nada, Persona, dan Kegunaan ke "
+#~ "Pustaka Suara.\n"
+#~ "- Memperbaiki sampel yang ada untuk ID suara tambahan seperti en-us-fola "
+#~ "dan en-us-rami.\n"
+#~ "- Native Speech Generation tahap 2: Menambahkan Pustaka Suara yang dapat "
+#~ "dicari dengan filter jenis dan bahasa, 70 sampel suara terverifikasi dan "
+#~ "pratinjau yang dibuat secara eksplisit dengan teks yang dapat diubah, "
+#~ "katalog dalam cache, serta suara narator/pembicara tersimpan untuk Gemini "
+#~ "3.8 TTS.\n"
+#~ "- Native Speech Generation tahap 1: Menambahkan Gemini 3.8 Flash-Lite dan "
+#~ "Flash TTS, metadata gaya dan pembicara terstruktur, validasi skrip, dan "
+#~ "Bantuan Skrip.\n"
+#~ "- Pembaruan sebelumnya menambahkan Gemini 3.8 Live untuk Quick Speak dan "
+#~ "Talk with AI, serta Gemini 3.8 Live Extended Thinking untuk Talk with "
+#~ "AI.\n"
+#~ "- Menerapkan pengaturan thinking sesuai model sambil mempertahankan "
+#~ "preferensi model yang sudah tersimpan.\n"
+#~ "- Memperbaiki pembacaan WebSocket yang terputus, penanganan error API "
+#~ "permanen, status setelah koneksi ulang, dan pemeliharaan fokus keyboard.\n"
+#~ "- Lihat changelog.md untuk detail lengkap.\n"
+
+#~ msgid "Thinking level:"
+#~ msgstr "Tingkat penalaran:"
+
+#~ msgid "Gemini 3.1 Flash Live Preview (recommended)"
+#~ msgstr "Gemini 3.1 Flash Live Preview (direkomendasikan)"
+
+#~ msgid ""
+#~ "- Added Gemini 3.8 Live for Quick Speak and Talk with AI, and Gemini 3.8 "
+#~ "Live Extended Thinking for Talk with AI.\n"
+#~ "- Applied model-specific thinking settings while preserving existing "
+#~ "model preferences.\n"
+#~ "- Fixed interrupted WebSocket reads, permanent API error handling, "
+#~ "reconnect status, and keyboard focus preservation.\n"
+#~ "- See changelog.md for full details.\n"
+#~ msgstr ""
+#~ "- Menambahkan Gemini 3.8 Live untuk Quick Speak dan Talk with AI, serta "
+#~ "Gemini 3.8 Live Extended Thinking untuk Talk with AI.\n"
+#~ "- Menerapkan pengaturan thinking sesuai model sambil mempertahankan "
+#~ "preferensi model yang sudah tersimpan.\n"
+#~ "- Memperbaiki pembacaan WebSocket yang terputus, penanganan error API "
+#~ "permanen, status setelah koneksi ulang, dan pemeliharaan fokus keyboard.\n"
+#~ "- Lihat changelog.md untuk detail lengkap.\n"
 
 #~ msgid ""
 #~ "Harness the power of Google's state-of-the-art Gemini AI for high-quality "
@@ -916,13 +1835,6 @@ msgstr ""
 #~ "Untuk memulai, dapatkan kunci API Gemini dari Google AI Studio dan "
 #~ "masukkan di panel pengaturan add-on pada menu Tools NVDA."
 
-#~ msgid ""
-#~ "- Added Quick Speak and improved Gemini Live support.\n"
-#~ "- See changelog.md for full details.\n"
-#~ msgstr ""
-#~ "- Menambahkan Quick Speak dan meningkatkan Gemini Live.\n"
-#~ "- Lihat changelog.md untuk detail lengkap.\n"
-
 #~ msgid "Quick Speak usage and &privacy:"
 #~ msgstr "Penggunaan dan &privasi Quick Speak:"
 
@@ -936,24 +1848,6 @@ msgstr ""
 #~ "membacakan teks clipboard. Tekan kembali salah satu perintah untuk "
 #~ "menghentikan. Anda dapat mengubah perintah ini di Input Gestures. Teks "
 #~ "yang diminta dikirim ke Google Gemini untuk membuat audio."
-
-#~ msgid ""
-#~ "- Added Quick Speak for selected text with NVDA+Alt+E.\n"
-#~ "- Added Quick Speak for clipboard text with NVDA+Alt+Shift+E.\n"
-#~ "- Added separate Quick Speak model, voice, and pronunciation/style "
-#~ "settings.\n"
-#~ "- Added internal NVDA audio playback while preserving application focus.\n"
-#~ "- Updated all included translations and documentation.\n"
-#~ "- See changelog.md for full details.\n"
-#~ msgstr ""
-#~ "- Menambahkan Quick Speak untuk teks terpilih dengan NVDA+Alt+E.\n"
-#~ "- Menambahkan Quick Speak untuk teks clipboard dengan NVDA+Alt+Shift+E.\n"
-#~ "- Menambahkan pengaturan model, suara, serta pelafalan/gaya Quick Speak "
-#~ "yang terpisah.\n"
-#~ "- Menambahkan pemutaran audio internal melalui NVDA tanpa mengubah fokus "
-#~ "aplikasi.\n"
-#~ "- Memperbarui semua terjemahan dan dokumentasi yang disertakan.\n"
-#~ "- Lihat changelog.md untuk detail lengkap.\n"
 
 #~ msgid "The latest library release does not include a version tag."
 #~ msgstr "Rilis library terbaru tidak menyertakan tag versi."
@@ -1042,16 +1936,3 @@ msgstr ""
 
 #~ msgid "WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3"
 #~ msgstr "Berkas WAV (*.wav)|*.wav|Berkas MP3 (*.mp3)|*.mp3"
-
-#~ msgid ""
-#~ "- Compatibility: Added support for NVDA 2026.1.\n"
-#~ "- Dependencies now use verified GitHub release metadata for NVDA-version-"
-#~ "aware library packages.\n"
-#~ "- Added Gemini Flash 3.1 Preview as the default TTS model.\n"
-#~ "- See changelog.md for full details.\n"
-#~ msgstr ""
-#~ "- Kompatibilitas: Menambahkan dukungan untuk NVDA 2026.1.\n"
-#~ "- Dependensi sekarang memakai metadata rilis GitHub terverifikasi untuk "
-#~ "paket library yang sadar versi NVDA.\n"
-#~ "- Menambahkan Gemini Flash 3.1 Preview sebagai model TTS default.\n"
-#~ "- Baca changelog.md untuk detail lengkap.\n"

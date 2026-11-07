@@ -1,5 +1,7 @@
 addon/doc/*.css
 addon/doc/en/
+addon/COPYING.txt
+addon/changelog.md
 *_docHandler.py
 *.html
 manifest.ini

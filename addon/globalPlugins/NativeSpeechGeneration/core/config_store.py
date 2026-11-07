@@ -12,6 +12,7 @@ from .constants import (
 	DEFAULT_MODEL,
 	FALLBACK_VOICES,
 	FLASH_25_MODEL,
+	LIVE_38_MODEL,
 	LIVE_MODEL,
 	NATIVE_AUDIO_25_MODEL,
 	PRO_25_MODEL,
@@ -19,6 +20,8 @@ from .constants import (
 	QUICK_SPEAK_DEFAULT_VOICE,
 	QUICK_SPEAK_DEFAULT_VOLUME,
 	TALK_WITH_AI_DEFAULT_VOLUME,
+	TALK_WITH_AI_MODELS,
+	TALK_WITH_AI_THINKING_LEVELS,
 )
 from .nvda_compat import shouldWriteToDisk
 
@@ -35,9 +38,12 @@ _CONFIG_SPEC: Final[dict[str, str]] = {
 	"talkWithAIInputDevice": "string(default='')",
 	"talkWithAIOutputDevice": "string(default='')",
 	"talkWithAIVolume": f"integer(default={TALK_WITH_AI_DEFAULT_VOLUME})",
+	"talkWithAIModel": f"string(default='{LIVE_MODEL}')",
+	"talkWithAIThinkingLevel": "string(default='minimal')",
 }
 
 QUICK_SPEAK_MODELS: Final[tuple[str, ...]] = (
+	LIVE_38_MODEL,
 	LIVE_MODEL,
 	NATIVE_AUDIO_25_MODEL,
 	DEFAULT_MODEL,
@@ -73,6 +79,8 @@ class TalkWithAISettings:
 	inputDevice: str
 	outputDevice: str
 	volume: int
+	model: str = LIVE_MODEL
+	thinkingLevel: str = "minimal"
 
 
 class _DATA_BLOB(ctypes.Structure):
@@ -181,6 +189,12 @@ def setQuickSpeakSettings(
 def getTalkWithAISettings() -> TalkWithAISettings:
 	registerConfigSpec()
 	section = _getConfigSection()
+	model = str(section.get("talkWithAIModel", LIVE_MODEL))
+	if model not in TALK_WITH_AI_MODELS:
+		model = LIVE_MODEL
+	thinkingLevel = str(section.get("talkWithAIThinkingLevel", "minimal"))
+	if thinkingLevel not in TALK_WITH_AI_THINKING_LEVELS:
+		thinkingLevel = "minimal"
 	volume = section.get("talkWithAIVolume", TALK_WITH_AI_DEFAULT_VOLUME)
 	try:
 		volume = int(volume)
@@ -190,15 +204,28 @@ def getTalkWithAISettings() -> TalkWithAISettings:
 		inputDevice=str(section.get("talkWithAIInputDevice", "") or "").strip(),
 		outputDevice=str(section.get("talkWithAIOutputDevice", "") or "").strip(),
 		volume=max(0, min(100, volume)),
+		model=model,
+		thinkingLevel=thinkingLevel,
 	)
 
 
-def setTalkWithAISettings(inputDevice: str, outputDevice: str, volume: int) -> None:
+def setTalkWithAISettings(
+	inputDevice: str,
+	outputDevice: str,
+	volume: int,
+	*,
+	model: str | None = None,
+	thinkingLevel: str | None = None,
+) -> None:
 	registerConfigSpec()
 	if not shouldWriteToDisk():
 		log.warning("Skipped Talk With AI configuration update because NVDA must not write to disk.")
 		return
 	section = _getConfigSection()
+	if model in TALK_WITH_AI_MODELS:
+		section["talkWithAIModel"] = model
+	if thinkingLevel in TALK_WITH_AI_THINKING_LEVELS:
+		section["talkWithAIThinkingLevel"] = thinkingLevel
 	if inputDevice.strip():
 		section["talkWithAIInputDevice"] = inputDevice.strip()
 	if outputDevice.strip():

@@ -23,7 +23,7 @@ from logHandler import log
 from . import config_store
 from .api_client import DirectApiError, DirectLiveSession, generate_tts
 from .audio_utils import parseAudioMimeType
-from .constants import LIVE_MODEL, NATIVE_AUDIO_25_MODEL
+from .constants import LIVE_38_MODEL, LIVE_MODEL, NATIVE_AUDIO_25_MODEL
 
 LIVE_RESPONSE_TIMEOUT = 60.0
 LIVE_RESPONSE_TIMEOUT_PER_CHARACTER = 0.08
@@ -152,7 +152,7 @@ class QuickSpeakController:
 					_("No Gemini API key is configured. Set it in NVDA settings before using Quick Speak."),
 				)
 			settings = config_store.getQuickSpeakSettings()
-			if settings.model in (LIVE_MODEL, NATIVE_AUDIO_25_MODEL):
+			if settings.model in (LIVE_38_MODEL, LIVE_MODEL, NATIVE_AUDIO_25_MODEL):
 				session = DirectLiveSession(
 					apiResolution.value,
 					settings.model,

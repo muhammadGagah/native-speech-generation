@@ -18,12 +18,12 @@ from logHandler import log
 from .core import config_store
 from .core.api_client import DirectLiveSession
 from .core.audio_runtime import PYAUDIO_AVAILABLE, PYAUDIO_IMPORT_ERROR, getRuntimeScope, pyaudio
+from .core.constants import LIVE_38_EXTENDED_MODEL, LIVE_38_MODEL, LIVE_MODEL
 from .core.screen_capture import ScreenCaptureWorker, is_screen_curtain_active
 
 addonHandler.initTranslation()
 
 
-MODEL_NAME = "gemini-3.1-flash-live-preview"
 MEDIA_DIR = os.path.join(os.path.dirname(__file__), "media")
 STREAM_START_SOUND_PATH = os.path.join(MEDIA_DIR, "stream-start.wav")
 STREAM_END_SOUND_PATH = os.path.join(MEDIA_DIR, "stream-end.wav")
@@ -57,6 +57,8 @@ class TalkWithAIDialog(wx.Dialog):
 	shareScreenCb: wx.CheckBox
 	thinkingLabel: wx.StaticText
 	thinkingChoice: wx.Choice
+	modelLabel: wx.StaticText
+	modelChoice: wx.Choice
 	volSlider: wx.Slider
 
 	def __init__(self, parent: wx.Window, apiKey: str, voiceName: str, systemInstruction: str) -> None:
@@ -73,6 +75,8 @@ class TalkWithAIDialog(wx.Dialog):
 		self.shareScreenCb = cast(wx.CheckBox, None)
 		self.thinkingLabel = cast(wx.StaticText, None)
 		self.thinkingChoice = cast(wx.Choice, None)
+		self.modelLabel = cast(wx.StaticText, None)
+		self.modelChoice = cast(wx.Choice, None)
 		self.volSlider = cast(wx.Slider, None)
 		self.apiKey = apiKey
 		self.voiceName = voiceName
@@ -92,7 +96,9 @@ class TalkWithAIDialog(wx.Dialog):
 		self._audioPlayerThread: threading.Thread | None = None
 		self.micOn = True
 		self.useGoogleSearch = False
-		self.selectedThinkingLevel = "minimal"
+		self.selectedThinkingLevel: str | None = "minimal"
+		self.selectedModel: str = LIVE_MODEL
+		self._interactionStatus: str | None = None
 		self._screenCaptureWorker: ScreenCaptureWorker | None = None
 		self._screenFramePending = False
 		self.shareScreen = False
@@ -104,6 +110,8 @@ class TalkWithAIDialog(wx.Dialog):
 		self._playbackGeneration = 0
 		self.isPlaying = False
 		persistedSettings = config_store.getTalkWithAISettings()
+		self.selectedModel = persistedSettings.model
+		self._preferredThinkingLevel = persistedSettings.thinkingLevel
 		self.volume = persistedSettings.volume
 		self._persistedInputDevice = persistedSettings.inputDevice
 		self._persistedOutputDevice = persistedSettings.outputDevice
@@ -132,6 +140,15 @@ class TalkWithAIDialog(wx.Dialog):
 			(_("Medium"), "medium"),
 			# Translators: Choice label for high reasoning depth in Talk With AI.
 			(_("High"), "high"),
+		]
+		self._allThinkingChoices = self.thinkingChoices[:]
+		self.modelChoices = [
+			# Translators: Low-latency voice conversation model.
+			(_("Gemini 3.8 Live"), LIVE_38_MODEL),
+			# Translators: Voice conversation model with configurable background reasoning.
+			(_("Gemini 3.8 Live Extended Thinking"), LIVE_38_EXTENDED_MODEL),
+			# Translators: Previous voice conversation model, with its original thinking levels.
+			(_("Gemini 3.1 Flash Live Preview"), LIVE_MODEL),
 		]
 
 		self._buildUi()
@@ -200,8 +217,6 @@ class TalkWithAIDialog(wx.Dialog):
 		if not runtimeUsable:
 			return
 		self.connectBtn.Enable()
-		if self.micBtn.HasFocus():
-			self.connectBtn.SetFocus()
 		if inputDevices or outputDevices:
 			# Translators: Status shown after Talk With AI finishes enumerating audio devices.
 			self.updateStatus(_("Audio devices loaded"), announce=True)
@@ -238,7 +253,13 @@ class TalkWithAIDialog(wx.Dialog):
 			and (self._outputDeviceSelectionDirty or not outputDevice)
 		):
 			outputDevice = str(self.outputDevices[outputSelection].get("name") or "")
-		config_store.setTalkWithAISettings(inputDevice, outputDevice, self.volSlider.GetValue())
+		config_store.setTalkWithAISettings(
+			inputDevice,
+			outputDevice,
+			self.volSlider.GetValue(),
+			model=self.selectedModel,
+			thinkingLevel=self._preferredThinkingLevel,
+		)
 
 	def _onInputDeviceChange(self, evt: wx.Event) -> None:
 		if not self._restoringDevices:
@@ -376,11 +397,24 @@ class TalkWithAIDialog(wx.Dialog):
 		self.shareScreenCb.Bind(wx.EVT_CHECKBOX, self.onShareScreenToggle)
 		controlsSizer.Add(self.shareScreenCb, 0, wx.ALL | wx.EXPAND, 5)
 
+		modelSizer = wx.BoxSizer(wx.HORIZONTAL)
+		# Translators: Label for the model used for voice conversations, separate from Quick Speak.
+		self.modelLabel = wx.StaticText(panel, label=_("Conversation &model:"))
+		self.modelChoice = wx.Choice(panel, choices=[label for label, _value in self.modelChoices])
+		self.modelChoice.SetSelection(
+			[value for _label, value in self.modelChoices].index(self.selectedModel),
+		)
+		self.modelChoice.Bind(wx.EVT_CHOICE, self._onModelChange)
+		modelSizer.Add(self.modelLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
+		modelSizer.Add(self.modelChoice, 1, wx.EXPAND)
+		controlsSizer.Add(modelSizer, 0, wx.ALL | wx.EXPAND, 5)
+
 		thinkingSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# Translators: Label for choosing the reasoning depth in Talk With AI.
-		self.thinkingLabel = wx.StaticText(panel, label=_("Thinking level:"))
+		self.thinkingLabel = wx.StaticText(panel, label=_("&Thinking level:"))
 		self.thinkingChoice = wx.Choice(panel, choices=[label for label, _value in self.thinkingChoices])
 		self.thinkingChoice.SetSelection(0)
+		self.thinkingChoice.Bind(wx.EVT_CHOICE, self._onThinkingChange)
 		thinkingSizer.Add(self.thinkingLabel, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 5)
 		thinkingSizer.Add(self.thinkingChoice, 1, wx.EXPAND)
 		controlsSizer.Add(thinkingSizer, 0, wx.ALL | wx.EXPAND, 5)
@@ -406,6 +440,9 @@ class TalkWithAIDialog(wx.Dialog):
 		panel.SetSizer(panelSizer)
 		mainSizer.Add(panel, 1, wx.EXPAND)
 		self.SetSizer(mainSizer)
+		# Reserve space for the thinking row even when the initial model hides it.
+		mainSizer.Fit(self)
+		self._updateThinkingControls()
 		self.CenterOnParent()
 
 	def _announceStatus(self, text: str, force: bool = False) -> None:
@@ -442,9 +479,10 @@ class TalkWithAIDialog(wx.Dialog):
 		except RuntimeError:
 			return
 
-	def _reportConnected(self, sessionId: int) -> None:
-		if not self._isSessionCurrent(sessionId):
+	def _reportConnected(self, sessionId: int, session: DirectLiveSession) -> None:
+		if not self._isSessionCurrent(sessionId) or session is not self.session:
 			return
+		self._interactionStatus = None
 		# Translators: Status shown when Talk With AI connects successfully.
 		self.updateStatus(_("Connected"), announce=True)
 		self._playSoundEffect(STREAM_START_SOUND_PATH)
@@ -550,10 +588,44 @@ class TalkWithAIDialog(wx.Dialog):
 	def onVolumeChange(self, evt: wx.Event) -> None:
 		self.volume = self.volSlider.GetValue()
 
-	def _getSelectedThinkingLevel(self) -> str:
+	def _onModelChange(self, evt: wx.Event) -> None:
+		"""Keep focus on the model selector while updating its supported settings."""
+		selection = self.modelChoice.GetSelection()
+		if selection == wx.NOT_FOUND:
+			return
+		self.selectedModel = self.modelChoices[selection][1]
+		self._updateThinkingControls()
+		evt.Skip()
+
+	def _onThinkingChange(self, evt: wx.Event) -> None:
+		level = self._getSelectedThinkingLevel()
+		if level is not None:
+			self._preferredThinkingLevel = level
+		evt.Skip()
+
+	def _updateThinkingControls(self) -> None:
+		"""Display only thinking levels supported by the selected conversation model."""
+		self.thinkingChoices = [
+			(label, value)
+			for label, value in self._allThinkingChoices
+			if self.selectedModel != LIVE_38_EXTENDED_MODEL or value != "minimal"
+		]
+		self.thinkingChoice.SetItems([label for label, _value in self.thinkingChoices])
+		levels = [value for _label, value in self.thinkingChoices]
+		level = self._preferredThinkingLevel
+		self.thinkingChoice.SetSelection(levels.index(level) if level in levels else 0)
+		showThinking = self.selectedModel != LIVE_38_MODEL
+		self.thinkingLabel.Show(showThinking)
+		self.thinkingChoice.Show(showThinking)
+		self.thinkingChoice.GetParent().Layout()
+		self.Layout()
+
+	def _getSelectedThinkingLevel(self) -> str | None:
+		if self.selectedModel == LIVE_38_MODEL:
+			return None
 		selection = self.thinkingChoice.GetSelection()
 		if selection == wx.NOT_FOUND:
-			return "minimal"
+			return "low" if self.selectedModel == LIVE_38_EXTENDED_MODEL else "minimal"
 		return self.thinkingChoices[selection][1]
 
 	def _clearSessionHistory(self) -> None:
@@ -643,6 +715,7 @@ class TalkWithAIDialog(wx.Dialog):
 		self.selectedThinkingLevel = self._getSelectedThinkingLevel()
 
 		self.googleSearchCb.Hide()
+		self.modelChoice.Disable()
 		self.thinkingLabel.Hide()
 		self.thinkingChoice.Hide()
 
@@ -674,6 +747,7 @@ class TalkWithAIDialog(wx.Dialog):
 		self._sessionHadError = False
 		self._restoreConnectFocus = False
 		self.sessionActive = True
+		self._interactionStatus = None
 		self.loopThread = threading.Thread(target=self._startAsyncLoop, args=(sessionId,), daemon=True)
 		self.loopThread.start()
 
@@ -974,6 +1048,8 @@ class TalkWithAIDialog(wx.Dialog):
 	def _isPermanentSessionError(self, error: BaseException) -> bool:
 		for attributeName in ("status_code", "status", "code"):
 			status = getattr(error, attributeName, None)
+			if status in ("INVALID_ARGUMENT", "UNAUTHENTICATED", "PERMISSION_DENIED", "NOT_FOUND"):
+				return True
 			try:
 				if int(status) in {400, 401, 403, 404}:
 					return True
@@ -1054,8 +1130,16 @@ class TalkWithAIDialog(wx.Dialog):
 				if not self._isSessionCurrent(sessionId):
 					break
 				serverContent = response.get("serverContent")
+				interactionStatus = response.get("interaction_status") or response.get("interactionStatus")
 				if isinstance(serverContent, dict):
 					self._handleServerContent(serverContent)
+					interactionStatus = (
+						interactionStatus
+						or serverContent.get("interaction_status")
+						or serverContent.get("interactionStatus")
+					)
+				if interactionStatus in ("IN_PROGRESS", "IDLE"):
+					wx.CallAfter(self._reportInteractionStatus, sessionId, interactionStatus, session)
 				if response.get("toolCall") is not None:
 					log.debug("TalkWithAI: Ignoring tool_call event from Live API.")
 		except asyncio.CancelledError:
@@ -1076,6 +1160,22 @@ class TalkWithAIDialog(wx.Dialog):
 			raise
 		finally:
 			log.debug("TalkWithAI: Receive loop ended")
+
+	def _reportInteractionStatus(self, sessionId: int, status: str, session: DirectLiveSession) -> None:
+		"""Track background reasoning without interrupting speech or moving focus."""
+		if (
+			not self._isSessionCurrent(sessionId)
+			or session is not self.session
+			or status == self._interactionStatus
+		):
+			return
+		self._interactionStatus = status
+		if status == "IN_PROGRESS":
+			# Translators: The model may still be reasoning after an audio turn finishes.
+			self.updateStatus(_("AI processing"))
+		else:
+			# Translators: All model processing is complete; the conversation remains connected.
+			self.updateStatus(_("AI ready for input"))
 
 	async def runSession(self, sessionId: int) -> None:
 		"""Open audio devices and keep the Live API session connected with retry backoff."""
@@ -1111,7 +1211,7 @@ class TalkWithAIDialog(wx.Dialog):
 					log.debug("TalkWithAI: Connecting to Gemini Live...")
 					session = DirectLiveSession(
 						self.apiKey,
-						MODEL_NAME,
+						self.selectedModel,
 						self.voiceName,
 						self._buildSystemInstruction(),
 						thinking_level=self.selectedThinkingLevel,
@@ -1126,9 +1226,8 @@ class TalkWithAIDialog(wx.Dialog):
 						if not self._isSessionCurrent(sessionId):
 							return
 						retryAttempt = 0
-						if firstConnect:
-							wx.CallAfter(self._reportConnected, sessionId)
-							firstConnect = False
+						wx.CallAfter(self._reportConnected, sessionId, session)
+						firstConnect = False
 						if self.shareScreen:
 							self._startScreenCapture(sessionId)
 						sendTask = asyncio.create_task(self.sendAudioLoop(session, sessionId))
@@ -1222,14 +1321,18 @@ class TalkWithAIDialog(wx.Dialog):
 			return
 		if self:
 			try:
-				currentFocus = wx.Window.FindFocus()
-				shouldRestoreFocus = self._restoreConnectFocus or currentFocus in (None, self.disconnectBtn)
+				currentFocus = cast(wx.Window | None, wx.Window.FindFocus())
+				shouldRestoreFocus = (
+					(currentFocus is None and self.IsActive())
+					or currentFocus is self.disconnectBtn
+					or (self._restoreConnectFocus and currentFocus is self.micBtn)
+				)
 				canConnect = self._devicesLoaded and not self.compatibilityError and PYAUDIO_AVAILABLE
 				self.connectBtn.Enable(canConnect)
 				self.disconnectBtn.Disable()
 				self.googleSearchCb.Show()
-				self.thinkingLabel.Show()
-				self.thinkingChoice.Show()
+				self.modelChoice.Enable()
+				self._updateThinkingControls()
 
 				for child in self.deviceSizer.GetChildren():
 					window = child.GetWindow()

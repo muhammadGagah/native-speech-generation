@@ -75,7 +75,7 @@ Dieses Addon ist für reibungslose Arbeitsabläufe, barrierefreie Bedienung und 
 
 -## Voraussetzungen
 
-* NVDA 2024.1 oder neuer. Getestet bis NVDA 2026.2.
+* NVDA 2024.1 oder neuer. Getestet bis NVDA 2026.3.
 * Aktive Internetverbindung
 * Gültiger **Google Gemini API‑Schlüssel**
 

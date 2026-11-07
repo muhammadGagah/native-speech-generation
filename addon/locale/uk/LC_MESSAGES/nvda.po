@@ -1,31 +1,92 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: NativeSpeechGeneration 1.8.1\n"
-"Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2026-09-02 06:57+0700\n"
+"Project-Id-Version: NativeSpeechGeneration 1.8.3\n"
+"Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
+"POT-Creation-Date: 2026-11-06 05:11+0700\n"
 "PO-Revision-Date: 2026-09-01 17:34+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk_UA\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Generated-By: Babel 2.18.0\n"
 
+#. Translators: Name of the add-on in the NVDA Tools menu.
+msgid "&Native Speech Generation"
+msgstr "&Генерація природного мовлення"
+
+#. Translators: Tooltip or description for the Native Speech Generation Tools menu item.
+msgid "Generate speech using Gemini TTS"
+msgstr "Генерувати мовлення за допомогою Gemini TTS"
+
+#. Translators: Input gesture description for opening the Native Speech Generation dialog.
+msgid "Open the Native Speech Generation dialog"
+msgstr "Відкриває діалог генерації природного мовлення"
+
+#. Translators: Input gestures category name for Native Speech Generation.
+#. Translators: Title of the settings panel in NVDA preferences.
+#. Translators: Summary for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
+msgid "Native Speech Generation"
+msgstr "Генерація природного мовлення"
+
+#. Translators: Input gesture description for speaking the selected text with Quick Speak.
+msgid "Speak selected text with Quick Speak, or stop Quick Speak"
+msgstr ""
+"Озвучити виділений текст за допомогою Quick Speak або зупинити Quick Speak"
+
+#. Translators: Input gesture description for speaking clipboard text with Quick Speak.
+msgid "Speak clipboard text with Quick Speak, or stop Quick Speak"
+msgstr ""
+"Озвучити текст із буфера обміну за допомогою Quick Speak або зупинити Quick "
+"Speak"
+
+#. Translators: Error announced when Quick Speak is invoked in a restricted NVDA mode.
+msgid "Quick Speak is unavailable in this NVDA mode."
+msgstr "Quick Speak недоступний у цьому режимі NVDA."
+
+#. Translators: Warning shown when the user tries to open the add-on dialog twice.
+msgid ""
+"The Native Speech Generation add-on is already open. Please close the dialog "
+"before opening it again."
+msgstr ""
+"Додаток Генерація природного мовлення вже відкрито. Закрийте діалог додатка, "
+"перш ніж відкривати його знову."
+
+#. Translators: Title of warning dialog when the user tries to open the add-on twice.
+msgid "Add-on Already Running"
+msgstr "Додаток вже запущено"
+
+#. Translators: Error shown when the main add-on dialog cannot be opened.
+#, python-brace-format
+msgid "Failed to open Native Speech Generation dialog: {error}"
+msgstr "Не вдалося відкрити діалог«Генерація природного мовлення»: {error}"
+
+#. Translators: Title of a dependency installation error dialog.
+#. Translators: Title of an error dialog in Talk With AI.
+#. Translators: Status shown when Talk With AI enters an error state.
+#. Translators: Title of an API key configuration error dialog.
+msgid "Error"
+msgstr "Помилка"
+
+#. Translators: Message shown when dependency installation is still pending.
+msgid ""
+"Native Speech Generation is installing dependencies. Please restart NVDA for "
+"the changes to take effect."
+msgstr ""
+"Генерація природного мовлення встановлює залежності. Перезапустіть NVDA, щоб "
+"зміни набули чинності."
+
+#. Translators: Title of the information dialog recommending an NVDA restart.
+msgid "Restart Required"
+msgstr "Потрібен перезапуск"
+
 #. Translators: Error shown when this add-on has no trusted checksum for a dependency archive.
 #, python-brace-format
 msgid "No approved checksum is bundled for {assetName}."
 msgstr "Для {assetName} немає затвердженої контрольної суми."
-
-#. Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
-msgid "Unable to inspect the HTTPS peer certificate."
-msgstr "Не вдалося перевірити сертифікат HTTPS-вузла."
-
-#. Translators: Error shown when the HTTPS peer does not provide a certificate.
-msgid "The HTTPS peer did not provide a certificate."
-msgstr "HTTPS-вузол не надав сертифікат."
 
 msgid ""
 "PyAudio checksum metadata does not match the checksum approved by this add-"
@@ -45,13 +106,6 @@ msgstr ""
 "працювати належним чином.\n"
 "\n"
 "Помилка: {error}"
-
-#. Translators: Title of a dependency installation error dialog.
-#. Translators: Title of an error dialog in Talk With AI.
-#. Translators: Status shown when Talk With AI enters an error state.
-#. Translators: Title of an API key configuration error dialog.
-msgid "Error"
-msgstr "Помилка"
 
 #. Translators: Title of a progress dialog shown while installing add-on dependencies.
 msgid "Installing Dependencies"
@@ -151,6 +205,14 @@ msgstr ""
 "Невідповідність контрольної суми бібліотеки. Очікуване значення {expected}, "
 "отримано {actual}."
 
+#. Translators: Error shown when the updater cannot inspect the HTTPS peer certificate.
+msgid "Unable to inspect the HTTPS peer certificate."
+msgstr "Не вдалося перевірити сертифікат HTTPS-вузла."
+
+#. Translators: Error shown when the HTTPS peer does not provide a certificate.
+msgid "The HTTPS peer did not provide a certificate."
+msgstr "HTTPS-вузол не надав сертифікат."
+
 #, python-brace-format
 msgid ""
 "PyAudio {version} does not provide a wheel for this NVDA Python runtime: "
@@ -179,6 +241,20 @@ msgstr "Середній"
 msgid "High"
 msgstr "Високий"
 
+#. Translators: Low-latency voice conversation model.
+msgid "Gemini 3.8 Live"
+msgstr ""
+
+#. Translators: Voice conversation model with configurable background reasoning.
+msgid "Gemini 3.8 Live Extended Thinking"
+msgstr ""
+
+#. Translators: Previous voice conversation model, with its original thinking levels.
+#. Translators: Previous Live model for Quick Speak, retaining its existing thinking settings.
+#, fuzzy
+msgid "Gemini 3.1 Flash Live Preview"
+msgstr "Gemini 3.1 Flash TTS Preview"
+
 msgid ""
 "PyAudio is not available. This feature requires a working PyAudio "
 "installation."
@@ -190,7 +266,6 @@ msgstr ""
 msgid "Audio devices loaded"
 msgstr "Аудіопристрої завантажено"
 
-#. Translators: Status shown when Talk With AI will use the operating system's default audio devices.
 msgid "No explicit audio devices found. System defaults will be used."
 msgstr ""
 "Окремих аудіопристроїв не знайдено. Будуть використані системні пристрої за "
@@ -242,8 +317,14 @@ msgstr "Перевірка за допомогою пошуку Google"
 msgid "Share screen with AI"
 msgstr "Ділитися екраном із ШІ"
 
+#. Translators: Label for the model used for voice conversations, separate from Quick Speak.
+#, fuzzy
+msgid "Conversation &model:"
+msgstr "Зупинити розмову"
+
 #. Translators: Label for choosing the reasoning depth in Talk With AI.
-msgid "Thinking level:"
+#, fuzzy
+msgid "&Thinking level:"
 msgstr "Рівень міркування:"
 
 #. Translators: Label for the Talk With AI playback volume slider.
@@ -262,7 +343,6 @@ msgstr "З'єднано"
 msgid "Microphone: OFF"
 msgstr "Мікрофон: ВИМК"
 
-#. Translators: Status announced when screen sharing is blocked by NVDA's Screen Curtain.
 msgid "Screen sharing is unavailable while Screen Curtain is enabled"
 msgstr ""
 "Демонстрація екрана недоступна, доки ввімкнено функцію «Затемнення екрана»"
@@ -309,6 +389,14 @@ msgstr "Помилка відтворення аудіо: {error}"
 msgid "Audio output device is no longer available."
 msgstr "Пристрій виведення аудіо більше недоступний."
 
+#. Translators: The model may still be reasoning after an audio turn finishes.
+msgid "AI processing"
+msgstr ""
+
+#. Translators: All model processing is complete; the conversation remains connected.
+msgid "AI ready for input"
+msgstr ""
+
 #. Translators: Status shown when the first Talk With AI connection attempt failed.
 #, python-brace-format
 msgid "Connection failed. Retrying in {seconds:.1f}s"
@@ -330,68 +418,6 @@ msgstr "Невідома помилка"
 #. Translators: Status shown when Talk With AI is ready for a new session.
 msgid "Ready"
 msgstr "Готово"
-
-#. Translators: Name of the add-on in the NVDA Tools menu.
-msgid "&Native Speech Generation"
-msgstr "&Генерація природного мовлення"
-
-#. Translators: Tooltip or description for the Native Speech Generation Tools menu item.
-msgid "Generate speech using Gemini TTS"
-msgstr "Генерувати мовлення за допомогою Gemini TTS"
-
-#. Translators: Input gesture description for opening the Native Speech Generation dialog.
-msgid "Open the Native Speech Generation dialog"
-msgstr "Відкриває діалог генерації природного мовлення"
-
-#. Translators: Input gestures category name for Native Speech Generation.
-#. Translators: Title of the settings panel in NVDA preferences.
-#. Translators: Summary for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
-msgid "Native Speech Generation"
-msgstr "Генерація природного мовлення"
-
-#. Translators: Input gesture description for speaking the selected text with Quick Speak.
-msgid "Speak selected text with Quick Speak, or stop Quick Speak"
-msgstr ""
-"Озвучити виділений текст за допомогою Quick Speak або зупинити Quick Speak"
-
-#. Translators: Input gesture description for speaking clipboard text with Quick Speak.
-msgid "Speak clipboard text with Quick Speak, or stop Quick Speak"
-msgstr ""
-"Озвучити текст із буфера обміну за допомогою Quick Speak або зупинити Quick "
-"Speak"
-
-#. Translators: Error announced when Quick Speak is invoked in a restricted NVDA mode.
-msgid "Quick Speak is unavailable in this NVDA mode."
-msgstr "Quick Speak недоступний у цьому режимі NVDA."
-
-#. Translators: Warning shown when the user tries to open the add-on dialog twice.
-msgid ""
-"The Native Speech Generation add-on is already open. Please close the dialog "
-"before opening it again."
-msgstr ""
-"Додаток Генерація природного мовлення вже відкрито. Закрийте діалог додатка, "
-"перш ніж відкривати його знову."
-
-#. Translators: Title of warning dialog when the user tries to open the add-on twice.
-msgid "Add-on Already Running"
-msgstr "Додаток вже запущено"
-
-#. Translators: Error shown when the main add-on dialog cannot be opened.
-#, python-brace-format
-msgid "Failed to open Native Speech Generation dialog: {error}"
-msgstr "Не вдалося відкрити діалог«Генерація природного мовлення»: {error}"
-
-#. Translators: Message shown when dependency installation is still pending.
-msgid ""
-"Native Speech Generation is installing dependencies. Please restart NVDA for "
-"the changes to take effect."
-msgstr ""
-"Генерація природного мовлення встановлює залежності. Перезапустіть NVDA, щоб "
-"зміни набули чинності."
-
-#. Translators: Title of the information dialog recommending an NVDA restart.
-msgid "Restart Required"
-msgstr "Потрібен перезапуск"
 
 #. Translators: Message shown when generated audio was saved but could not be opened automatically.
 #, python-brace-format
@@ -461,7 +487,26 @@ msgstr ""
 msgid "Native Speech Generation (Gemini TTS)"
 msgstr "Генерація природного мовлення (Gemini TTS)"
 
-#. Translators: Model option for the newest Gemini Flash text-to-speech preview.
+#. Translators: Model option for Gemini 3.8 Flash-Lite text-to-speech.
+msgid "Flash-Lite 3.8 TTS"
+msgstr ""
+
+#. Translators: Description of the default model in the speech generation dialog.
+msgid "Fast, efficient speech generation for everyday reading and narration."
+msgstr ""
+
+#. Translators: Model option for Gemini 3.8 Flash text-to-speech.
+#, fuzzy
+msgid "Flash 3.8 TTS"
+msgstr "Flash 2.5"
+
+#. Translators: Description of the creative Gemini 3.8 speech model.
+msgid ""
+"Expressive speech generation for narration, acting, and multi-speaker "
+"dialogue."
+msgstr ""
+
+#. Translators: Model option for the previous Gemini Flash text-to-speech preview.
 msgid "Flash 3.1 Preview"
 msgstr "Flash 3.1 Preview"
 
@@ -552,6 +597,10 @@ msgstr "Вибрати & Голос:"
 msgid "Loading voices..."
 msgstr "Завантаження голосів ..."
 
+#. Translators: Opens the library for the single narrator; applies only to TTS generation.
+msgid "View voice &library"
+msgstr ""
+
 #. Translators: Label for entering the first speaker name in multi-speaker mode.
 msgid "Speaker 1 Name:"
 msgstr "Голос 1 Ім'я:"
@@ -564,6 +613,10 @@ msgstr "Голос 1"
 #. Translators: Label for choosing the first speaker voice in multi-speaker mode.
 #. Translators: Label for selecting the voice assigned to speaker 1 in multi-speaker mode.
 msgid "Speaker 1 &voice:"
+msgstr "&Голос мовця 1:"
+
+#, fuzzy
+msgid "Speaker 1 voice &library"
 msgstr "&Голос мовця 1:"
 
 #. Translators: Label for entering the second speaker name in multi-speaker mode.
@@ -579,6 +632,73 @@ msgstr "Голос 2"
 #. Translators: Label for selecting the voice assigned to speaker 2 in multi-speaker mode.
 msgid "Speaker 2 v&oice:"
 msgstr "Г&олос мовця 2:"
+
+#, fuzzy
+msgid "Speaker 2 voice li&brary"
+msgstr "Г&олос мовця 2:"
+
+#. Translators: Opens keyboard-readable instructions for writing a two-speaker script.
+msgid "Script &Help"
+msgstr ""
+
+#. Translators: Speaker identities used in library labels and announcements.
+msgid "Narrator"
+msgstr ""
+
+#, fuzzy
+msgid "Speaker 1"
+msgstr "Голос 1"
+
+#, fuzzy
+msgid "Speaker 2"
+msgstr "Голос 2"
+
+#. Translators: No TTS library override is selected for this speaker.
+#, python-brace-format
+msgid "{speaker}: use library voice for Gemini 3.8 (none selected)"
+msgstr ""
+
+#. Translators: Speaker-specific TTS override; unchecking returns to the built-in voice picker.
+#, python-brace-format
+msgid "{speaker}: use library voice for Gemini 3.8: {name}"
+msgstr ""
+
+#. Translators: Selection works now but cannot be restored after NVDA restarts.
+msgid "Library preferences apply for this session but could not be saved."
+msgstr ""
+
+msgid "Select a Gemini 3.8 TTS model to use the voice library."
+msgstr ""
+
+#, python-brace-format
+msgid "{speaker} generation voice selected: {name}"
+msgstr ""
+
+msgid ""
+"For Gemini 3.8, write one spoken turn per line as Name: text. Use the "
+"speaker names exactly as entered, including capitalization. Each nonblank "
+"line needs a name and spoken text; blank lines are ignored. Names must be "
+"different even when capitalization is ignored, and cannot contain a colon. "
+"Put delivery directions in Style instructions; they apply to both speakers."
+msgstr ""
+
+#. Translators: Instructions for multi-speaker scripts when an older model is selected.
+msgid ""
+"Label each speaker's dialogue with the matching speaker name followed by a "
+"colon."
+msgstr ""
+
+#. Translators: A two-line script example. Keep each speaker placeholder followed by a colon.
+#, python-brace-format
+msgid ""
+"{speaker1}: Hello!\n"
+"{speaker2}: Good morning!"
+msgstr ""
+
+#. Translators: Title of the multi-speaker script instructions dialog.
+#, fuzzy
+msgid "Multi-speaker script help"
+msgstr "Багатомовний (2)"
 
 #. Translators: Announcement after the advanced settings panel becomes visible.
 msgid "Advanced settings shown."
@@ -633,6 +753,11 @@ msgstr "Обмеження функцій"
 msgid "Failed to open Talk With AI: {error}"
 msgstr "Не вдалося відкрити Розмову з ШІ: {error}"
 
+msgid ""
+"This library voice requires Gemini 3.8 TTS. Select a 3.8 model or uncheck "
+"the library voice."
+msgstr ""
+
 #. Translators: Error shown when the user tries to generate speech without entering text.
 msgid "Please enter text to generate."
 msgstr "Будь ласка, введіть текст для генерації."
@@ -640,6 +765,40 @@ msgstr "Будь ласка, введіть текст для генерації
 #. Translators: Temporary Generate button label while speech generation is running.
 msgid "Generating..."
 msgstr "Генерувати..."
+
+#. Translators: Title of a speech generation input validation error.
+msgid "Check speech input"
+msgstr ""
+
+#. Translators: Error shown when a voice is missing for one of the speakers being generated.
+msgid "Select a voice for each speaker, then try again."
+msgstr ""
+
+#. Translators: Error shown when the text or speaker settings cannot be sent for generation.
+msgid "Check the text and speaker settings, then try again."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Speaker {number} must have a different name from the other speaker, even "
+"when capitalization is ignored."
+msgstr ""
+
+#. Translators: Validation error for a missing or invalid speaker name.
+#, python-brace-format
+msgid "Enter a name for Speaker {number} without a colon or line break."
+msgstr ""
+
+#. Translators: Validation error for a script line with a speaker but no spoken text.
+#, python-brace-format
+msgid "Line {line}: enter spoken text after the speaker name and colon."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Line {line}: start with '{speaker1}:' or '{speaker2}:' using the exact "
+"speaker name."
+msgstr ""
 
 #. Translators: Status announcement made when speech generation starts.
 msgid "Generating speech, please wait..."
@@ -701,6 +860,28 @@ msgstr "Не вдалося відтворити зразок"
 msgid "Voice list loaded."
 msgstr "Список голосів завантажено."
 
+#. Translators: Choose how to create a custom voice.
+#, fuzzy
+msgid "Create voice"
+msgstr "&Голос мовця 1:"
+
+msgid ""
+"Choose how to create your voice. Both options require a Gemini API key from "
+"a project with billing enabled (paid tier)."
+msgstr ""
+
+msgid ""
+"Voice &Design\n"
+"Create a voice from a text description of its age,\n"
+"tone, accent, and delivery."
+msgstr ""
+
+msgid ""
+"Voice &Replication\n"
+"Create a voice from a reference recording,\n"
+"with the speaker's recorded consent verified by Google."
+msgstr ""
+
 msgid "&Gemini API Key:"
 msgstr "&Ключ API Gemini:"
 
@@ -713,7 +894,8 @@ msgid "Quick Speak"
 msgstr "Quick Speak"
 
 #. Translators: Recommended low-latency model for Quick Speak.
-msgid "Gemini 3.1 Flash Live Preview (recommended)"
+#, fuzzy
+msgid "Gemini 3.8 Live (recommended)"
 msgstr "Gemini 3.1 Flash Live Preview (рекомендовано)"
 
 #. Translators: Low-latency native audio model for Quick Speak.
@@ -792,6 +974,421 @@ msgstr "Не вдалося безпечно зберегти API-ключ Gemin
 msgid "Select both a Quick Speak model and voice."
 msgstr "Виберіть модель і голос Quick Speak."
 
+#. Translators: Title of the form for creating a custom voice from a description.
+msgid "Voice Design"
+msgstr ""
+
+msgid ""
+"Voice Design requires a Gemini API key from a project with billing enabled "
+"(paid tier). Free-tier API keys cannot create voices. Describe the voice's "
+"age, tone, accent, and delivery. Create voice uses API quota and saves the "
+"voice in your Google project immediately. Closing the library does not "
+"cancel creation or delete the voice."
+msgstr ""
+
+#. Translators: Required display name of the new designed voice.
+#. Translators: Name of the new replicated voice.
+#, fuzzy
+msgid "Voice &name:"
+msgstr "Голос:"
+
+msgid "Voice &description:"
+msgstr ""
+
+#. Translators: Optional BCP-47 language tag for catalog metadata.
+msgid "&Language tag (optional, e.g. id-ID):"
+msgstr ""
+
+msgid "&Gender:"
+msgstr ""
+
+#. Translators: Voices whose catalog entry has no language tag.
+msgid "Unspecified"
+msgstr ""
+
+msgid "Female"
+msgstr ""
+
+msgid "Male"
+msgstr ""
+
+msgid "Neutral"
+msgstr ""
+
+#. Translators: Explicitly create and store a voice using the API.
+#, fuzzy
+msgid "&Create voice"
+msgstr "&Голос мовця 1:"
+
+#. Translators: Required voice name validation.
+msgid "Enter a voice name, up to 100 characters."
+msgstr ""
+
+msgid "Enter a voice description, up to 2000 characters."
+msgstr ""
+
+msgid "Enter a language tag such as id-ID, or leave it blank."
+msgstr ""
+
+msgid "Voice library"
+msgstr ""
+
+msgid ""
+"Select a voice and press Space or Enter to play its sample. Use Generate "
+"preview to create audio from the preview text using API quota."
+msgstr ""
+
+#. Translators: Search field in the voice library; searches names, language, accent, and descriptions.
+#, fuzzy
+msgid "&Search voices:"
+msgstr "&Голос мовця 1:"
+
+#, fuzzy
+msgid "Voice &type:"
+msgstr "Голос:"
+
+#. Translators: Voice library type filters, in order: all, built-in catalog, designed, replicated.
+msgid "All voices"
+msgstr ""
+
+#. Translators: Readable voice metadata; the ID distinguishes voices with identical display names.
+msgid "Prebuilt"
+msgstr ""
+
+msgid "Designed"
+msgstr ""
+
+msgid "Replicated"
+msgstr ""
+
+#. Translators: Filter by the language tag in the voice catalog, for example id-ID or en-US.
+msgid "&Language:"
+msgstr ""
+
+msgid "G&ender:"
+msgstr ""
+
+msgid "&Pitch:"
+msgstr ""
+
+msgid "Perso&na:"
+msgstr ""
+
+msgid "Use c&ase:"
+msgstr ""
+
+#. Translators: Native list of voices matching the search and filter.
+msgid "Available &voices:"
+msgstr ""
+
+msgid "Voice &details:"
+msgstr ""
+
+#. Translators: Text synthesized only when the user activates Generate preview.
+msgid "Preview te&xt:"
+msgstr ""
+
+#. Translators: Default short utterance for generated previews. Users can edit it in any language.
+msgid "Hello! This is a short preview of my voice."
+msgstr ""
+
+#. Translators: Read-only status of voice library loading, filtering, and preview.
+#, fuzzy
+msgid "Status:"
+msgstr "Статус"
+
+#. Translators: Reload the complete catalog from Google.
+msgid "&Refresh"
+msgstr ""
+
+#. Translators: Choose Voice Design or Voice Replication.
+msgid "Ne&w voice"
+msgstr ""
+
+#. Translators: Explicitly generate a preview of the selected voice using API quota.
+#, fuzzy
+msgid "&Generate preview"
+msgstr "&Генерувати мовлення"
+
+#. Translators: Creates a new voice by modifying the selected voice; the original is unchanged.
+#, fuzzy
+msgid "Re&mix selected voice"
+msgstr "Вибрати & Голос:"
+
+#. Translators: Stop playing or waiting for a downloaded sample.
+#, fuzzy
+msgid "St&op sample"
+msgstr "Не вдалося відтворити зразок"
+
+#. Translators: Apply the selected voice to the speaker whose library was opened.
+#, fuzzy
+msgid "&Use selected voice"
+msgstr "Вибрати & Голос:"
+
+#. Translators: Editing the preview text stops playback or discards a pending response.
+#. Translators: Selecting another voice cancels preview; native selection speech identifies the voice.
+#. Translators: Playback or retrieval of the sample was stopped locally.
+msgid "Sample stopped."
+msgstr ""
+
+#. Translators: Show all catalog voices regardless of language metadata.
+msgid "All languages"
+msgstr ""
+
+#. Translators: Catalog filter choices: no restriction, or missing metadata.
+msgid "All"
+msgstr ""
+
+#. Translators: Number of voices matching the current filters; selection is never changed automatically.
+#, python-brace-format
+msgid "{count} voices found."
+msgstr ""
+
+msgid ""
+"The previous voice is not in these results. Choose a voice or change the "
+"filters."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Name: {name}\n"
+"ID: {id}\n"
+"Type: {type}\n"
+"Language: {language}\n"
+"Accent: {accent}\n"
+"Gender: {gender}\n"
+"Pitch: {pitch}\n"
+"Persona: {persona}\n"
+"Use case: {context}\n"
+"Description: {description}"
+msgstr ""
+
+#. Translators: Avoid overlapping catalog refresh with creation of a persistent voice.
+msgid "Voice creation is still in progress."
+msgstr ""
+
+#. Keep the focused button enabled; ignore repeated activation until this request completes.
+#. Translators: Voice catalog request is in progress; existing results remain usable.
+msgid "Loading voices. Current results remain available."
+msgstr ""
+
+#. Translators: The explicit create request is being sent; closing cannot cancel the server operation.
+msgid ""
+"Creating voice using API quota. It will be saved in your Google project."
+msgstr ""
+
+msgid ""
+"Checking recordings and creating voice using API quota. Google will verify "
+"consent."
+msgstr ""
+
+msgid ""
+"Select a prebuilt or designed voice to remix. Replicated voices cannot be "
+"remixed."
+msgstr ""
+
+#. Translators: Status while a remixed voice is being created.
+msgid ""
+"Remixing voice using API quota. It will be saved in your Google project."
+msgstr ""
+
+msgid ""
+"Reference recording must be a readable 24 kHz mono 16-bit PCM WAV file of 10–"
+"30 seconds."
+msgstr ""
+
+msgid ""
+"Consent recording must be a readable 24 kHz mono 16-bit PCM WAV file, up to "
+"60 seconds."
+msgstr ""
+
+msgid ""
+"Nothing was uploaded. Open New voice, then Voice Replication to choose the "
+"files again."
+msgstr ""
+
+msgid ""
+"Could not confirm voice creation. Refresh the library before trying again; "
+"the voice may already have been saved. Check billing, API access, quota, "
+"and, for replication, the consent recording if it is missing."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Voice {name} created and saved in Google. Filters cleared to show it. Press "
+"Space or Enter on the voice to hear its sample, or use Use selected voice."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Voice {name} created and saved in Google. Filters cleared to show it. Use "
+"Generate preview to hear it using API quota, or Use selected voice."
+msgstr ""
+
+#. Translators: The server operation succeeded but local metadata persistence failed.
+msgid "The local cache could not be saved."
+msgstr ""
+
+msgid ""
+"Could not refresh voices. Previous results kept. Check the API key or "
+"connection and retry."
+msgstr ""
+
+#. Translators: Voices loaded successfully but could not be persisted in this NVDA session.
+msgid "Voices loaded for this session. The cache could not be saved."
+msgstr ""
+
+#. Translators: A sample shortcut was used without a selected result.
+#, fuzzy
+msgid "Select a voice first."
+msgstr "Вибрати & Голос:"
+
+#. Translators: NVDA is not allowing temporary audio files in this session.
+#, fuzzy
+msgid "Samples are unavailable while file saving is disabled."
+msgstr ""
+"Демонстрація екрана недоступна, доки ввімкнено функцію «Затемнення екрана»"
+
+#. Translators: Fetching an existing sample, without synthesizing speech.
+#, fuzzy
+msgid "Loading sample..."
+msgstr "Завантаження голосів ..."
+
+msgid ""
+"Sample not available for this voice. Use Generate preview to create one "
+"using API quota."
+msgstr ""
+
+#. Translators: Validation for the short text used to generate a missing voice sample.
+msgid "Enter preview text, up to 300 characters."
+msgstr ""
+
+#. Translators: Generating a preview consumes the user's API quota.
+#, fuzzy
+msgid "Generating preview using API quota..."
+msgstr "Генерація мовлення, будь ласка, зачекайте..."
+
+#. Translators: Retrieving, generating, or playing the voice sample failed.
+msgid "Could not play the sample. Please try again."
+msgstr ""
+
+#, fuzzy, python-brace-format
+msgid "Playing sample for {name}."
+msgstr "Відтворення зразка голосу"
+
+#. Translators: The voice preview has finished playing.
+#, fuzzy
+msgid "Sample complete."
+msgstr "Генерація завершена."
+
+#. Translators: Local cancellation cannot undo a request already submitted to Google.
+msgid "A submitted generation request may still use API quota."
+msgstr ""
+
+#. Translators: Title of the dialog that creates a new voice by modifying an existing one.
+#, fuzzy
+msgid "Voice Remix"
+msgstr "Голос:"
+
+#, python-brace-format
+msgid ""
+"Voice Remix creates a new voice based on {name}. The original voice is not "
+"changed. It requires a Gemini API key from a project with billing enabled "
+"(paid tier). Describe one or two changes, such as age, pitch, energy, "
+"pacing, tone, or accent. Create voice uses API quota and saves the new voice "
+"in your Google project immediately. Closing the library does not cancel "
+"creation or delete the voice."
+msgstr ""
+
+#. Translators: Read-only field showing the voice that will be remixed.
+#, fuzzy
+msgid "&Base voice:"
+msgstr "&Голос мовця 1:"
+
+#. Translators: Optional name for the new remixed voice.
+msgid "New voice &name (optional):"
+msgstr ""
+
+#. Translators: Field describing how the base voice should change.
+msgid "&Changes to make:"
+msgstr ""
+
+#. Translators: Button that submits a voice remix request.
+#, fuzzy
+msgid "Create &voice"
+msgstr "&Голос мовця 1:"
+
+#. Translators: Validation error for an overly long remixed voice name.
+msgid "Enter a voice name of up to 100 characters, or leave it blank."
+msgstr ""
+
+#. Translators: Validation error when remix instructions are missing or too long.
+msgid "Describe the changes to make, up to 2000 characters."
+msgstr ""
+
+msgid "Voice Replication"
+msgstr ""
+
+msgid ""
+"Voice Replication requires a Gemini API key from a project with billing "
+"enabled (paid tier). Free-tier API keys cannot create voices. Use two real "
+"recordings from the same adult speaker. This version accepts 24 kHz mono 16-"
+"bit PCM WAV files: reference speech of 10–30 seconds and a consent recording "
+"of up to 60 seconds. Record the exact statement below. Create voice uploads "
+"both recordings to Google for verification, uses API quota, and saves the "
+"voice in your Google project. Closing the library does not cancel creation "
+"or delete the voice."
+msgstr ""
+
+msgid "Consent statement &language:"
+msgstr ""
+
+msgid "Indonesian"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Statement to &record:"
+msgstr ""
+
+#. Translators: Local reference audio file path.
+msgid "Reference &audio file:"
+msgstr ""
+
+#. Translators: Choose the reference recording from disk.
+msgid "&Browse reference…"
+msgstr ""
+
+#. Translators: Local consent audio file path.
+msgid "&Consent audio file:"
+msgstr ""
+
+#. Translators: Choose the consent recording from disk.
+msgid "Browse con&sent…"
+msgstr ""
+
+msgid ""
+"I con&firm these are recordings of the same adult speaker who gave the "
+"recorded consent."
+msgstr ""
+
+#. Translators: Explicit paid upload and creation action.
+#, fuzzy
+msgid "Cr&eate voice"
+msgstr "&Голос мовця 1:"
+
+msgid "Choose WAV recording"
+msgstr ""
+
+#. Translators: Missing local audio file; nothing has been uploaded.
+msgid "Choose an existing WAV recording."
+msgstr ""
+
+#. Translators: Required consent confirmation; Google also verifies the recording.
+msgid "Confirm the speaker's recorded consent before creating the voice."
+msgstr ""
+
 msgid ""
 "Native Speech Generation now uses a WebSocket connection. For the best "
 "performance and compatibility, restart NVDA, open NVDA Settings, select "
@@ -807,15 +1404,16 @@ msgid "Native Speech Generation updated"
 msgstr "Native Speech Generation оновлено"
 
 #. Translators: Long description for this add-on shown in NVDA's Add-ons Store and Add-ons Manager.
+#, fuzzy
 msgid ""
 "Harness the power of Google's state-of-the-art Gemini AI for high-quality "
 "speech generation directly within NVDA. This add-on provides a user-friendly "
 "dialog to convert text into natural-sounding audio.\n"
 "\n"
 "Key Features:\n"
-"- High-Quality Voices: Choose between Gemini Flash 3.1 Preview for powerful, "
-"low-latency short audio, Gemini Flash 2.5 for standard responsive "
-"generation, and Gemini Pro 2.5 for premium, life-like speech.\n"
+"- High-Quality Voices: Choose Gemini Flash-Lite 3.8 TTS for everyday "
+"narration or Gemini Flash 3.8 TTS for expressive dialogue. Previous Gemini "
+"3.1 and 2.5 TTS models remain available.\n"
 "- Single and Multi-Speaker Modes: Easily generate audio for a single speaker "
 "or create dynamic dialogues with two distinct speakers. Simply format your "
 "text with \"SpeakerName:\" to assign voices.\n"
@@ -830,100 +1428,81 @@ msgid ""
 "To get started, obtain a Gemini API key from Google AI Studio and enter it "
 "in the add-on's settings panel, found under NVDA's Tools menu."
 msgstr ""
+"Використовуйте передовий штучний інтелект Google Gemini для високоякісної "
+"генерації мовлення безпосередньо в NVDA. Цей додаток надає зручний діалог "
+"для перетворення тексту на природне аудіо.\n"
+"\n"
+"Основні можливості:\n"
+"- Високоякісні голоси: вибирайте Gemini Flash 3.1 Preview для потужного "
+"короткого аудіо з низькою затримкою, Gemini Flash 2.5 для швидкої генерації "
+"стандартної якості або Gemini Pro 2.5 для преміального реалістичного "
+"мовлення.\n"
+"- Режими одного й кількох мовців: створюйте аудіо для одного мовця або "
+"динамічні діалоги з двома різними голосами. Форматуйте текст як \"Ім'яМовця:"
+"\", щоб призначити голоси.\n"
+"- Розширене керування голосом: регулюйте температуру для творчіших або "
+"стабільніших результатів і задавайте власні інструкції щодо стилю.\n"
+"- Quick Speak: миттєво озвучуйте виділений текст або текст із буфера обміну "
+"з окремими налаштуваннями моделі, голосу та стилю, зберігаючи фокус у "
+"поточній програмі.\n"
+"- Доступний інтерфейс: усі елементи керування повністю доступні, включно зі "
+"згортаною панеллю розширених налаштувань.\n"
+"- Зручний робочий процес: додаток одразу відтворює створене аудіо й дає "
+"змогу зберегти WAV-файл для подальшого використання.\n"
+"\n"
+"Щоб почати роботу, отримайте ключ API Gemini у Google AI Studio та введіть "
+"його на панелі налаштувань додатка в меню «Інструменти» NVDA."
 
 #. Translators: Short release notes shown for this add-on version.
 msgid ""
-"- Added Quick Speak for selected text (NVDA+Alt+E) and clipboard text "
-"(NVDA+Alt+Shift+E), with configurable model, voice, style, volume, and "
-"internal playback.\n"
-"- Migrated Gemini Live features to a direct WebSocket API and improved "
-"connection timeouts, retries, server errors, and cancellation.\n"
-"- Improved Quick Speak with high thinking for Gemini 3.1 Flash Live Preview, "
-"silent routine states, protected-field blocking, focus preservation, key-"
-"repeat suppression, and stale playback protection.\n"
-"- Improved Talk With AI with saved audio devices and volume, better default-"
-"device selection, safer playback interruption and shutdown, and more "
-"reliable screen sharing.\n"
-"- Updated accessibility, error announcements, translations, and "
-"documentation. Tested through NVDA 2026.2 while retaining NVDA 2024.1 as the "
-"minimum supported version.\n"
+"- Tested with NVDA 2026.3.\n"
+"- Fixed Voice Library caching, voice creation, and dialog closing issues, "
+"and updated the Indonesian translation.\n"
+"- Added Voice Remix to create a new voice by describing changes to an "
+"existing voice in Voice Library.\n"
+"- Grouped Voice Design and Voice Replication under New voice with "
+"descriptions.\n"
+"- Added Voice Replication with reference and consent WAV uploads, consent "
+"verification, and a paid-tier notice.\n"
+"- Clarified that Voice Design requires an API key from a project with "
+"billing enabled.\n"
+"- Added Voice Design to create custom voices from descriptions in Voice "
+"Library.\n"
+"- Added Gender, Pitch, Persona, and Use case filters to Voice Library.\n"
+"- Fixed existing samples for extended voice IDs such as en-us-fola and en-us-"
+"rami.\n"
+"- Native Speech Generation stage 2: Added a searchable Voice Library with "
+"type and language filters, 70 verified voice samples and explicitly "
+"generated previews with editable text, cached catalogs, and saved narrator/"
+"speaker voices for Gemini 3.8 TTS.\n"
+"- Native Speech Generation stage 1: Added Gemini 3.8 Flash-Lite and Flash "
+"TTS, structured style and speaker metadata, script validation, and Script "
+"Help.\n"
+"- Added Gemini 3.8 Live for Quick Speak and Talk with AI, and Gemini 3.8 "
+"Live Extended Thinking for Talk with AI.\n"
+"- Applied model-specific thinking settings while preserving existing model "
+"preferences.\n"
+"- Fixed interrupted WebSocket reads, permanent API error handling, reconnect "
+"status, and keyboard focus preservation.\n"
 "- See changelog.md for full details.\n"
 msgstr ""
-"- Додано Quick Speak для виділеного тексту (NVDA+Alt+E) і тексту з буфера "
-"обміну (NVDA+Alt+Shift+E) з налаштовуваними моделлю, голосом, стилем, "
-"гучністю та внутрішнім відтворенням.\n"
-"- Функції Gemini Live переведено на прямий WebSocket API, покращено тайм-аути "
-"підключення, повторні спроби, обробку помилок сервера та скасування.\n"
-"- Quick Speak покращено високим рівнем міркування для Gemini 3.1 Flash Live "
-"Preview, беззвучними звичайними станами, блокуванням захищених полів, "
-"збереженням фокуса, придушенням повтору клавіш і захистом від застарілого "
-"відтворення.\n"
-"- Talk With AI покращено збереженням аудіопристроїв і гучності, кращим "
-"вибором типового пристрою, безпечнішим перериванням і завершенням "
-"відтворення, а також надійнішим спільним доступом до екрана.\n"
-"- Оновлено доступність, оголошення помилок, переклади та документацію. "
-"Протестовано до NVDA 2026.2, мінімальною підтримуваною версією залишається "
-"NVDA 2024.1.\n"
-"- Повні відомості наведено в changelog.md.\n"
 
 #~ msgid ""
-#~ "Harness the power of Google's state-of-the-art Gemini AI for high-quality "
-#~ "speech generation directly within NVDA. This add-on provides a user-"
-#~ "friendly dialog to convert text into natural-sounding audio.\n"
-#~ "\n"
-#~ "Key Features:\n"
-#~ "- High-Quality Voices: Choose between Gemini Flash 3.1 Preview for "
-#~ "powerful, low-latency short audio, Gemini Flash 2.5 for standard "
-#~ "responsive generation, and Gemini Pro 2.5 for premium, life-like speech.\n"
-#~ "- Single and Multi-Speaker Modes: Easily generate audio for a single "
-#~ "speaker or create dynamic dialogues with two distinct speakers. Simply "
-#~ "format your text with \"SpeakerName:\" to assign voices.\n"
-#~ "- Advanced Voice Control: Fine-tune the output by adjusting the "
-#~ "temperature for more creative or stable results, and provide custom style "
-#~ "instructions.\n"
-#~ "- Quick Speak: Speak selected text or clipboard text immediately with "
-#~ "separate model, voice, and style settings while keeping focus in the "
-#~ "current application.\n"
-#~ "- Accessible Interface: All controls are fully accessible, including a "
-#~ "collapsible panel for advanced settings to keep the interface clean and "
-#~ "easy to navigate.\n"
-#~ "- Seamless Workflow: The add-on provides instant audio playback upon "
-#~ "generation and allows you to save the resulting .wav file for later use.\n"
-#~ "\n"
-#~ "To get started, obtain a Gemini API key from Google AI Studio and enter "
-#~ "it in the add-on's settings panel, found under NVDA's Tools menu."
-#~ msgstr ""
-#~ "Використовуйте передовий штучний інтелект Google Gemini для високоякісної "
-#~ "генерації мовлення безпосередньо в NVDA. Цей додаток надає зручний діалог "
-#~ "для перетворення тексту на природне аудіо.\n"
-#~ "\n"
-#~ "Основні можливості:\n"
-#~ "- Високоякісні голоси: вибирайте Gemini Flash 3.1 Preview для потужного "
-#~ "короткого аудіо з низькою затримкою, Gemini Flash 2.5 для швидкої "
-#~ "генерації стандартної якості або Gemini Pro 2.5 для преміального "
-#~ "реалістичного мовлення.\n"
-#~ "- Режими одного й кількох мовців: створюйте аудіо для одного мовця або "
-#~ "динамічні діалоги з двома різними голосами. Форматуйте текст як "
-#~ "\"Ім'яМовця:\", щоб призначити голоси.\n"
-#~ "- Розширене керування голосом: регулюйте температуру для творчіших або "
-#~ "стабільніших результатів і задавайте власні інструкції щодо стилю.\n"
-#~ "- Quick Speak: миттєво озвучуйте виділений текст або текст із буфера "
-#~ "обміну з окремими налаштуваннями моделі, голосу та стилю, зберігаючи "
-#~ "фокус у поточній програмі.\n"
-#~ "- Доступний інтерфейс: усі елементи керування повністю доступні, включно "
-#~ "зі згортаною панеллю розширених налаштувань.\n"
-#~ "- Зручний робочий процес: додаток одразу відтворює створене аудіо й дає "
-#~ "змогу зберегти WAV-файл для подальшого використання.\n"
-#~ "\n"
-#~ "Щоб почати роботу, отримайте ключ API Gemini у Google AI Studio та "
-#~ "введіть його на панелі налаштувань додатка в меню «Інструменти» NVDA."
-
-#~ msgid ""
-#~ "- Added Quick Speak and improved Gemini Live support.\n"
+#~ "- Added Gemini 3.8 Live for Quick Speak and Talk with AI, and Gemini 3.8 "
+#~ "Live Extended Thinking for Talk with AI.\n"
+#~ "- Applied model-specific thinking settings while preserving existing "
+#~ "model preferences.\n"
+#~ "- Fixed interrupted WebSocket reads, permanent API error handling, "
+#~ "reconnect status, and keyboard focus preservation.\n"
 #~ "- See changelog.md for full details.\n"
 #~ msgstr ""
-#~ "- Додано Quick Speak і покращено Gemini Live.\n"
-#~ "- Докладні відомості див. у changelog.md.\n"
+#~ "- Додано модель Gemini 3.8 Live для Quick Speak і Talk with AI, а також "
+#~ "Gemini 3.8 Live Extended Thinking для Talk with AI.\n"
+#~ "- Налаштування міркування застосовуються відповідно до вибраної моделі зі "
+#~ "збереженням наявних уподобань вибору моделі.\n"
+#~ "- Виправлено перерване читання WebSocket, обробку постійних помилок API, "
+#~ "стан після повторного підключення та збереження фокуса клавіатури.\n"
+#~ "- Повні відомості наведено в changelog.md.\n"
 
 #~ msgid "Quick Speak usage and &privacy:"
 #~ msgstr "Використання та &конфіденційність Quick Speak:"
@@ -939,23 +1518,6 @@ msgstr ""
 #~ "яку команду, щоб зупинити озвучування. Команди можна змінити в діалозі "
 #~ "«Жести вводу». Запитаний текст надсилається до Google Gemini для "
 #~ "створення аудіо."
-
-#~ msgid ""
-#~ "- Added Quick Speak for selected text with NVDA+Alt+E.\n"
-#~ "- Added Quick Speak for clipboard text with NVDA+Alt+Shift+E.\n"
-#~ "- Added separate Quick Speak model, voice, and pronunciation/style "
-#~ "settings.\n"
-#~ "- Added internal NVDA audio playback while preserving application focus.\n"
-#~ "- Updated all included translations and documentation.\n"
-#~ "- See changelog.md for full details.\n"
-#~ msgstr ""
-#~ "- Додано Quick Speak для виділеного тексту за NVDA+Alt+E.\n"
-#~ "- Додано Quick Speak для тексту з буфера обміну за NVDA+Alt+Shift+E.\n"
-#~ "- Додано окремі налаштування моделі, голосу та вимови/стилю Quick Speak.\n"
-#~ "- Додано внутрішнє відтворення аудіо через NVDA зі збереженням фокуса "
-#~ "програми.\n"
-#~ "- Оновлено всі включені переклади та документацію.\n"
-#~ "- Повні відомості наведено в changelog.md.\n"
 
 #~ msgid "The latest library release does not include a version tag."
 #~ msgstr "Останній випуск бібліотеки не містить тегу версії."
@@ -1028,9 +1590,6 @@ msgstr ""
 #~ "3.1. Відсутній метод сеансу: {methodName}. Будь ласка, оновіть бібліотеки "
 #~ "додатка."
 
-#~ msgid "Voice:"
-#~ msgstr "Голос:"
-
 #~ msgid ""
 #~ "google-genai is not available. Please restart NVDA after updating the add-"
 #~ "on libraries."
@@ -1046,19 +1605,6 @@ msgstr ""
 
 #~ msgid "WAV files (*.wav)|*.wav|MP3 files (*.mp3)|*.mp3"
 #~ msgstr "Файли WAV (*.wav)|*.wav|Файли MP3 (*.mp3)|*.mp3"
-
-#~ msgid ""
-#~ "- Compatibility: Added support for NVDA 2026.1.\n"
-#~ "- Dependencies now use the latest verified library package for each "
-#~ "supported NVDA runtime.\n"
-#~ "- Added Gemini Flash 3.1 Preview as the default TTS model.\n"
-#~ "- See changelog.md for full details.\n"
-#~ msgstr ""
-#~ "- Сумісність: додано підтримку NVDA 2026.1.\n"
-#~ "- Залежності тепер використовують найновіший перевірений пакет бібліотек "
-#~ "для кожного підтримуваного середовища виконання NVDA.\n"
-#~ "- Додано Gemini Flash 3.1 Preview як початкову модель TTS.\n"
-#~ "- Детальнішу інформацію дивіться у файлі changelog.md.\n"
 
 #~ msgid "Extraction complete."
 #~ msgstr "Видобування завершено."

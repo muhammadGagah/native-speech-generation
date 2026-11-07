@@ -84,6 +84,11 @@ env.Append(**env["addon_info"])
 addonFile = env.File("${addon_name}-${addon_version}.nvda-addon")
 addon = env.NVDAAddon(addonFile, env.Dir(addonDir), excludePatterns=buildVars.excludedFiles)
 
+# Include release notes and the license from their authoritative source files.
+for releaseFile in ("COPYING.txt", "changelog.md"):
+	releaseTarget = env.Command(str(addonDir / releaseFile), releaseFile, Copy("$TARGET", "$SOURCE"))
+	env.Depends(addon, releaseTarget)
+
 langDirs: list[FS.Dir] = [env.Dir(d) for d in env.Glob(localeDir / "*/") if d.isdir()]
 
 # Allow all NVDA's gettext po files to be compiled in source/locale, and manifest files to be generated

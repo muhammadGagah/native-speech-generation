@@ -9,8 +9,10 @@ import sys
 import threading
 import types
 import unittest
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ADDON_PACKAGE = REPO_ROOT / "addon" / "globalPlugins" / "NativeSpeechGeneration"
@@ -117,6 +119,175 @@ def _loadTalkWithAI() -> Any:
 
 
 class RuntimeRegressionTests(unittest.TestCase):
+	def testConversationModelChangesControlThinkingWithoutMovingFocus(self) -> None:
+		talkWithAI = _loadTalkWithAI()
+		dialog = object.__new__(talkWithAI.TalkWithAIDialog)
+
+		class Choice:
+			selection = 0
+			shown = True
+			items: tuple[str, ...] = ()
+
+			def GetSelection(self):
+				return self.selection
+
+			def SetSelection(self, value):
+				self.selection = value
+
+			def SetItems(self, items):
+				self.items = tuple(items)
+
+			def Show(self, shown):
+				self.shown = shown
+
+			def GetParent(self):
+				return types.SimpleNamespace(Layout=lambda: None)
+
+		dialog.thinkingChoice = Choice()
+		dialog.thinkingLabel = Choice()
+		dialog.Layout = lambda: None
+		dialog._allThinkingChoices = [(v, v) for v in ("minimal", "low", "medium", "high")]
+		dialog._preferredThinkingLevel = "minimal"
+		dialog.modelChoices = [
+			(v, v)
+			for v in (talkWithAI.LIVE_38_MODEL, talkWithAI.LIVE_38_EXTENDED_MODEL, talkWithAI.LIVE_MODEL)
+		]
+		dialog.modelChoice = Choice()
+		event = types.SimpleNamespace(Skip=lambda: None)
+		for index, expectedLevel, shown, count in (
+			(0, None, False, 4),
+			(1, "low", True, 3),
+			(2, "minimal", True, 4),
+		):
+			dialog.modelChoice.selection = index
+			dialog._onModelChange(event)
+			self.assertEqual(dialog._getSelectedThinkingLevel(), expectedLevel)
+			self.assertEqual(dialog.thinkingChoice.shown, shown)
+			self.assertEqual(dialog.thinkingLabel.shown, shown)
+			self.assertEqual(len(dialog.thinkingChoice.items), count)
+		# A chosen high level survives switching to the model without configurable thinking and back.
+		dialog.thinkingChoice.selection = 3
+		dialog._onThinkingChange(event)
+		dialog.modelChoice.selection = 0
+		dialog._onModelChange(event)
+		self.assertIsNone(dialog._getSelectedThinkingLevel())
+		dialog.modelChoice.selection = 1
+		dialog._onModelChange(event)
+		self.assertEqual(dialog._getSelectedThinkingLevel(), "high")
+
+	def testExtendedThinkingReceivesAudioAfterTurnComplete(self) -> None:
+		talkWithAI = _loadTalkWithAI()
+		dialog = object.__new__(talkWithAI.TalkWithAIDialog)
+
+		def isCurrent(sessionId: int) -> bool:
+			return sessionId == 1
+
+		dialog._isSessionCurrent = isCurrent
+		dialog._interactionStatus = None
+		dialog._rememberConversationTurn = mock.Mock()
+		audio = []
+		statuses = []
+		dialog._queueAudioData = audio.append
+		dialog.updateStatus = statuses.append
+
+		def callAfter(callback: Callable[..., Any], *args: Any) -> Any:
+			return callback(*args)
+
+		talkWithAI.wx.CallAfter = callAfter
+
+		class Session:
+			async def receive(self):
+				yield {"serverContent": {"turnComplete": True}, "interaction_status": "IN_PROGRESS"}
+				yield {"serverContent": {"modelTurn": {"parts": [{"inlineData": {"data": "cGNt"}}]}}}
+				yield {"interaction_status": "IDLE"}
+
+		dialog.session = Session()
+		asyncio.run(dialog.receiveLoop(dialog.session, 1))
+		self.assertEqual(audio, [b"pcm"])
+		self.assertEqual(statuses, ["AI processing", "AI ready for input"])
+		dialog._reportInteractionStatus(1, "IDLE", dialog.session)
+		dialog._reportInteractionStatus(0, "IN_PROGRESS", dialog.session)
+		self.assertEqual(len(statuses), 2)
+
+	def testReconnectClearsDedupAndRejectsOldConnectionCallbacks(self) -> None:
+		talkWithAI = _loadTalkWithAI()
+		dialog = object.__new__(talkWithAI.TalkWithAIDialog)
+
+		def isCurrent(sessionId: int) -> bool:
+			return sessionId == 1
+
+		dialog._isSessionCurrent = isCurrent
+		dialog._interactionStatus = "IDLE"
+		oldSession = object()
+		dialog.session = object()
+		dialog.updateStatus = mock.Mock()
+		dialog._playSoundEffect = mock.Mock()
+		dialog._reportConnected(1, dialog.session)
+		dialog.updateStatus.assert_called_once_with("Connected", announce=True)
+		self.assertIsNone(dialog._interactionStatus)
+		dialog.updateStatus.reset_mock()
+		dialog._reportInteractionStatus(1, "IDLE", dialog.session)
+		dialog.updateStatus.assert_called_once_with("AI ready for input")
+		dialog.updateStatus.reset_mock()
+		dialog._reportInteractionStatus(1, "IN_PROGRESS", oldSession)
+		dialog._reportConnected(1, oldSession)
+		dialog._reportConnected(0, dialog.session)
+		dialog.updateStatus.assert_not_called()
+		self.assertEqual(dialog._interactionStatus, "IDLE")
+
+	def testResetDoesNotStealFocusAfterUserMovesAwayDuringStop(self) -> None:
+		talkWithAI = _loadTalkWithAI()
+		for focusTarget, isActive, expected in (
+			("volume", True, False),
+			("mic", True, True),
+			("none", False, False),
+		):
+			with self.subTest(focusTarget=focusTarget):
+				dialog = object.__new__(talkWithAI.TalkWithAIDialog)
+				dialog._isClosing = False
+				dialog._restoreConnectFocus = True
+				dialog._devicesLoaded = True
+				dialog.compatibilityError = None
+				dialog._sessionHadError = False
+				dialog.connectBtn = mock.Mock()
+				dialog.disconnectBtn = mock.Mock()
+				dialog.micBtn = mock.Mock()
+				dialog.volSlider = mock.Mock()
+				dialog.googleSearchCb = mock.Mock()
+				dialog.modelChoice = mock.Mock()
+				dialog.deviceSizer = mock.Mock()
+				dialog.deviceSizer.GetChildren.return_value = []
+				dialog._updateThinkingControls = mock.Mock()
+				dialog.Layout = mock.Mock()
+				dialog.updateStatus = mock.Mock()
+				dialog.IsActive = lambda: isActive
+				focus = {"volume": dialog.volSlider, "mic": dialog.micBtn, "none": None}[focusTarget]
+				talkWithAI.wx.Window.FindFocus = lambda: focus
+				dialog.resetUi()
+				self.assertEqual(dialog.connectBtn.SetFocus.called, expected)
+				dialog.modelChoice.Enable.assert_called_once()
+				dialog._updateThinkingControls.assert_called_once()
+
+	def testDeviceLoadingDoesNotMoveFocusOffMicrophone(self) -> None:
+		talkWithAI = _loadTalkWithAI()
+		dialog = object.__new__(talkWithAI.TalkWithAIDialog)
+		dialog._isClosing = False
+		dialog._persistedInputDevice = ""
+		dialog._persistedOutputDevice = ""
+		dialog.compatibilityError = None
+		dialog.inputChoice = mock.Mock()
+		dialog.outputChoice = mock.Mock()
+		dialog.connectBtn = mock.Mock()
+		dialog.micBtn = mock.Mock()
+		dialog.micBtn.HasFocus.return_value = True
+		dialog.updateStatus = mock.Mock()
+		dialog._applyDeviceLists([{"name": "Mic", "index": 1}], [{"name": "Speakers", "index": 2}])
+		dialog.connectBtn.Enable.assert_called_once()
+		dialog.connectBtn.SetFocus.assert_not_called()
+		dialog.inputChoice.SetSelection.assert_called_once_with(0)
+		dialog.outputChoice.SetSelection.assert_called_once_with(0)
+		dialog.updateStatus.assert_called_once_with("Audio devices loaded", announce=True)
+
 	def testAudioSavePathKeepsGeneratedFormat(self) -> None:
 		audioUtils = _loadAudioUtils()
 		self.assertEqual(
@@ -207,9 +378,11 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog.volSlider = types.SimpleNamespace(GetValue=lambda: 65)
 		saved: list[tuple[str, str, int]] = []
 
-		def saveSettings(inputDevice: str, outputDevice: str, volume: int) -> None:
+		def saveSettings(inputDevice: str, outputDevice: str, volume: int, **modelSettings: Any) -> None:
 			saved.append((inputDevice, outputDevice, volume))
 
+		dialog.selectedModel = talkWithAI.LIVE_MODEL
+		dialog._preferredThinkingLevel = "minimal"
 		talkWithAI.config_store.setTalkWithAISettings = saveSettings
 
 		dialog._savePersistentSettings()
@@ -230,9 +403,11 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog.volSlider = types.SimpleNamespace(GetValue=lambda: 80)
 		saved: list[tuple[str, str, int]] = []
 
-		def saveSettings(inputDevice: str, outputDevice: str, volume: int) -> None:
+		def saveSettings(inputDevice: str, outputDevice: str, volume: int, **modelSettings: Any) -> None:
 			saved.append((inputDevice, outputDevice, volume))
 
+		dialog.selectedModel = talkWithAI.LIVE_MODEL
+		dialog._preferredThinkingLevel = "minimal"
 		talkWithAI.config_store.setTalkWithAISettings = saveSettings
 		dialog._savePersistentSettings()
 
@@ -252,9 +427,11 @@ class RuntimeRegressionTests(unittest.TestCase):
 		dialog.volSlider = types.SimpleNamespace(GetValue=lambda: 70)
 		saved: list[tuple[str, str, int]] = []
 
-		def saveSettings(inputDevice: str, outputDevice: str, volume: int) -> None:
+		def saveSettings(inputDevice: str, outputDevice: str, volume: int, **modelSettings: Any) -> None:
 			saved.append((inputDevice, outputDevice, volume))
 
+		dialog.selectedModel = talkWithAI.LIVE_MODEL
+		dialog._preferredThinkingLevel = "minimal"
 		talkWithAI.config_store.setTalkWithAISettings = saveSettings
 		dialog._savePersistentSettings()
 
@@ -449,6 +626,23 @@ class RuntimeRegressionTests(unittest.TestCase):
 
 		self.assertTrue(dialog._isPermanentSessionError(UnauthorizedError("bad key")))
 		self.assertFalse(dialog._isPermanentSessionError(RuntimeError("temporary network failure")))
+		apiClient = sys.modules["nsg_runtime_under_test.core.api_client"]
+		for code, status, expected in (
+			(400, "INVALID_ARGUMENT", True),
+			(None, "INVALID_ARGUMENT", True),
+			(403, "PERMISSION_DENIED", True),
+			(429, "RESOURCE_EXHAUSTED", False),
+			(503, "UNAVAILABLE", False),
+		):
+			with self.subTest(code=code, status=status):
+				error = apiClient.DirectApiError.fromResponse(
+					{
+						"code": code,
+						"status": status,
+						"message": "thinkingLevel is not supported for this model",
+					},
+				)
+				self.assertEqual(dialog._isPermanentSessionError(error), expected)
 
 
 if __name__ == "__main__":

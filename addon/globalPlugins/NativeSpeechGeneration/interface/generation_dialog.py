@@ -32,6 +32,15 @@ from ..core.constants import (
 	PRO_25_MODEL,
 	VOICE_SAMPLE_BASE,
 )
+from ..core.nvda_compat import shouldWriteToDisk
+from ..core.tts_requests import (
+	FLASH_38_TTS_MODEL,
+	FLASH_LITE_38_TTS_MODEL,
+	STRUCTURED_TTS_MODELS,
+	SpeechInputError,
+	parseSpeechTurns,
+)
+from ..core.voice_library import Voice, VoiceLibraryStore
 
 if TYPE_CHECKING:
 
@@ -130,8 +139,15 @@ class NativeSpeechDialog(wx.Dialog):
 		self._audioPathsLock = threading.Lock()
 		self._restoreGenerateFocus = False
 		self._modelDescriptionAnnouncementId = 0
+		self._librarySelections: dict[str, Voice] = {}
+		self._libraryControls: dict[str, tuple[wx.Choice, wx.CheckBox]] = {}
+		self._libraryStore: VoiceLibraryStore | None = None
+		self._libraryDialog = None
 
 		self._buildUi()
+		apiKey = config_store.resolveApiKey().value
+		if apiKey:
+			self._syncLibraryStore(apiKey)
 		self._cleanupStaleGeneratedAudioFiles()
 		threading.Thread(target=self.loadVoices, daemon=True).start()
 		self.textCtrl.SetFocus()
@@ -139,8 +155,22 @@ class NativeSpeechDialog(wx.Dialog):
 	def _getModelOptions(self) -> list[tuple[str, str, str]]:
 		return [
 			(
+				FLASH_LITE_38_TTS_MODEL,
+				# Translators: Model option for Gemini 3.8 Flash-Lite text-to-speech.
+				_("Flash-Lite 3.8 TTS"),
+				# Translators: Description of the default model in the speech generation dialog.
+				_("Fast, efficient speech generation for everyday reading and narration."),
+			),
+			(
+				FLASH_38_TTS_MODEL,
+				# Translators: Model option for Gemini 3.8 Flash text-to-speech.
+				_("Flash 3.8 TTS"),
+				# Translators: Description of the creative Gemini 3.8 speech model.
+				_("Expressive speech generation for narration, acting, and multi-speaker dialogue."),
+			),
+			(
 				DEFAULT_MODEL,
-				# Translators: Model option for the newest Gemini Flash text-to-speech preview.
+				# Translators: Model option for the previous Gemini Flash text-to-speech preview.
 				_("Flash 3.1 Preview"),
 				# Translators: Description for the Gemini Flash 3.1 Preview model.
 				_("Powerful, low-latency speech generation, very good for short audio."),
@@ -293,7 +323,8 @@ class NativeSpeechDialog(wx.Dialog):
 
 	def _buildVoicePanelSingle(self) -> wx.Panel:
 		panel = wx.Panel(self)
-		sizer = wx.BoxSizer(wx.HORIZONTAL)
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		voiceSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# Translators: Label for selecting a voice in single speaker mode.
 		label = wx.StaticText(panel, label=_("Select &Voice:"))
 		# Translators: Temporary item shown while the add-on prepares the voice list.
@@ -301,8 +332,11 @@ class NativeSpeechDialog(wx.Dialog):
 		self.voiceChoiceSingle.SetSelection(0)
 		self.voiceChoiceSingle.Bind(wx.EVT_CHOICE, self.onVoiceChange)
 		self.voiceChoiceSingle.Bind(wx.EVT_CHAR_HOOK, self.onVoiceKeypressGeneric)
-		sizer.Add(label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
-		sizer.Add(self.voiceChoiceSingle, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
+		voiceSizer.Add(label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
+		voiceSizer.Add(self.voiceChoiceSingle, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
+		sizer.Add(voiceSizer, flag=wx.EXPAND)
+		# Translators: Opens the library for the single narrator; applies only to TTS generation.
+		self._addLibraryControls(panel, sizer, "single", self.voiceChoiceSingle, _("View voice &library"))
 		panel.SetSizer(sizer)
 		return panel
 
@@ -328,6 +362,14 @@ class NativeSpeechDialog(wx.Dialog):
 		spk1Sizer.Add(voice1Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
 		spk1Sizer.Add(self.voiceChoiceMulti1, proportion=1, flag=wx.EXPAND)
 		sizer.Add(spk1Sizer, flag=wx.EXPAND | wx.ALL, border=6)
+		# Translators: Opens the TTS voice library for the first speaker.
+		self._addLibraryControls(
+			panel,
+			sizer,
+			"speaker1",
+			self.voiceChoiceMulti1,
+			_("Speaker 1 voice &library"),
+		)
 
 		spk2Sizer = wx.BoxSizer(wx.HORIZONTAL)
 		# Translators: Label for entering the second speaker name in multi-speaker mode.
@@ -347,14 +389,204 @@ class NativeSpeechDialog(wx.Dialog):
 		spk2Sizer.Add(voice2Label, flag=wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, border=5)
 		spk2Sizer.Add(self.voiceChoiceMulti2, proportion=1, flag=wx.EXPAND)
 		sizer.Add(spk2Sizer, flag=wx.EXPAND | wx.ALL, border=6)
+		# Translators: Opens the TTS voice library for the second speaker.
+		self._addLibraryControls(
+			panel,
+			sizer,
+			"speaker2",
+			self.voiceChoiceMulti2,
+			_("Speaker 2 voice li&brary"),
+		)
+
+		# Translators: Opens keyboard-readable instructions for writing a two-speaker script.
+		scriptHelpBtn = wx.Button(panel, label=_("Script &Help"))
+		scriptHelpBtn.Bind(wx.EVT_BUTTON, self.onScriptHelp)
+		sizer.Add(scriptHelpBtn, flag=wx.ALL, border=6)
 
 		panel.SetSizer(sizer)
 		return panel
+
+	def _addLibraryControls(
+		self,
+		panel: wx.Panel,
+		sizer: wx.BoxSizer,
+		target: str,
+		choice: wx.Choice,
+		label: str,
+	) -> None:
+		button = wx.Button(panel, label=label)
+
+		def openLibrary(evt: wx.Event) -> None:
+			self.onVoiceLibrary(evt, target)
+
+		def toggleLibrary(evt: wx.Event) -> None:
+			self.onLibrarySelectionToggle(evt, target)
+
+		button.Bind(wx.EVT_BUTTON, openLibrary)
+		# Translators: Checkbox for a TTS-only library selection; the built-in picker stays available for Live.
+		checkbox = wx.CheckBox(panel, label=self._libraryCheckboxLabel(target))
+		checkbox.Disable()
+		checkbox.Bind(wx.EVT_CHECKBOX, toggleLibrary)
+		sizer.Add(button, flag=wx.LEFT | wx.RIGHT | wx.TOP, border=6)
+		sizer.Add(checkbox, flag=wx.ALL, border=6)
+		self._libraryControls[target] = (choice, checkbox)
+
+	def _libraryTargetName(self, target: str) -> str:
+		# Translators: Speaker identities used in library labels and announcements.
+		return {"single": _("Narrator"), "speaker1": _("Speaker 1"), "speaker2": _("Speaker 2")}[target]
+
+	def _libraryCheckboxLabel(self, target: str, voice: Voice | None = None) -> str:
+		if voice is None:
+			# Translators: No TTS library override is selected for this speaker.
+			return _("{speaker}: use library voice for Gemini 3.8 (none selected)").format(
+				speaker=self._libraryTargetName(target),
+			)
+		# Translators: Speaker-specific TTS override; unchecking returns to the built-in voice picker.
+		return _("{speaker}: use library voice for Gemini 3.8: {name}").format(
+			speaker=self._libraryTargetName(target),
+			name=voice.displayName[:60],
+		)
+
+	def _syncLibraryStore(self, apiKey: str) -> VoiceLibraryStore:
+		import globalVars
+
+		store = VoiceLibraryStore(apiKey, globalVars.appArgs.configPath if shouldWriteToDisk() else None)
+		if self._libraryStore is None or store.scope != self._libraryStore.scope:
+			self._libraryStore = store
+			self._librarySelections = store.readSelections()
+			self._updateLibraryControls()
+		return self._libraryStore
+
+	def _updateLibraryControls(self) -> None:
+		for target, (_choice, checkbox) in self._libraryControls.items():
+			voice = self._librarySelections.get(target)
+			checkbox.Enable(voice is not None)
+			checkbox.SetValue(voice is not None)
+			checkbox.SetLabel(self._libraryCheckboxLabel(target, voice))
+		self.Layout()
+		self.Fit()
+
+	def _saveLibrarySelections(self) -> None:
+		if self._libraryStore and not self._libraryStore.writeSelections(self._librarySelections):
+			# Translators: Selection works now but cannot be restored after NVDA restarts.
+			ui.message(_("Library preferences apply for this session but could not be saved."))
+
+	def onLibrarySelectionToggle(self, evt: wx.Event, target: str) -> None:
+		if not evt.GetEventObject().GetValue():
+			self._librarySelections.pop(target, None)
+			choice, checkbox = self._libraryControls[target]
+			choice.SetFocus()
+			checkbox.SetLabel(self._libraryCheckboxLabel(target))
+			checkbox.Disable()
+			self._saveLibrarySelections()
+
+	def _clearLibraryOverride(self, choice: wx.Choice) -> None:
+		for target, (control, checkbox) in self._libraryControls.items():
+			if control is choice and target in self._librarySelections:
+				self._librarySelections.pop(target)
+				checkbox.SetValue(False)
+				checkbox.Disable()
+				checkbox.SetLabel(self._libraryCheckboxLabel(target))
+				self._saveLibrarySelections()
+
+	def onVoiceLibrary(self, evt: wx.Event, target: str) -> None:
+		from .voice_library_dialog import VoiceLibraryDialog
+
+		launcher = evt.GetEventObject()
+		if self.model not in STRUCTURED_TTS_MODELS:
+			# Translators: Voice Library is only available for the new TTS models.
+			self._showInputError(
+				_("Select a Gemini 3.8 TTS model to use the voice library."),
+				self.modelChoice,
+			)
+			return
+		apiKey = self._resolveApiKeyForUse()
+		if not apiKey:
+			return
+		store = self._syncLibraryStore(apiKey)
+		choice, _checkbox = self._libraryControls[target]
+		selected = self._librarySelections.get(target)
+		selectedId = selected.id if selected else self._getSelectedVoiceName(choice, choice.GetSelection())
+		dialog = VoiceLibraryDialog(self, apiKey, self.model, store, selectedId)
+		self._libraryDialog = dialog
+		try:
+			if dialog.ShowModal() == wx.ID_OK and dialog.selectedVoice is not None and not self.isClosed:
+				self._librarySelections[target] = dialog.selectedVoice
+				self._updateLibraryControls()
+				self._saveLibrarySelections()
+				# Translators: Confirmation after applying the chosen TTS voice to one speaker.
+				ui.message(
+					_("{speaker} generation voice selected: {name}").format(
+						speaker=self._libraryTargetName(target),
+						name=dialog.selectedVoice.displayName,
+					),
+				)
+		finally:
+			self._libraryDialog = None
+			dialog.Destroy()
+			if self.isClosed:
+				# onClose deferred teardown until the library's modal loops unwound.
+				self._finalizeClose()
+			else:
+				launcher.SetFocus()
+
+	def _getGenerationVoiceName(self, choice: wx.Choice, index: int) -> str:
+		for target, (control, _checkbox) in self._libraryControls.items():
+			if control is choice and target in self._librarySelections:
+				return self._librarySelections[target].id
+		return self._getSelectedVoiceName(choice, index)
+
+	def _showMessage(self, message: str, title: str, *, isError: bool = False) -> None:
+		"""Show a parented modal message on the GUI thread, including older NVDA versions."""
+		try:
+			from gui.message import DialogType, MessageDialog
+		except ImportError:
+			# MessageDialog is not available in all supported NVDA releases.
+			gui.messageBox(message, title, wx.OK | (wx.ICON_ERROR if isError else 0), parent=self)
+		else:
+			MessageDialog(
+				self,
+				message,
+				title,
+				dialogType=DialogType.ERROR if isError else DialogType.STANDARD,
+			).ShowModal()
+
+	def onScriptHelp(self, evt: wx.Event) -> None:
+		launcher = evt.GetEventObject()
+		if self.model in STRUCTURED_TTS_MODELS:
+			# Translators: Instructions for the strict two-speaker script format in Gemini 3.8.
+			message = _(
+				"For Gemini 3.8, write one spoken turn per line as Name: text. "
+				"Use the speaker names exactly as entered, including capitalization. "
+				"Each nonblank line needs a name and spoken text; blank lines are ignored. "
+				"Names must be different even when capitalization is ignored, and cannot contain a colon. "
+				"Put delivery directions in Style instructions; they apply to both speakers.",
+			)
+		else:
+			# Translators: Instructions for multi-speaker scripts when an older model is selected.
+			message = _("Label each speaker's dialogue with the matching speaker name followed by a colon.")
+		# Translators: A two-line script example. Keep each speaker placeholder followed by a colon.
+		example = _("{speaker1}: Hello!\n{speaker2}: Good morning!").format(
+			speaker1=self.spk1NameCtrl.GetValue().strip() or _("Speaker1"),
+			speaker2=self.spk2NameCtrl.GetValue().strip() or _("Speaker2"),
+		)
+		# Translators: Title of the multi-speaker script instructions dialog.
+		self._showMessage(f"{message}\n\n{example}", _("Multi-speaker script help"))
+		if not self.isClosed:
+			launcher.SetFocus()
 
 	def onClose(self, evt: wx.Event) -> None:
 		if self.isClosed:
 			return
 		self.isClosed = True
+		if self._libraryDialog is not None:
+			# The library may be running nested modal dialogs. Ask it to unwind them
+			# first; onVoiceLibrary finishes closing this dialog once ShowModal returns.
+			self._libraryDialog.requestClose()
+			return
+		self._finalizeClose()
+
+	def _finalizeClose(self) -> None:
 		if self.talkDialog is not None:
 			try:
 				self.talkDialog.Close()
@@ -423,7 +655,11 @@ class NativeSpeechDialog(wx.Dialog):
 		announcementId = self._modelDescriptionAnnouncementId
 
 		def announce() -> None:
-			if self.isClosed or announcementId != self._modelDescriptionAnnouncementId:
+			if (
+				self.isClosed
+				or announcementId != self._modelDescriptionAnnouncementId
+				or not self.modelChoice.HasFocus()
+			):
 				return
 			ui.message(description)
 
@@ -444,9 +680,11 @@ class NativeSpeechDialog(wx.Dialog):
 
 	def onVoiceChange(self, evt: wx.Event) -> None:
 		self.selectedVoiceIdx = evt.GetEventObject().GetSelection()
+		self._clearLibraryOverride(evt.GetEventObject())
 
 	def onVoiceChange2(self, evt: wx.Event) -> None:
 		self.selectedVoiceIdx2 = self.voiceChoiceMulti2.GetSelection()
+		self._clearLibraryOverride(self.voiceChoiceMulti2)
 
 	def onVoiceKeypressGeneric(self, evt: wx.Event) -> None:
 		key = evt.GetKeyCode()
@@ -568,8 +806,8 @@ class NativeSpeechDialog(wx.Dialog):
 			temperature=self.tempSlider.GetValue() / 10.0,
 			styleInstructions=self.styleCtrl.GetValue().strip(),
 			modeMulti=self.modeMulti,
-			voiceName=self._getSelectedVoiceName(primaryVoiceCtrl, primaryVoiceIdx),
-			voiceName2=self._getSelectedVoiceName(self.voiceChoiceMulti2, secondaryVoiceIdx),
+			voiceName=self._getGenerationVoiceName(primaryVoiceCtrl, primaryVoiceIdx),
+			voiceName2=self._getGenerationVoiceName(self.voiceChoiceMulti2, secondaryVoiceIdx),
 			# Translators: Fallback speaker name used when the first speaker field is blank.
 			speaker1Name=self.spk1NameCtrl.GetValue().strip() or _("Speaker1"),
 			# Translators: Fallback speaker name used when the second speaker field is blank.
@@ -582,16 +820,32 @@ class NativeSpeechDialog(wx.Dialog):
 		apiKey = self._resolveApiKeyForUse()
 		if not apiKey:
 			return
-		text = self.textCtrl.GetValue().strip()
-		if not text:
-			wx.CallAfter(
-				wx.MessageBox,
-				# Translators: Error shown when the user tries to generate speech without entering text.
-				_("Please enter text to generate."),
-				_("Error"),
-				wx.OK | wx.ICON_ERROR,
+		self._syncLibraryStore(apiKey)
+		activeTargets = ("speaker1", "speaker2") if self.modeMulti else ("single",)
+		if self.model not in STRUCTURED_TTS_MODELS and any(
+			target in self._librarySelections for target in activeTargets
+		):
+			# Translators: Do not silently replace a custom voice when the user switches to an older model.
+			self._showInputError(
+				_(
+					"This library voice requires Gemini 3.8 TTS. Select a 3.8 model or uncheck the library voice.",
+				),
+				self.modelChoice,
 			)
 			return
+		text = self.textCtrl.GetValue()
+		if not text.strip():
+			self._showInputError(
+				# Translators: Error shown when the user tries to generate speech without entering text.
+				_("Please enter text to generate."),
+				self.textCtrl,
+			)
+			return
+		if self.model in STRUCTURED_TTS_MODELS:
+			if not self._validateStructuredScript(text):
+				return
+		else:
+			text = text.strip()
 
 		generationRequest = self._buildGenerationRequest(text, apiKey)
 		self.isGenerating = True
@@ -605,6 +859,65 @@ class NativeSpeechDialog(wx.Dialog):
 		self.saveBtn.Enable(False)
 		self.talkBtn.Enable(False)
 		threading.Thread(target=self._generateThread, args=(generationRequest,), daemon=True).start()
+
+	def _showInputError(self, message: str, control: wx.Window) -> None:
+		# Translators: Title of a speech generation input validation error.
+		self._showMessage(message, _("Check speech input"), isError=True)
+		if not self.isClosed:
+			control.SetFocus()
+
+	def _reportSpeechInputError(self, error: SpeechInputError) -> None:
+		"""Translate a request-building error instead of showing its internal reason code."""
+		if self.isClosed:
+			return
+		if error.reason in ("voiceCount", "speakerCount"):
+			# Translators: Error shown when a voice is missing for one of the speakers being generated.
+			message = _("Select a voice for each speaker, then try again.")
+			control: wx.Window = self.voiceChoiceMulti1 if self.modeMulti else self.voiceChoiceSingle
+		elif error.reason == "emptyText":
+			# Translators: Error shown when the user tries to generate speech without entering text.
+			message = _("Please enter text to generate.")
+			control = self.textCtrl
+		else:
+			# Translators: Error shown when the text or speaker settings cannot be sent for generation.
+			message = _("Check the text and speaker settings, then try again.")
+			control = self.textCtrl
+		self._showInputError(message, control)
+
+	def _validateStructuredScript(self, text: str) -> bool:
+		if not self.modeMulti:
+			return True
+		speakerControls = (self.spk1NameCtrl, self.spk2NameCtrl)
+		speakerNames = [control.GetValue().strip() for control in speakerControls]
+		try:
+			parseSpeechTurns(text, speakerNames)
+		except SpeechInputError as error:
+			control = self.textCtrl
+			if error.speakerIndex is not None:
+				control = speakerControls[error.speakerIndex]
+				if error.reason == "duplicateSpeakerName":
+					# Translators: Validation error for duplicate names in the two-speaker form.
+					message = _(
+						"Speaker {number} must have a different name from the other speaker, "
+						"even when capitalization is ignored.",
+					)
+				else:
+					# Translators: Validation error for a missing or invalid speaker name.
+					message = _("Enter a name for Speaker {number} without a colon or line break.")
+				message = message.format(number=error.speakerIndex + 1)
+			elif error.reason == "emptyTurn":
+				# Translators: Validation error for a script line with a speaker but no spoken text.
+				message = _("Line {line}: enter spoken text after the speaker name and colon.").format(
+					line=error.lineNumber,
+				)
+			else:
+				# Translators: Validation error for an unlabeled line or an unknown speaker in the script.
+				message = _(
+					"Line {line}: start with '{speaker1}:' or '{speaker2}:' using the exact speaker name.",
+				).format(line=error.lineNumber, speaker1=speakerNames[0], speaker2=speakerNames[1])
+			self._showInputError(message, control)
+			return False
+		return True
 
 	def _generateThread(self, generationRequest: GenerationRequest) -> None:
 		# Translators: Status announcement made when speech generation starts.
@@ -658,6 +971,11 @@ class NativeSpeechDialog(wx.Dialog):
 
 			wx.CallAfter(handleSuccess, savedPath)
 
+		except SpeechInputError as e:
+			if self.isClosed:
+				return
+			log.debugWarning(f"Speech generation input rejected: {e.reason}")
+			wx.CallAfter(self._reportSpeechInputError, e)
 		except DirectApiError as e:
 			if self.isClosed:
 				return
